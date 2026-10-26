@@ -4,7 +4,8 @@ Gestión de fichas de usuarios y cuenta operadora independiente. Identidad y
 versiones normativas en `.ai/0-core/project.xml`; instrucciones en `AGENTS.md`.
 
 Estado de HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
-preparado/validado localmente. Publicación pendiente de conexión GitHub. No hay
+validado y publicado en `4b282103f7c4d1f7d9399c184cd4c408b44f9c29`
+mediante Git y helper `gh` de OCI (SHA remoto verificado). No hay
 aplicación, servicio HTTPS, despliegue persistente ni aceptación funcional.
 
 ## Toolchain verificado

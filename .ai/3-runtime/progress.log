@@ -108,3 +108,14 @@ status: completed
 result: driver docker existente; imagen sha256:cdbdfd5711c800b4743c7887e14d3c08d30b31b8c38a84a256510a6a9c962aeb, linux/arm64; contenedor de verificación HostConfig.Privileged=false, ExitCode=0; versiones, DTO Jackson3/UTC/fronteras y TypeScript verificadas; retirados contenedor de sondeo, constructor inicial y su volumen; vieja imagen ausente tras importar nueva (rm exit 1 No such image, inspect confirma ausencia); imagen correctiva retenida para continuación, cache driver default inventariada sin prune global
 artifacts: HAR-107 anexo, inventario y registros de corrección
 next_step: publicar contrato tras conexión; continuar producto sin declarar conforme el intento inicial ni aceptación
+
+---
+timestamp: 2026-10-26T15:59:45.175225+00:00
+agent: Niobe
+issue: HAR-107
+run: 49ae115d-1d5f-4267-a4a0-9da3232761c6
+action: retirar conector innecesario y publicar contrato mediante Git/gh OCI
+status: completed
+result: identidad davidgpol, ADMIN; tarjeta 1a2faa84-1629-4bd4-a94f-b7c8bb9c77ad cancelled; push ordinario exit 0 y SHA remoto exacto 4b282103f7c4d1f7d9399c184cd4c408b44f9c29 antes de endpoints; sin reescritura ni configuración global
+evidence: work product commit HAR-107; Neo informado HAR-80
+next_step: implementar producto dentro del contrato publicado; revisión Niobe y QA Seraph posteriores

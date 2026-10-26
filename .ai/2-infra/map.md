@@ -122,3 +122,22 @@ Incidente: Buildx docker-container creó auxiliar privilegiado, contrario a
 security.xml OPS_02. Constructor propio y volumen retirados; cambio a driver
 Docker existente sin auxiliar. Evidencia y corrección en HAR-107, comunicada a
 Neo en HAR-80. No se modifica la regla ni se afirma conformidad del intento inicial.
+
+## Acceso GitHub y publicación contractual — 2026-10-26T15:59:45.175225+00:00
+
+Decisión operativa de David en HAR-107, comentario
+`e6661875-0b5c-4308-9a5c-71d638bdd8ec`: todas las tareas de UserManager03 usan
+Git y `gh` con autenticación existente de OCI y su helper de credenciales.
+No se requiere conector integrado de Paperclip. Usar el helper limitado al comando:
+`git -c credential.helper= -c 'credential.helper=!gh auth git-credential' <operación>`.
+No modificar configuración global ni mostrar credenciales.
+
+Run `49ae115d-1d5f-4267-a4a0-9da3232761c6`: `gh api user` verificó davidgpol;
+`gh repo view davidgpol/UserManager03 --json nameWithOwner,url,viewerPermission,isPrivate`
+verificó ADMIN y repositorio público. Push ordinario del commit
+`4b282103f7c4d1f7d9399c184cd4c408b44f9c29` a main, exit 0;
+`git ls-remote origin refs/heads/main` devolvió exactamente ese SHA antes de endpoints.
+Tarjeta Connect GitHub retirada (API: cancelled). Neo informado en HAR-80.
+Contrato publicado: `api/openapi.yaml`, SHA-256
+`02752a57912cf391b8efcf8af5a5a15e48f96831994c3006c3c832518e1cc70a`.
+La espera de conexión anotada arriba queda superada. No equivale a producto ni QA.
