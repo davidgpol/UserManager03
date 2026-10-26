@@ -1,0 +1,7 @@
+.git
+.ai
+**/node_modules
+**/target
+**/dist
+**/*.log
+.env*

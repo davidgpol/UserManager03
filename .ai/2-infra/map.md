@@ -170,3 +170,38 @@ Frontend y scripts `platform/frontend/` son trabajo de Mouse HAR-109, todavía
 sin integrar/publicar: primera revisión Niobe pidió correcciones de validación de
 pegado, tipado, estado/sesión, errores y acciones accesibles. Su presencia local no
 es aprobación. Niobe revisará cambios antes de commit; Neo mantiene coordinación.
+
+## Integración y operación HAR-107 — 2026-10-26T16:47:01.699038+00:00
+
+Run `dfe7ab16-7266-4572-a30f-a7edf940e910`, Niobe. Mouse terminó HAR-109 tras dos revisiones; Niobe revisó
+`frontend/src`, cliente generado y scripts. Existen UI React/Material con tarjetas
+móviles, tipos strict, Unicode16 compartido y recuperación de sesión. Fuentes
+`frontend/`, generación `platform/frontend/`, pruebas de navegador `platform/browser/`.
+Imagen integra dist en recursos estáticos Boot; SPA/API mismo origen. Correcciones
+adicionales Niobe: limpieza inmediata tras logout confirmado, errores por campo y
+presentación móvil. No se han editado interfaces/cliente generados.
+
+`platform/runtime/` contiene Dockerfile, exclusiones, Compose permanente, roles/HBA,
+provisión oculta de hash y operaciones limitadas. Secretos y certificados privados
+residen fuera de Git en `/opt/Dev/Secrets/UserManager03`, directorios 0700 y ficheros
+sensibles 0600; montajes solo lectura `/run/secrets`. Puerto `127.0.0.1:18443` hacia
+8443 TLS1.2/1.3 verificado; PostgreSQL sin puerto host, TLS/SCRAM y JDBC verify-full.
+Roles bootstrap/migración/aplicación distintos; app solo SELECT/INSERT/UPDATE.
+Compose `usermanager03`, servicios app/db no root UID1001, no privileged, restart
+unless-stopped y salud verificada; volumen externo protegido
+`usermanager03-postgres-data` montado en /var/lib/postgresql. No ejecutar down -v.
+
+Pruebas reales Chromium1.64.1 con datos sintéticos y capturas desktop/móvil; 403→401
+limpia UI sin repetir mutación y detalle tardío no reaparece. Recreación app/db
+conservó 24 registros y checksum completo; prueba de caída DB dio readiness503 y
+recuperó healthy. Cambio privado de operador: anterior401/nueva204, hash Argon2id
+56.7ms de verificación en OCI. Sin secretos en evidencia compartida.
+
+URL local `https://localhost:18443` operativa con certificado específico confiado
+explícitamente; no acredita acceso del equipo de David. Faltan alias/túnel existente
+y confirmación de confianza/acceso desde su equipo. Portainer existente monta el
+mismo socket Docker; vista autenticada no acreditada (sin secreto concedido ni
+conector disponible). Neo informado para recuperar acceso existente, sin cambios
+globales ni nuevas aprobaciones de alcance. SHA de contrato previo permanece
+4b282103f7c4d1f7d9399c184cd4c408b44f9c29; evidencia y SHA de integración en HAR-107.
+QA Seraph y aceptación no ejecutadas. Las anotaciones anteriores son históricas.

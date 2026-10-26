@@ -5,8 +5,9 @@ versiones normativas en `.ai/0-core/project.xml`; instrucciones en `AGENTS.md`.
 
 Estado de HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
 validado y publicado en `4b282103f7c4d1f7d9399c184cd4c408b44f9c29`
-mediante Git y helper `gh` de OCI (SHA remoto verificado). Backend implementado y 14 pruebas de desarrollo pasan. UI en revisión de Niobe.
-No hay servicio HTTPS persistente ni aceptación funcional.
+mediante Git y helper `gh` de OCI (SHA remoto verificado). Backend implementado con 14 pruebas de desarrollo previas; frontend integrado y
+pruebas reales de navegador pasan. Servicio HTTPS persistente local operativo.
+Acceso desde equipo de David y Portainer autenticado pendientes; no hay aceptación.
 
 ## Toolchain verificado
 
@@ -113,3 +114,73 @@ el servidor. Sin cuerpos, cookies, tokens ni valores personales en mensajes.
 Pendientes: revisión/integración de UI Mouse, pruebas de navegador y matriz integral,
 revisión de logging/dependencias/operación, TLS y acceso David, persistencia/reinicio,
 Portainer y QA independiente. No hay comandos de despliegue permanente acreditados.
+
+## Integración y operación verificadas (HAR-107)
+
+Las notas de pendientes en secciones anteriores describen sus runs históricos.
+La entrega actual integra React en Boot y ofrece `https://localhost:18443`, solo
+loopback OCI. Certificado y claves reales permanecen fuera del repositorio.
+`platform/runtime/compose.yaml` define servicios permanentes `usermanager03`,
+restart unless-stopped, TLS interno verify-full, roles separados y volumen externo
+protegido `usermanager03-postgres-data`. App y DB ejecutan UID/GID1001 verificados
+en este host. No hay puerto DB publicado; health HTTPS/BD solo dentro de app.
+
+Comandos ejecutados (variables no contienen valores de contraseña):
+
+```bash
+export UM03_PRIVATE_DIR=/opt/Dev/Secrets/UserManager03
+export UM03_APP_IMAGE="usermanager03-app:$PAPERCLIP_RUN_ID"
+docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/runtime/Dockerfile \
+  -t "$UM03_APP_IMAGE" .
+# Solo NUEVA instalación; prepare.py rechaza sobrescritura y pide clave oculta.
+python3 platform/runtime/prepare.py "$UM03_PRIVATE_DIR"
+bash platform/runtime/operate.sh up
+bash platform/runtime/operate.sh status
+# Recreación autorizada comprobada sin pérdida; nunca down -v.
+bash platform/runtime/operate.sh recreate
+```
+
+La preparación inicial del volumen externo se realizó con etiquetas project,
+lifecycle=permanent y run real; inicialización de permisos1001/0700 con auxiliar
+propio desechable. No repetir creación/preparación sobre datos existentes.
+`prepare.py` produce una entrega privada inicial en `access/operator-password`;
+no publicar ni copiar a tickets. La contraseña usada por Spring solo está en forma
+Argon2id en `app/um03.operator.password-hash`. Tras entrega segura al operador,
+retirar la copia de entrega mediante acción controlada. Cambiar cuenta con
+`python3 platform/runtime/set-operator.py "$UM03_PRIVATE_DIR"` (entrada oculta),
+y reiniciar app mediante `operate.sh restart-app`. La rotación fue comprobada:
+clave anterior401, nueva204, sin modificar fichas; verificación Argon2id56.7ms.
+
+Prueba navegador reproducible con dataset sintético nuevo (DNI no reutilizados):
+
+```bash
+docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/browser/Dockerfile \
+  -t "usermanager03-browser:$PAPERCLIP_RUN_ID" .
+export UM03_EVIDENCE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/evidence"
+export UM03_DATASET=76000000
+bash platform/browser/run.sh
+bash platform/browser/run.sh platform/browser/regression.cjs
+```
+
+Playwright1.64.1 y lockfile dedicado; fixture de regresión utiliza cuenta privada
+montada solo lectura. No imprime cookies/tokens ni captura contraseñas. Chromium
+confía en la clave específica del certificado; curl valida además certificado,
+fechas y hostname y Node usa NODE_EXTRA_CA_CERTS. No se desactiva TLS globalmente.
+El runner monta solo código, credencial de prueba y evidencia; nunca socket Docker.
+Las fichas sintéticas creadas permanecen en la BD de demostración: no eliminarlas
+con SQL ni limpiar el volumen permanente. QA puede usar su propio rango DNI.
+
+Verificación real: escritorio1440×1000 y móvil390×844, CRUD/UTC/no-op/baja,
+unicidad incluso inactivos, filtro/consulta/paginación, errores, separación de cuenta,
+logout, recuperación403→401 sin repetición y detalle tardío. Las capturas y matriz
+con límites por caso están en HAR-107. Recreación conservó recuento24 y checksum
+completo; parada DB produjo readiness503 y luego healthy. TLS1.2 y1.3 verificaron
+200 y ssl_verify_result0. Sin aceptación ni QA independiente.
+
+Acceso de David: usar exclusivamente el alias SSH ya autorizado, StrictHostKeyChecking
+activado y forwarding local18443. No abrir firewall ni publicar en0.0.0.0. El alias
+y la comprobación desde su equipo están pendientes en HAR-107; allí se entrega el
+certificado público y procedimiento. Portainer ya usa el mismo daemon, pero su
+vista autenticada no se ha verificado: falta acceso concedido. No reconfigurarlo.

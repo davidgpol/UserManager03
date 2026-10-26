@@ -1,0 +1,66 @@
+name: usermanager03
+services:
+  db:
+    image: postgres:18.6@sha256:a8be76d23699a6c366437e9f80ead007975f24c35e01c9ee0533c6930ab57ac1
+    platform: linux/arm64
+    user: '1001:1001'
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: um03_bootstrap
+      POSTGRES_DB: usermanager03
+      POSTGRES_PASSWORD_FILE: /run/secrets/bootstrap-password
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C.UTF-8 --auth-host=scram-sha-256
+    command: [postgres, -c, ssl=on, -c, ssl_cert_file=/run/secrets/db.crt, -c, ssl_key_file=/run/secrets/db.key, -c, hba_file=/etc/postgresql/pg_hba.conf, -c, log_statement=none]
+    volumes:
+      - usermanager03-postgres-data:/var/lib/postgresql
+      - ${UM03_PRIVATE_DIR:?private configuration required}/db:/run/secrets:ro
+      - ./init-role.sh:/docker-entrypoint-initdb.d/10-role.sh:ro
+      - ./pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    tmpfs:
+      - /var/run/postgresql:uid=1001,gid=1001,mode=0700
+    healthcheck:
+      test: [CMD, pg_isready, -U, um03_bootstrap, -d, usermanager03]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    labels: &labels
+      com.hariklabs.project: usermanager03
+      com.hariklabs.lifecycle: permanent
+      com.hariklabs.run: ${PAPERCLIP_RUN_ID:?run required}
+  app:
+    image: ${UM03_APP_IMAGE:?application image required}
+    platform: linux/arm64
+    user: '1001:1001'
+    restart: unless-stopped
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    ports: ['127.0.0.1:18443:8443']
+    environment:
+      SERVER_PORT: '8443'
+      SERVER_SSL_ENABLED: 'true'
+      SERVER_SSL_CERTIFICATE: /run/secrets/https.crt
+      SERVER_SSL_CERTIFICATE_PRIVATE_KEY: /run/secrets/https.key
+      SERVER_SSL_ENABLED_PROTOCOLS: TLSv1.2,TLSv1.3
+      MANAGEMENT_SERVER_SSL_ENABLED: 'true'
+      MANAGEMENT_SERVER_SSL_CERTIFICATE: /run/secrets/https.crt
+      MANAGEMENT_SERVER_SSL_CERTIFICATE_PRIVATE_KEY: /run/secrets/https.key
+    volumes:
+      - ${UM03_PRIVATE_DIR}/app:/run/secrets:ro
+    tmpfs: ['/tmp:uid=1001,gid=1001,mode=0700']
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, --cacert, /run/secrets/https.crt, https://localhost:8081/actuator/health/readiness]
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 6
+    labels: *labels
+volumes:
+  usermanager03-postgres-data:
+    external: true
+networks:
+  default:
+    labels: *labels

@@ -133,3 +133,16 @@ review: primera entrega Mouse HAR-109 rechazada técnicamente con ocho correccio
 cleanup: contenedores Compose temporal del run y red retirados tras evidencia y etiquetas; privileged=false/exit0; sin volúmenes permanentes/prune
 limitations: no browser/UI integrado, despliegue persistente, acceso David, Portainer, QA ni aceptación; faltan revisión completa y evidencia integral
 next_step: Niobe revisa correcciones HAR-109, integra frontend, amplía flujos reales y entrega operación dentro de HAR-107; sin nuevas aprobaciones de alcance
+
+---
+timestamp: 2026-10-26T16:47:01.699038+00:00
+agent: Niobe
+issue: HAR-107
+run: dfe7ab16-7266-4572-a30f-a7edf940e910
+action: revisar e integrar HAR-109; desplegar y verificar producto HTTPS ARM64
+status: partial
+result: build normativo PASS; Chromium CRUD/auth/consulta/paginación/móvil PASS; regresión real403→csrf200→session401 y respuesta detalle tardía PASS; recreación conserva24/hash; readiness503 con DB detenida y recuperaciónhealthy; rotación operador401/204 y Argon2id56.7ms
+corrections: Compose tmpfs flow-list requería comillas; localizadores MUI de prueba ajustados por asterisco required; Node route.fetch requería CA explícita; tabla móvil reemplazada por tarjetas; logout limpia UI al confirmarse aunque renovación CSRF falle
+security_evidence: error inicial route.fetch incluyó cookie efímera en log técnico; registro redactado antes de artefacto y sesiones invalidadas por recreación/reinicio; no se publica material de sesión
+limitations: acceso desde equipo David y Portainer autenticado pendientes; casos con cobertura parcial identificados en matriz; QA independiente no ejecutada
+next_step: publicar SHA ordinario, entregar evidencias y concretar acceso existente con Neo/David mediante interacción; no aceptar producto ni cerrar HAR-80

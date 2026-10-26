@@ -49,3 +49,18 @@ no equivalen a QA independiente ni validación funcional de la aplicación.
   lo admite. HttpContractTest verifica ambos casos; no editar código generado.
 
 Resultados del run 49ae115d-1d5f-4267-a4a0-9da3232761c6; no sustituyen QA.
+
+### HAR-107 — Integración navegador y operación
+
+- Los localizadores exactos por etiqueta MUI deben considerar el marcador required;
+  validar selectores en navegador real, no inferir desde JSX.
+- La confianza Chromium mediante pin de clave no configura el cliente Node de
+  route.fetch. Proporcionar NODE_EXTRA_CA_CERTS con certificado del proyecto; los
+  errores de red pueden incluir cabeceras, por lo que deben redactarse antes de
+  publicar y las sesiones involucradas invalidarse.
+- Una tabla sin desbordamiento global aún puede ser ilegible en móvil. La inspección
+  de captura390px motivó tarjetas con acciones visibles y prueba de apertura real.
+- Compose interpreta comas de listas YAML inline: citar completamente opciones
+  tmpfs o usar listas de bloque. El fallo se produjo antes de arrancar aplicación.
+
+Evidencia: HAR-107, run dfe7ab16-7266-4572-a30f-a7edf940e910. No reemplaza QA.
