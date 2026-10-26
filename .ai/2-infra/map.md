@@ -205,3 +205,28 @@ conector disponible). Neo informado para recuperar acceso existente, sin cambios
 globales ni nuevas aprobaciones de alcance. SHA de contrato previo permanece
 4b282103f7c4d1f7d9399c184cd4c408b44f9c29; evidencia y SHA de integración en HAR-107.
 QA Seraph y aceptación no ejecutadas. Las anotaciones anteriores son históricas.
+
+## Confirmación externa y entrega técnica — 2026-10-26T17:14:05.578890+00:00
+
+HAR-107, run `c5df0af5-5923-4231-85ae-088494b61546`. David respondió «Me ha funcionado
+correctamente» a las preguntas de acceso desde su equipo y Portainer mediante la
+interacción autenticada `6987f0ce-be0b-46db-aba5-4a604bbd18ec`, resuelta
+2026-10-26T17:11:38.570Z. Se registra como evidencia declarada por el operador;
+no como sesión Portainer observada por Niobe. No aportó alias, navegador/SO,
+captura ni credenciales de Portainer; la API confirma cero secretos concedidos.
+La comprobación independiente corresponde a Seraph en HAR-108.
+
+Niobe vuelve a observar app/db healthy, restart unless-stopped, UID1001,
+Privileged=false y HTTPS /login HTTP200/ssl_verify_result0. Imagen app conserva
+SHA `770383f45b2f144185de341bad50df934ad88f29`, digest
+`sha256:20498efc9db351110cc978190a22e9a567b767852535c1f5a28159da8736e9d2`.
+Solo existen los dos contenedores permanentes del proyecto. Tras confirmar la
+recepción, se retiró exclusivamente `access/operator-password` del directorio
+privado, comprobando archivo regular UID1001/0600 y ausencia de montajes activos.
+Se mantienen hash runtime, certificados, volumen permanente y herramientas QA.
+
+Los runners de navegador requieren una credencial sintética en un entorno privado
+de prueba; la copia de entrega de producción ya no está disponible. Seraph debe
+usar entorno aislado y cuenta sintética propios, sin rotar la cuenta de David ni
+recrear su copia eliminada. Se mantiene la evidencia durable de las pruebas previas.
+Entrega de desarrollo preparada para QA; no aceptación ni cierre de HAR-80.

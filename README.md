@@ -7,7 +7,9 @@ Estado de HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
 validado y publicado en `4b282103f7c4d1f7d9399c184cd4c408b44f9c29`
 mediante Git y helper `gh` de OCI (SHA remoto verificado). Backend implementado con 14 pruebas de desarrollo previas; frontend integrado y
 pruebas reales de navegador pasan. Servicio HTTPS persistente local operativo.
-Acceso desde equipo de David y Portainer autenticado pendientes; no hay aceptación.
+David confirmó funcionamiento de acceso y Portainer el 2026-10-26; evidencia
+declarada por el operador, sin observación autenticada de Niobe en Portainer.
+QA independiente y aceptación pendientes.
 
 ## Toolchain verificado
 
@@ -180,7 +182,18 @@ completo; parada DB produjo readiness503 y luego healthy. TLS1.2 y1.3 verificaro
 200 y ssl_verify_result0. Sin aceptación ni QA independiente.
 
 Acceso de David: usar exclusivamente el alias SSH ya autorizado, StrictHostKeyChecking
-activado y forwarding local18443. No abrir firewall ni publicar en0.0.0.0. El alias
-y la comprobación desde su equipo están pendientes en HAR-107; allí se entrega el
-certificado público y procedimiento. Portainer ya usa el mismo daemon, pero su
-vista autenticada no se ha verificado: falta acceso concedido. No reconfigurarlo.
+activado y forwarding local18443. No abrir firewall ni publicar en0.0.0.0. El certificado público y procedimiento están en HAR-107. David confirmó
+funcionamiento de acceso y Portainer mediante la interacción autenticada
+6987f0ce-be0b-46db-aba5-4a604bbd18ec el 2026-10-26T17:11:38.570Z. No indicó
+alias ni navegador/SO; Niobe no obtuvo sesión ni captura autenticada de Portainer.
+Esta evidencia del operador queda diferenciada de la futura QA independiente.
+No reconfigurar Portainer.
+
+Tras recepción se retiró la copia privada `access/operator-password`; el hash de
+runtime y el servicio permanecen intactos. Los comandos de navegador anteriores
+describen la ejecución acreditada antes de esa retirada. Para nuevas pruebas
+autenticadas, usar entorno aislado y credencial sintética privada propios; no
+rotar la cuenta de David ni recrear la copia de entrega. La imagen de navegador
+retenida usa el tag del run `dfe7ab16-7266-4572-a30f-a7edf940e910`; el runner
+construye el tag a partir del run actual, por lo que este requiere construir o
+etiquetar su imagen de prueba antes de ejecutarlo.

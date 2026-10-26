@@ -146,3 +146,15 @@ corrections: Compose tmpfs flow-list requería comillas; localizadores MUI de pr
 security_evidence: error inicial route.fetch incluyó cookie efímera en log técnico; registro redactado antes de artefacto y sesiones invalidadas por recreación/reinicio; no se publica material de sesión
 limitations: acceso desde equipo David y Portainer autenticado pendientes; casos con cobertura parcial identificados en matriz; QA independiente no ejecutada
 next_step: publicar SHA ordinario, entregar evidencias y concretar acceso existente con Neo/David mediante interacción; no aceptar producto ni cerrar HAR-80
+
+---
+timestamp: 2026-10-26T17:14:05.578890+00:00
+agent: Niobe
+issue: HAR-107
+run: c5df0af5-5923-4231-85ae-088494b61546
+action: incorporar respuestas autenticadas, verificar salud y retirar copia de entrega
+status: completed
+result: David confirma funcionamiento de acceso y Portainer en interacción 6987f0ce-be0b-46db-aba5-4a604bbd18ec (2026-10-26T17:11:38.570Z); app/db healthy, restart unless-stopped, UID1001, privileged=false; HTTPS login 200/verify0; remoto770383f exacto antes del commit documental
+cleanup: retirada únicamente copia privada access/operator-password, regular UID1001/0600 sin montaje activo; hash runtime, certificados y volumen preservados; solo dos contenedores permanentes
+limitations: evidencia Portainer declarada por David, sin sesión/captura independiente Niobe ni secreto concedido; alias/navegador/SO no informados; no se repiten builds ni matriz funcional; QA/aceptación pendientes
+next_step: Seraph verifica entrega en HAR-108 con entorno sintético aislado; Neo coordina aceptación y limpieza de temporales posteriores; no cerrar HAR-80
