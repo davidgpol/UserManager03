@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project_identity priority="0" status="approved">
+    <metadata>
+        <name>UserManager03</name>
+        <version>0.1.0</version>
+        <objective>Aplicación web de gestión de fichas de usuarios con login de cuenta operadora independiente, conforme a HAR-79.</objective>
+        <development_approach>Desarrollo independiente API-first; contrato antes de endpoints; revisión técnica de Niobe y QA independiente de Seraph.</development_approach>
+        <governance_revision>S02-NIOBE-2P</governance_revision>
+    </metadata>
+    <functional_scope>
+        <capability>POST /api/users: alta activa con identificador técnico generado.</capability>
+        <capability>PUT /api/users/{id}: modificación sin reactivar registros inactivos.</capability>
+        <capability>DELETE /api/users/{id}: baja lógica que conserva registro y actualiza modificación.</capability>
+        <capability>GET /api/users: listado y búsqueda por nombre, apellidos, DNI y mail, filtros activos/inactivos/todos, paginación backend y orden estable.</capability>
+        <capability>GET /api/users/{id}: detalle con id, nombre, apellidos, DNI, mail, activo y fechas de creación/modificación.</capability>
+        <capability>React responsive con Material Design: login/logout, listado inicial de activos sin búsqueda previa, creación y acciones por fila de detalle, edición y baja con confirmación.</capability>
+        <capability>UI con estados comprensibles de carga, vacío, error y confirmación.</capability>
+        <constraint>Nombre, apellidos, DNI y mail obligatorios; validar datos y formato de correo.</constraint>
+        <constraint>DNI único en toda la tabla, también en registros inactivos.</constraint>
+        <constraint>Auditoría UTC generada por backend; creación conservada; campos generados no editables por cliente.</constraint>
+        <constraint>Spring Security protege UI de negocio y todos los endpoints de gestión.</constraint>
+        <constraint>Una cuenta operadora configurable separada del CRUD; crear una ficha no concede acceso.</constraint>
+        <exclusion>Autorregistro y gestión de roles.</exclusion>
+        <exclusion>Arquitectura hexagonal, puertos y adaptadores.</exclusion>
+        <exclusion>Reutilización de código o gobernanza de otras aplicaciones.</exclusion>
+        <exclusion>Cambios de agentes, servicios o configuración global del host.</exclusion>
+    </functional_scope>
+    <runtime_environment>
+        <language>
+            <name>Java / Eclipse Temurin</name>
+            <version>25.0.5+8</version>
+        </language>
+        <framework>
+            <name>Spring Boot</name>
+            <version>4.1.2</version>
+        </framework>
+        <build_system>Apache Maven 3.10.0; Java --release 25. Frontend Node.js 24.22.1, npm 11.19.1, Vite 8.3.5, TypeScript 7.0.2.</build_system>
+        <execution_environment>OCI GNU/Linux ARM64; contenedores linux/arm64. Versiones seleccionadas, no instaladas ni validadas en build integrado por S02.</execution_environment>
+        <component version="7.1.2">Spring Security</component>
+        <component version="3.1.7">Jackson</component>
+        <component version="7.4.13.Final">Hibernate ORM</component>
+        <component version="2026.0.2">Spring Data BOM</component>
+        <component version="18.6">PostgreSQL</component>
+        <component version="42.7.14">pgJDBC</component>
+        <component version="12.4.0">Flyway core y database-postgresql</component>
+        <component version="19.3.1">react</component>
+        <component version="19.3.1">react-dom</component>
+        <component version="9.5.0">@mui/material</component>
+        <component version="9.5.0">@mui/icons-material</component>
+        <component version="11.14.0">@emotion/react</component>
+        <component version="11.14.1">@emotion/styled</component>
+        <component version="6.1.2">@vitejs/plugin-react</component>
+        <component version="19.3.0">@types/react</component>
+        <component version="19.3.0">@types/react-dom</component>
+        <component version="24.19.2">@types/node</component>
+        <component version="7.26.0">OpenAPI Generator</component>
+        <component version="1.86">bcprov-jdk18on</component>
+        <component version="6.0.3">JUnit Jupiter</component>
+        <component version="1.64.1">@playwright/test</component>
+        <dependency_policy>BOM Spring Boot 4.1.2 para dependencias gestionadas; versiones directas exactas; lockfile npm y árbol Maven registrados al implementar. No sustituir versiones para acomodar el runtime.</dependency_policy>
+    </runtime_environment>
+    <repository_layout>
+        <infrastructure_root>platform/</infrastructure_root>
+        <application_source>backend/src/main/java/com/hariklabs/usermanager03; frontend/src; api/openapi.yaml</application_source>
+        <build_descriptor>backend/pom.xml y frontend/package.json implementan esta identidad; aún no creados.</build_descriptor>
+        <repository_root>/opt/Dev/Projects/UserManager03</repository_root>
+        <initial_branch>main</initial_branch>
+    </repository_layout>
+    <architecture_constraints>
+        <pattern>Tres capas clásicas: REST → Servicio → Persistencia → Base de datos.</pattern>
+        <layers>com.hariklabs.usermanager03.rest; .service; .persistence. .security y .config son soporte transversal, no capas alternativas.</layers>
+        <constraint>Controladores dependen de servicios, nunca de repositorios; persistencia no depende de REST. Negocio y transacciones pertenecen a servicio.</constraint>
+        <mapping_strategy>Mapeo manual explícito sin MapStruct ni Lombok. rest.mapper.UserRestMapper transforma DTO y comandos/resultados de servicio. El servicio transforma entidades en resultados propios; no expone JPA por HTTP.</mapping_strategy>
+        <time_model>Instant en servicio/entidad, timestamptz en PostgreSQL, ISO-8601 UTC en HTTP; conversión explícita a UTC para OffsetDateTime generado.</time_model>
+        <persistence>JPA; migraciones SQL Flyway versionadas en backend/src/main/resources/db/migration; Hibernate ddl-auto=validate; restricción UNIQUE de DNI sobre todos los registros.</persistence>
+    </architecture_constraints>
+    <api_specification type="api-first">
+        <standard>OpenAPI 3.0.3</standard>
+        <contract_path>api/openapi.yaml</contract_path>
+        <generation_strategy>OpenAPI Generator 7.26.0: spring, library=spring-boot, interfaceOnly=true, skipDefaultInterface=true, useSpringBoot4=true, useSpringBoot3=false, useJackson3=true, useJakartaEe=true, useBeanValidation=true, annotationLibrary=none, documentationProvider=none, openApiNullable=false, dateLibrary=java8. Interfaces y DTO en backend/target/generated-sources/openapi; cliente typescript-fetch de misma versión y contrato en frontend/src/generated/api. Sin servicios ni entidades generados.</generation_strategy>
+        <input_policy>Entradas/salidas separadas; id, active, createdAt, updatedAt fuera de DTO de alta/edición. La semántica de PUT y el tratamiento de campos desconocidos se resolverán en contrato bajo decisión funcional trazada antes del endpoint. No se impone aún catálogo de errores de negocio.</input_policy>
+    </api_specification>
+    <external_integrations applicable="false" reason="No hay proveedores externos de negocio autorizados; PostgreSQL forma parte de la persistencia del proyecto." />
+    <authentication_design source="HAR-79 apartado 5; decisión de Niobe HAR-83 S02-NIOBE-1">
+        <operator>UserDetailsService de configuración privada; una cuenta operadora; arranque falla si falta usuario/hash válido.</operator>
+        <session>Spring Security HTTP session IF_REQUIRED en memoria de una instancia; timeout inactivo configurable con valor inicial 30 minutos. Reinicio invalida sesiones. Sin remember-me ni tokens de acceso persistidos en navegador. Sin restricción adicional de sesión única; sesiones autenticadas independientes hasta expiración/logout/reinicio.</session>
+        <cookie>Secure; HttpOnly; SameSite=Lax; Path=/; sin Domain; rotar ID tras autenticación.</cookie>
+        <csrf>HttpSessionCsrfTokenRepository; token obtenido por GET /api/auth/csrf accesible antes del login, no cacheable; valor en memoria SPA y cabecera X-CSRF-TOKEN para mutaciones. Conservar protección BREACH mediante manejo compatible Spring; obtener token nuevo tras login/logout.</csrf>
+        <routes>GET /login y recursos estáticos imprescindibles públicos; GET /api/auth/csrf público; POST /api/auth/login público con CSRF; POST /api/auth/logout con CSRF e invalidación de sesión. /api/users y subrutas siempre autenticadas. Ninguna allowlist global /api/**.</routes>
+        <responses>Login con filtros estándar Spring Security y handlers HTTP; credenciales incorrectas: 401 genérico; falta de sesión en API después de superar CSRF aplicable: 401 JSON. CSRF inválido/ausente: 403 con prioridad aun sin sesión. Son mecanismos de autenticación delegados, no catálogo de errores de negocio.</responses>
+        <password_hash>Argon2id mediante Argon2PasswordEncoder(16,32,1,19456,2), Bouncy Castle 1.86; sal aleatoria 16 bytes, salida 32, paralelismo 1, memoria 19456 KiB, iteraciones 2. Esquema {argon2} con PHC, sin noop; medir coste en OCI y no reducir este mínimo.</password_hash>
+        <secrets>Usuario/hash y demás secretos montados de solo lectura bajo /run/secrets; fichero de origen privado fuera del árbol Git. Generación interactiva oculta posterior, sin secretos en argumentos ni logs.</secrets>
+    </authentication_design>
+    <delivery_and_authorizations>
+        <baseline_source>HAR-79, apartados 1–6; plan HAR-80 revisión b77d1589-46ee-4f76-8d8f-611265ac9f21. HAR-83 solo prepara el paquete; Neo confirma manifiesto antes de instalación.</baseline_source>
+        <deliverables>Revisión técnica y QA independiente satisfactorias; repositorio público con URL/SHA verificado; aplicación persistente Docker ARM64; URL y acceso privado cifrado desde equipo de David; configuración segura de credenciales; healthchecks, reinicio y persistencia comprobados; visibilidad Portainer; limpieza temporal verificada; informe Paperclip con resultados y capturas legibles sintéticas por flujo/caso, revisión, entorno, contexto y anexo técnico.</deliverables>
+        <repository_policy>HTTPS https://github.com/davidgpol/UserManager03.git público, excepción expresa al privado por defecto. David autoriza creación remota, commits y push inicial/posteriores exclusivamente para este proyecto; ejecutar según asignación de fase de Neo.</repository_policy>
+        <deployment_policy>Niobe autorizada por HAR-79 apartado 5 para diseñar autenticación y operar Docker del proyecto; Seraph verificación independiente. Diseño seleccionado: aplicación Boot sirve React y PostgreSQL separado, linux/arm64, Compose usermanager03. HTTPS TLS 1.2/1.3 en Tomcat, acceso por loopback y túnel SSH ya autorizado, sin modificar red/global host. La operatividad del acceso de David requiere inspección posterior.</deployment_policy>
+        <resource_policy>Despliegue permanente usermanager03; volumen externo protegido usermanager03-postgres-data, montaje /var/lib/postgresql; restart unless-stopped en ambos servicios; healthchecks pg_isready y HTTPS readiness incluyendo BD. Recursos temporales usermanager03-test-&lt;run-id&gt; con datos sintéticos. Etiquetas com.hariklabs.project=usermanager03, com.hariklabs.lifecycle=permanent|temporary y com.hariklabs.run=&lt;run-id&gt;; inventario equivalente para cache dedicada. Niobe retira únicamente temporales propios comprobados tras conservar evidencia y liberar referencias; preserva volumen permanente, despliegue final y ajenos/desconocidos.</resource_policy>
+        <network_policy>Aplicación publicada solo en 127.0.0.1, puerto objetivo 18443 hacia 8443 sujeto a comprobación de disponibilidad; BD sin puerto publicado. Red privada del proyecto; JDBC TLS verify-full con certificados privados de servicio. Acceso David mediante HTTPS validado por túnel SSH existente; no desactivar TLS ni modificar configuración global.</network_policy>
+        <initial_readiness>Neo puede confirmar preparación inicial con evidencias conformes según HAR-79; no equivale a QA ni aceptación del producto.</initial_readiness>
+    </delivery_and_authorizations>
+    <decision_sources>
+        <source>HAR-79 baseline de David: requisitos, excepciones y autorizaciones.</source>
+        <source>HAR-80 plan único revisión b77d1589-46ee-4f76-8d8f-611265ac9f21: secuencia y revisión de Neo.</source>
+        <source>HAR-81 decisiones-s01 revisión 83e89d71-6df7-4513-acc8-cbf4475a7932: versiones y diseño técnico; evidencia-s01 revisión 7b6e5347-beeb-4b4d-9ba6-ec3568ab35b7: inspección real, no prueba integrada.</source>
+        <source>HAR-82 functional-acceptance-matrix revisión 8c107607-8ee5-4f56-a2ff-ed68731b0771: solo RE/CD como requisitos; PR/PD no son aprobaciones.</source>
+        <source>HAR-83 S02-NIOBE-1, Niobe: versión inicial 0.1.0; paquete base; adopción concreta del diseño de sesión, CSRF y hash; identidad/política Docker permanente/temporal; TLS interno verify-full. Autoridad delegada HAR-79 apartado 5.</source>
+        <source>project-bootstrap 2.2.0 S01/S02 y Harik governance v1: estructura y reglas comunes, no autoridad adicional.</source>
+    </decision_sources>
+</project_identity>

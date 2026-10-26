@@ -1,0 +1,10 @@
+# UserManager03 — Progress log
+#
+# Append entries in chronological order.
+# Record actual actions and observed outcomes.
+# Preserve previous entries; corrections reference the original entry.
+# Use real Paperclip identifiers when available, otherwise none.
+# Do not store credentials or sensitive payloads.
+# completed describes the named action, not project acceptance.
+# next_step references pending work tracked in Paperclip.
+#

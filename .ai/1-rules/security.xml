@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<security_rules priority="1" status="approved">
+    <credential_protection>
+        <rule id="CRED_01" priority="critical">Exclude credential values from version-controlled files.</rule>
+        <rule id="CRED_02" priority="critical">Load required credentials from deployment-provided configuration at runtime.</rule>
+        <rule id="CRED_03" priority="critical">Restrict access to deployed credentials to the service and explicitly authorized administrators.</rule>
+        <rule id="SECRET_01" priority="high">Excluir el hash real de la cuenta operadora de Git y artefactos públicos.</rule>
+        <rule id="SECRET_02" priority="high">Montar secretos de ejecución como archivos de solo lectura bajo /run/secrets.</rule>
+        <rule id="SECRET_03" priority="high">Conservar el origen de secretos y certificados privados fuera del repositorio.</rule>
+        <rule id="SECRET_04" priority="high">Generar el hash mediante entrada interactiva oculta.</rule>
+        <rule id="SECRET_05" priority="high">Fallar el arranque ante ausencia de usuario o hash válido de la cuenta operadora.</rule>
+        <rule id="SECRET_06" priority="critical">Excluir contraseñas de los argumentos de proceso.</rule>
+    </credential_protection>
+    <private_access>
+        <rule id="ACCESS_01" priority="critical">Exigir HTTPS TLS 1.2/1.3 para el acceso de David.</rule>
+        <rule id="ACCESS_02" priority="critical">Publicar la aplicación únicamente en loopback del host.</rule>
+        <rule id="ACCESS_03" priority="critical">Mantener PostgreSQL sin puerto publicado al host.</rule>
+        <rule id="ACCESS_04" priority="critical">Usar solo acceso SSH existente y autorizado para el túnel de David.</rule>
+        <rule id="ACCESS_05" priority="critical">Servir SPA y API desde el mismo origen.</rule>
+        <rule id="ACCESS_06" priority="critical">No permitir orígenes CORS comodín.</rule>
+        <rule id="ACCESS_07" priority="critical">Autenticar todas las rutas de gestión de usuarios en el servidor.</rule>
+        <rule id="ACCESS_08" priority="critical">Proteger la navegación de negocio en la interfaz.</rule>
+        <rule id="ACCESS_09" priority="critical">Limitar rutas anónimas a login, recursos imprescindibles y CSRF conforme a project.xml.</rule>
+        <rule id="ACCESS_10" priority="critical">No exponer información administrativa de healthchecks al acceso externo.</rule>
+        <rule id="ACCESS_11" priority="critical">Validar certificado TLS y confianza del servidor en el equipo de David.</rule>
+    </private_access>
+    <data_protection>
+        <rule id="DATA_01" priority="critical">Usar exclusivamente datos sintéticos en pruebas y evidencias publicadas.</rule>
+        <rule id="DATA_02" priority="critical">Excluir secretos, material de sesión y datos personales reales de logs y capturas.</rule>
+        <rule id="DATA_03" priority="critical">Evitar detalles internos sensibles en respuestas de error.</rule>
+        <rule id="DATA_04" priority="critical">Proteger usermanager03-postgres-data frente a limpieza temporal.</rule>
+        <rule id="DATA_05" priority="critical">Usar TLS verify-full en JDBC hacia PostgreSQL.</rule>
+    </data_protection>
+    <operational_boundaries>
+        <rule id="OPS_01" priority="critical">Ejecutar la aplicación como usuario no root.</rule>
+        <rule id="OPS_02" priority="critical">No ejecutar contenedores privileged.</rule>
+        <rule id="OPS_03" priority="critical">No montar el socket Docker en contenedores de aplicación.</rule>
+        <rule id="OPS_04" priority="critical">Usar un rol BD de ejecución con permisos limitados a sus operaciones.</rule>
+        <rule id="OPS_05" priority="critical">Ejecutar migraciones con un rol distinto del rol de aplicación.</rule>
+        <rule id="OPS_06" priority="critical">No modificar configuración global del host, agentes ni servicios ajenos.</rule>
+        <rule id="OPS_07" priority="critical">Verificar propiedad de recursos antes de cualquier retirada.</rule>
+    </operational_boundaries>
+    <session_authentication>
+        <rule id="SESS_01" priority="critical">Cargar la cuenta operadora desde configuración separada de las entidades CRUD.</rule>
+        <rule id="SESS_02" priority="critical">Utilizar sesiones HTTP servidor IF_REQUIRED en memoria de una instancia.</rule>
+        <rule id="SESS_03" priority="critical">Configurar expiración por inactividad en 30 minutos inicialmente.</rule>
+        <rule id="SESS_04" priority="critical">Establecer Secure en cookie de sesión.</rule>
+        <rule id="SESS_05" priority="critical">Establecer HttpOnly en cookie de sesión.</rule>
+        <rule id="SESS_06" priority="critical">Establecer SameSite=Lax en cookie de sesión.</rule>
+        <rule id="SESS_07" priority="critical">Omitir Domain en cookie de sesión.</rule>
+        <rule id="SESS_08" priority="critical">Establecer Path=/ en cookie de sesión.</rule>
+        <rule id="SESS_09" priority="critical">Rotar identificador de sesión tras autenticación satisfactoria.</rule>
+        <rule id="SESS_10" priority="critical">Procesar login con filtros estándar Spring Security.</rule>
+        <rule id="SESS_11" priority="critical">Invalidar la sesión al cerrar sesión mediante POST.</rule>
+        <rule id="SESS_12" priority="critical">Eliminar cookie de sesión al cerrar sesión.</rule>
+        <rule id="SESS_13" priority="critical">Deshabilitar remember-me.</rule>
+        <rule id="SESS_14" priority="critical">No persistir tokens de acceso en almacenamiento del navegador.</rule>
+        <rule id="SESS_15" priority="critical">Responder 401 JSON cuando una API protegida carezca de sesión válida después de superar el control CSRF aplicable.</rule>
+        <rule id="SESS_16" priority="critical">Dar respuesta genérica 401 ante credenciales incorrectas.</rule>
+        <rule id="SESS_17" priority="critical">Persistir el contexto de seguridad después de autenticación satisfactoria.</rule>
+    </session_authentication>
+    <csrf_protection>
+        <rule id="CSRF_01" priority="critical">Mantener CSRF habilitado para métodos mutadores incluyendo login y logout.</rule>
+        <rule id="CSRF_02" priority="critical">Almacenar token CSRF mediante HttpSessionCsrfTokenRepository.</rule>
+        <rule id="CSRF_03" priority="critical">Entregar token CSRF por GET /api/auth/csrf.</rule>
+        <rule id="CSRF_04" priority="critical">Enviar token CSRF desde memoria SPA en cabecera X-CSRF-TOKEN para mutaciones.</rule>
+        <rule id="CSRF_05" priority="critical">Obtener nuevo token después de login o logout.</rule>
+        <rule id="CSRF_06" priority="critical">Conservar el manejo BREACH compatible de Spring al exponer y resolver el token.</rule>
+        <rule id="CSRF_07" priority="critical">Responder 403 ante token CSRF inválido o ausente en operación protegida.</rule>
+        <rule id="CSRF_08" priority="critical">Marcar la respuesta del token CSRF con Cache-Control: no-store.</rule>
+    </csrf_protection>
+    <password_hashing>
+        <rule id="HASH_01" priority="critical">Usar Argon2id con Argon2PasswordEncoder(16,32,1,19456,2) y Bouncy Castle de project.xml.</rule>
+        <rule id="HASH_02" priority="critical">Aceptar exclusivamente esquema de hash Argon2 configurado, nunca noop.</rule>
+        <rule id="HASH_03" priority="critical">Medir coste de verificación en OCI antes de entrega.</rule>
+        <rule id="HASH_04" priority="critical">No reducir los parámetros mínimos de Argon2id seleccionados.</rule>
+    </password_hashing>
+</security_rules>

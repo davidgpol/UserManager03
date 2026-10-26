@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coding_standards priority="2" status="approved">
+    <empirical_validation>
+        <rule id="VAL_01" priority="critical">Execute work within the authorized task scope.</rule>
+        <rule id="VAL_02" priority="critical">Obtain authorization before performing actions outside the authorized task scope.</rule>
+        <rule id="VAL_03" priority="critical">Verify implementation changes through applicable tests, builds and checks.</rule>
+        <rule id="VAL_04" priority="critical">Label reported results according to their actual verified state: inspected, implemented, tested or operational.</rule>
+        <rule id="VAL_05" priority="high">Explicitly report failed checks.</rule>
+        <rule id="VAL_06" priority="high">Explicitly report applicable checks that were not executed.</rule>
+        <rule id="VAL_07" priority="high">Support completion claims with traceable evidence.</rule>
+    </empirical_validation>
+    <technology_guidelines>
+        <rule id="TECH_01" priority="high">Los descriptores de build implementarán la identidad aprobada de .ai/0-core/project.xml.</rule>
+        <rule id="TECH_02" priority="high">Fijar dependencias directas a las versiones exactas de project.xml.</rule>
+        <rule id="TECH_03" priority="high">Conservar el lockfile íntegro de npm de la implementación.</rule>
+        <rule id="TECH_04" priority="high">Verificar el checksum oficial de cada distribución de toolchain antes de usarla.</rule>
+        <rule id="TECH_05" priority="high">Verificar arquitectura linux/arm64 del digest de imagen antes de construir o desplegar.</rule>
+        <rule id="TECH_06" priority="high">Implementar infraestructura, Dockerfiles, Compose y scripts operativos exclusivamente bajo platform/.</rule>
+        <rule id="TECH_07" priority="high">Usar migraciones SQL Flyway versionadas para evolucionar el esquema.</rule>
+        <rule id="TECH_08" priority="high">Configurar Hibernate ddl-auto=validate.</rule>
+        <rule id="TECH_09" priority="high">Probar el conflicto concurrente de DNI contra PostgreSQL real.</rule>
+        <rule id="TECH_10" priority="high">Verificar el tipo frontend con tsc --noEmit en el flujo de build.</rule>
+        <rule id="TECH_11" priority="high">Resolver antes del endpoint afectado las decisiones funcionales pendientes con Trinity y Neo.</rule>
+    </technology_guidelines>
+    <structured_logging_and_tracing>
+        <format>
+            <rule id="LOG_01" priority="critical">Emit each application log event as a single-line JSON object.</rule>
+            <rule id="LOG_02" priority="high">Express log timestamps in UTC.</rule>
+            <rule id="LOG_03" priority="high">Include timestamp, level, application, component and message in every application log event.</rule>
+            <rule id="LOG_04" priority="high">Include correlation_id, flow and event_type in log events associated with an operation.</rule>
+            <rule id="LOG_30" priority="high">Keep application logs local to the application or container environment.</rule>
+        </format>
+        <correlation>
+            <rule id="LOG_05" priority="critical">Assign each request or task a correlation_id by reusing a validated incoming value or generating a new one.</rule>
+            <rule id="LOG_06" priority="critical">Preserve the operation correlation_id across application layers through MDC or an equivalent context mechanism.</rule>
+            <rule id="LOG_07" priority="critical">Propagate the operation correlation_id to asynchronous tasks belonging to that operation.</rule>
+            <rule id="LOG_08" priority="critical">Clear or restore the correlation context when its scope ends, including error paths.</rule>
+            <rule id="LOG_29" priority="critical">Propagate the operation correlation_id on outbound calls or messages to other services using the integration's agreed metadata field.</rule>
+        </correlation>
+        <levels>
+            <rule id="LOG_09" priority="high">Use TRACE for exhaustive internal detail.</rule>
+            <rule id="LOG_10" priority="high">Use DEBUG for technical diagnostics.</rule>
+            <rule id="LOG_11" priority="high">Use INFO for normal operation and relevant milestones.</rule>
+            <rule id="LOG_12" priority="high">Use WARN for recoverable anomalies or degraded operation.</rule>
+            <rule id="LOG_13" priority="high">Use ERROR for operations that failed and could not be recovered.</rule>
+            <rule id="LOG_14" priority="high">Use FATAL or CRITICAL when the service cannot continue, if the logging framework supports that level.</rule>
+            <rule id="LOG_15" priority="high">Configure INFO as the normal logging level.</rule>
+            <rule id="LOG_16" priority="high">Enable DEBUG and TRACE only temporarily for diagnostics.</rule>
+            <rule id="LOG_17" priority="high">Do not classify a recovered exception as ERROR solely because an exception occurred.</rule>
+        </levels>
+        <safe_logger_usage>
+            <rule id="LOG_18" priority="high">Route application logs through the project logging framework instead of direct output such as print.</rule>
+            <rule id="LOG_19" priority="high">Use parameterized log messages instead of string concatenation.</rule>
+            <rule id="LOG_20" priority="critical">Exclude secrets, tokens, unnecessary personal data and complete request bodies from logs.</rule>
+            <rule id="LOG_21" priority="critical">Sanitize external data and exception messages before logging them.</rule>
+        </safe_logger_usage>
+        <events_and_flows>
+            <rule id="LOG_22" priority="high">Identify each functional process with a stable flow name preserved across components.</rule>
+            <rule id="LOG_23" priority="high">Document the meaning of each flow name.</rule>
+            <rule id="LOG_24" priority="high">Classify events consistently through event_type.</rule>
+            <rule id="LOG_25" priority="high">Describe the actual event and outcome in log messages.</rule>
+            <rule id="LOG_26" priority="high">Include sufficient diagnostic context in failure logs.</rule>
+            <rule id="LOG_27" priority="high">Include the exception stack trace when needed to diagnose a failure.</rule>
+            <rule id="LOG_28" priority="high">Avoid repeatedly logging the same exception in different application layers.</rule>
+        </events_and_flows>
+    </structured_logging_and_tracing>
+    <layer_interaction_rules>
+        <rule id="LAYER_01" priority="high">Mantener el flujo REST → Servicio → Persistencia → BD sin arquitectura hexagonal.</rule>
+        <rule id="LAYER_02" priority="high">Los controladores accederán a persistencia exclusivamente mediante servicios.</rule>
+        <rule id="LAYER_03" priority="high">Situar la lógica de negocio en la capa de servicio.</rule>
+        <rule id="LAYER_04" priority="high">Situar los límites transaccionales en la capa de servicio.</rule>
+        <rule id="LAYER_05" priority="high">La persistencia no dependerá de la capa REST.</rule>
+        <rule id="LAYER_06" priority="high">Realizar mapeo HTTP mediante componentes manuales explícitos en rest.mapper.</rule>
+        <rule id="LAYER_07" priority="high">Devolver resultados propios de servicio en lugar de entidades JPA hacia REST.</rule>
+    </layer_interaction_rules>
+    <api_first_implementation>
+        <rule id="API_01" priority="high">Versionar api/openapi.yaml antes de implementar o modificar el endpoint correspondiente.</rule>
+        <rule id="API_02" priority="high">Definir entradas, salidas, validaciones, paginación y errores del endpoint en su contrato previo.</rule>
+        <rule id="API_03" priority="high">Generar interfaces REST y DTO con la configuración exacta de project.xml.</rule>
+        <rule id="API_04" priority="high">Implementar los controladores sobre las interfaces REST generadas.</rule>
+        <rule id="API_05" priority="high">No editar manualmente código generado.</rule>
+        <rule id="API_06" priority="high">Generar el cliente typescript-fetch desde la misma versión del contrato del servidor.</rule>
+        <rule id="API_07" priority="high">Validar la sintaxis del contrato antes de generar código.</rule>
+        <rule id="API_08" priority="high">Verificar conformidad de endpoints con el contrato mediante pruebas.</rule>
+        <rule id="API_09" priority="high">Expresar errores comprensibles para el usuario.</rule>
+        <rule id="API_10A" priority="high">Comprobar serialización Jackson 3 con modelos generados en build integrado.</rule>
+        <rule id="API_10B" priority="high">Comprobar UTC con modelos generados en build integrado.</rule>
+    </api_first_implementation>
+    <authorization_and_delivery>
+        <rule id="AUTH_01" priority="critical">Limitar las operaciones Git autorizadas a UserManager03 según la fase asignada por Neo; HAR-79 permite remoto público HTTPS, commits y push inicial/posteriores.</rule>
+        <rule id="AUTH_02" priority="critical">Instalar únicamente el paquete de gobernanza cuyo manifiesto exacto haya confirmado Neo.</rule>
+        <rule id="AUTH_03" priority="critical">Comparar los hashes instalados con el manifiesto confirmado.</rule>
+        <rule id="AUTH_04" priority="critical">Operar Docker solo en el ámbito UserManager03 autorizado por HAR-79 apartado 5.</rule>
+        <rule id="AUTH_05" priority="critical">Usar usermanager03 como identidad Compose permanente.</rule>
+        <rule id="AUTH_06" priority="critical">Usar usermanager03-test-&lt;run-id&gt; como identidad Compose temporal.</rule>
+        <rule id="AUTH_07" priority="critical">Registrar propiedad de contenedores, imágenes, redes, volúmenes y cache mediante etiquetas/inventario de project.xml.</rule>
+        <rule id="AUTH_08" priority="critical">Retirar temporales solo por Niobe cuando inventario demuestre pertenencia, carácter desechable y ausencia de referencias protegidas tras preservar evidencia.</rule>
+        <rule id="AUTH_09" priority="critical">Preservar el despliegue final y datos permanentes durante limpieza temporal.</rule>
+        <rule id="AUTH_10" priority="critical">Preservar recursos de otros proyectos o de propiedad desconocida.</rule>
+        <rule id="AUTH_11" priority="critical">Prohibir limpieza Docker global.</rule>
+        <rule id="AUTH_12" priority="critical">Configurar restart unless-stopped en servicios permanentes.</rule>
+        <rule id="AUTH_13" priority="critical">Definir healthchecks de aplicación y PostgreSQL conforme a project.xml.</rule>
+        <rule id="AUTH_14" priority="critical">Comprobar continuidad de datos tras recrear contenedores permanentes.</rule>
+        <rule id="AUTH_15" priority="critical">Verificar visibilidad del despliegue en Portainer existente.</rule>
+        <rule id="AUTH_16" priority="critical">No ejecutar down -v del despliegue permanente.</rule>
+    </authorization_and_delivery>
+    <reporting>
+        <rule id="RPT_01" priority="high">Structure reports for David into Introducción ejecutiva resumida, Casos de uso presentados, and Conclusión final y acciones a realizar.</rule>
+        <rule id="RPT_02" priority="high">Identify applicable project-bootstrap sections by their real code and a short description when reporting bootstrap findings.</rule>
+        <rule id="RPT_03" priority="high">Distinguish real execution evidence from hypothetical examples and explanatory illustrations.</rule>
+        <rule id="RPT_04" priority="high">Provide diagrams as readable text or accessible rendered images rather than Mermaid source alone.</rule>
+        <rule id="RPT_05" priority="high">Present required next actions with their responsible owner and completion criterion.</rule>
+        <rule id="EVID_01A" priority="high">Aportar resultado de cada flujo/caso ejecutado según HAR-79.</rule>
+        <rule id="EVID_01B" priority="high">Aportar captura legible sintética de cada flujo/caso ejecutado según HAR-79.</rule>
+        <rule id="EVID_02" priority="high">Identificar revisión, entorno y contexto de ejecución en la evidencia.</rule>
+        <rule id="EVID_03" priority="high">Registrar comando, código y salida sanitizada de cada check no visual.</rule>
+        <rule id="EVID_04" priority="high">Mantener evidencia técnica extensa en anexo enlazado al informe.</rule>
+        <rule id="EVID_05" priority="high">Presentar casos del informe en 3–6 filas comprensibles con consecuencia práctica.</rule>
+        <rule id="EVID_06" priority="high">Redactar introducción ejecutiva breve indicando ejecución real y alcance demostrado.</rule>
+        <rule id="EVID_07" priority="high">Agrupar acciones finales en un máximo de cinco filas priorizadas.</rule>
+        <rule id="EVID_08" priority="high">Mantener el veredicto de QA independiente de Seraph separado de la verificación de desarrollo.</rule>
+        <rule id="EVID_09A" priority="high">Ante QA FAIL, Neo coordinará corrección asignada.</rule>
+        <rule id="EVID_09B" priority="high">Ante QA FAIL, Neo coordinará nueva verificación.</rule>
+    </reporting>
+</coding_standards>
