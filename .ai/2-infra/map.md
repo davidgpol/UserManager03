@@ -141,3 +141,32 @@ Tarjeta Connect GitHub retirada (API: cancelled). Neo informado en HAR-80.
 Contrato publicado: `api/openapi.yaml`, SHA-256
 `02752a57912cf391b8efcf8af5a5a15e48f96831994c3006c3c832518e1cc70a`.
 La espera de conexión anotada arriba queda superada. No equivale a producto ni QA.
+
+## Backend implementado y verificación de desarrollo — 2026-10-26T16:21:30.897668+00:00
+
+Run `49ae115d-1d5f-4267-a4a0-9da3232761c6`, HAR-107. Existen `backend/pom.xml`, capas
+`backend/src/main/java/com/hariklabs/usermanager03/{rest,service,persistence,security,config}`,
+migración `backend/src/main/resources/db/migration/V1__user_record.sql` y pruebas
+en `backend/src/test`. `platform/backend/` genera tabla Unicode y ejecuta Maven;
+`platform/testing/` contiene Compose temporal TLS, preparación privada sintética y
+bootstrap de roles separados. Código OpenAPI generado por build en backend/target
+(no versionado ni editado a mano). La tabla UCD TSV es recurso generado versionado.
+
+14 pruebas Maven/JUnit ejecutadas, 0 fallos/errores/omitidas: dominio Unicode/DNI/correo/
+consulta; límites de sesión; Spring Security/CSRF/JSON estricto/negociación; PostgreSQL
+18.6 real ARM64 con JDBC verify-full, rol um03_app limitado y migraciones um03_migrate;
+conflicto DNI concurrente, no-op/baja idempotente, búsqueda/paginación y round-trip
+HTTP/BD/DTO Jackson3 UTC con 100 puntos suplementarios. Es verificación de desarrollo
+acotada, no la matriz funcional completa ni QA independiente.
+
+Recursos de prueba: Compose `usermanager03-test-49ae115d-1d5f-4267-a4a0-9da3232761c6`, dos contenedores
+no privilegiados, red propia, datos tmpfs sintéticos, sin volumen permanente. Tras
+preservar evidencia e inspeccionar etiquetas/ExitCode=0, se retiraron con `down`
+sin `-v`; no quedan contenedores del run. Se conservan imagen de toolchain e imagen
+PostgreSQL digest ARM64 `sha256:a8be76d23699a6c366437e9f80ead007975f24c35e01c9ee0533c6930ab57ac1`
+para continuación; no prune global. No existe despliegue persistente de producto.
+
+Frontend y scripts `platform/frontend/` son trabajo de Mouse HAR-109, todavía
+sin integrar/publicar: primera revisión Niobe pidió correcciones de validación de
+pegado, tipado, estado/sesión, errores y acciones accesibles. Su presencia local no
+es aprobación. Niobe revisará cambios antes de commit; Neo mantiene coordinación.

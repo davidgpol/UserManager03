@@ -5,8 +5,8 @@ versiones normativas en `.ai/0-core/project.xml`; instrucciones en `AGENTS.md`.
 
 Estado de HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
 validado y publicado en `4b282103f7c4d1f7d9399c184cd4c408b44f9c29`
-mediante Git y helper `gh` de OCI (SHA remoto verificado). No hay
-aplicación, servicio HTTPS, despliegue persistente ni aceptación funcional.
+mediante Git y helper `gh` de OCI (SHA remoto verificado). Backend implementado y 14 pruebas de desarrollo pasan. UI en revisión de Niobe.
+No hay servicio HTTPS persistente ni aceptación funcional.
 
 ## Toolchain verificado
 
@@ -67,3 +67,49 @@ El sondeo no sustituye pruebas de aplicación contra PostgreSQL, sesión/CSRF,
 concurrencia, UI ni QA de Seraph. Las fixtures de producto no son pruebas pasadas.
 No hay comandos de despliegue verificados todavía. Compose, TLS, acceso David,
 persistencia, healthchecks, Portainer y limpieza final continúan pendientes.
+
+## Backend y pruebas verificadas
+
+REST generado → mapper manual → servicio transaccional → JPA → PostgreSQL.
+`backend/pom.xml` mantiene las versiones aprobadas. No editar `backend/target`;
+Maven genera interfaces/DTO desde el contrato publicado. La fuente Unicode fijada
+genera el recurso TSV mediante `platform/backend/generate-unicode.py`.
+
+Verificados en HAR-107, run `49ae115d-1d5f-4267-a4a0-9da3232761c6`:
+14 tests, 0 fallos/errores/omitidas, incluidos HTTP/CSRF, expiración, todos los puntos
+Unicode, PostgreSQL real TLS y conflicto concurrente de DNI. Son pruebas de
+desarrollo; no equivalen a matriz integral, QA independiente ni producto aceptado.
+
+Reproducción del entorno efímero (desde raíz; requiere variables Paperclip reales):
+
+```bash
+python3 platform/testing/prepare.py "$PAPERCLIP_RUN_SCRATCH_DIR/test-secrets"
+mkdir -p "$PAPERCLIP_RUN_SCRATCH_DIR/maven"
+export UM03_UID="$(id -u)" UM03_GID="$(id -g)"
+export UM03_TEST_SECRETS="$PAPERCLIP_RUN_SCRATCH_DIR/test-secrets"
+export UM03_MAVEN_CACHE="$PAPERCLIP_RUN_SCRATCH_DIR/maven"
+docker compose -p "usermanager03-test-$PAPERCLIP_RUN_ID" \
+  -f platform/testing/compose.yaml up --abort-on-container-exit --exit-code-from verify
+```
+
+Los secretos sintéticos se generan en scratch privado, sin argumentos ni valores
+impresos. PostgreSQL no publica puertos; datos tmpfs y roles migrador/aplicación
+separados. El test JDBC prueba `verify-full`, UTF8 y rol sin DELETE. Fuera de ese
+entorno `PostgresTest` se omite explícitamente; no confundir una ejecución sin BD
+con el resultado integral anterior.
+
+Tras preservar evidencia y verificar propiedad/ausencia de referencias protegidas,
+se ejecutó la retirada temporal `docker compose -p "usermanager03-test-$PAPERCLIP_RUN_ID"
+-f platform/testing/compose.yaml down`, sin `-v`. Nunca usar este procedimiento
+para un despliegue permanente ni ejecutar prune global.
+
+Logs de aplicación: JSON de una línea con timestamp UTC, level, application,
+component, message y correlación. Flujos `operator_auth` (sesión/CSRF/login/logout),
+`user_records` (CRUD/consulta) y `navigation` (recursos/UI); eventos request,
+user_created, user_updated, user_deactivated y operation_failed. Cabecera
+X-Correlation-ID limitada a caracteres seguros; el requestId de Problem lo genera
+el servidor. Sin cuerpos, cookies, tokens ni valores personales en mensajes.
+
+Pendientes: revisión/integración de UI Mouse, pruebas de navegador y matriz integral,
+revisión de logging/dependencias/operación, TLS y acceso David, persistencia/reinicio,
+Portainer y QA independiente. No hay comandos de despliegue permanente acreditados.

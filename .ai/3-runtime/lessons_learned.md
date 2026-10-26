@@ -35,3 +35,17 @@ Execution history belongs in `progress.log`; this document records reusable conc
 Evidencia: HAR-107, run 7e663ce2-43fc-488e-a1ee-d1a44950d594; registros de generación,
 compilación, SerializationProbe y revisión HostConfig en su anexo. Estas observaciones
 no equivalen a QA independiente ni validación funcional de la aplicación.
+
+### HAR-107 — Verificación HTTP y Unicode con PostgreSQL
+
+- En pruebas MockMvc, suministrar sesión no representa automáticamente una cookie
+  previa válida: declarar requestedSessionId y su validez para verificar rotación
+  real del mecanismo estándar de Spring. Evidencia HttpContractTest.
+- El borrado mediante CookieClearingLogoutHandler no conservó SameSite=Lax en la
+  verificación. El handler de éxito usa ResponseCookie explícito conservando los
+  atributos; la invalidación/contexto siguen en el filtro estándar.
+- Las interfaces generadas incluyen medios de error en produces. La negociación
+  de éxito se acota a application/json y 406 publica Problem solo cuando el cliente
+  lo admite. HttpContractTest verifica ambos casos; no editar código generado.
+
+Resultados del run 49ae115d-1d5f-4267-a4a0-9da3232761c6; no sustituyen QA.

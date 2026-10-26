@@ -119,3 +119,17 @@ status: completed
 result: identidad davidgpol, ADMIN; tarjeta 1a2faa84-1629-4bd4-a94f-b7c8bb9c77ad cancelled; push ordinario exit 0 y SHA remoto exacto 4b282103f7c4d1f7d9399c184cd4c408b44f9c29 antes de endpoints; sin reescritura ni configuración global
 evidence: work product commit HAR-107; Neo informado HAR-80
 next_step: implementar producto dentro del contrato publicado; revisión Niobe y QA Seraph posteriores
+
+---
+timestamp: 2026-10-26T16:21:30.897668+00:00
+agent: Niobe
+issue: HAR-107
+run: 49ae115d-1d5f-4267-a4a0-9da3232761c6
+action: implementar backend y verificar capas HTTP/servicio/PostgreSQL real
+status: partial
+result: 14 tests PASS, 0 fallos/errores/omitidas; Java25/Boot4.1.2/Generator7.26.0; Unicode1114112 puntos; PostgreSQL18.6 TLS verify-full con roles separados; conflicto concurrente DNI, no-op/baja, paginación y DTO UTC/suplementarios
+corrections: Maven inicial sin repositorio escribible corregido con /cache; configuración de slice HTTP y API de validación Spring7 corregidas; rutas MockMvc y cookie previa modeladas; borrado cookie ahora conserva SameSite=Lax; negociación 406 explícita
+review: primera entrega Mouse HAR-109 rechazada técnicamente con ocho correcciones; se reanuda encargo, no integrada
+cleanup: contenedores Compose temporal del run y red retirados tras evidencia y etiquetas; privileged=false/exit0; sin volúmenes permanentes/prune
+limitations: no browser/UI integrado, despliegue persistente, acceso David, Portainer, QA ni aceptación; faltan revisión completa y evidencia integral
+next_step: Niobe revisa correcciones HAR-109, integra frontend, amplía flujos reales y entrega operación dentro de HAR-107; sin nuevas aprobaciones de alcance
