@@ -10,9 +10,9 @@ Mapa con inspección histórica de HAR-83, run 6ccc3a9d-552a-4a71-8943-e7232274a
 
 Existente = observado en destino en la inspección indicada; planificado = ubicación seleccionada no creada en esa inspección; generado = salida futura del build. Ninguna observación histórica establece por sí sola el estado posterior.
 
-Estado documental de esta revisión: S02-NIOBE-2P, confirmada por Neo mediante el manifiesto exacto de HAR-91 tras dictamen conforme de Seraph en HAR-90; los tres XML tienen `status=approved`. El estado documental no prueba instalación; consultar en HAR-91 la evidencia fechada de instalación, comparación de bytes y checker final.
+Estado documental: paquete de promoción S02-NIOBE-3P preparado en HAR-101 para confirmación exacta de Neo en HAR-80; todavía no confirmado, instalado ni publicado. Procede de S02-NIOBE-3C (HAR-99, revisión 683a3807-a17c-42f8-a008-3c4b2e04d891), con PASS documental de Seraph en HAR-100 (revisión 91ce925c-987e-4fc4-879e-0d420371e7e1). Los tres XML presentan status=approved como estado preparado para la promoción autorizada en HAR-101; este atributo no sustituye la confirmación del nuevo manifiesto. general.xml y security.xml conservan los bytes aprobados de S02-NIOBE-2P, sin nuevas reglas. Conforme a .ai/1-rules/general.xml AUTH_02/AUTH_03, Neo debe confirmar los siete hashes antes de asignar instalación y comparación/checker final en destino. Al preparar este paquete, la gobernanza instalada/publicada sigue siendo S02-NIOBE-2P. Esta entrega no acredita preparación inicial, aceptación ni PROJECT READY.
 
-Última inspección del destino durante esta corrección: 2026-10-26T10:00:36.566553+00:00, HAR-89, run 340d756d-5d71-4c5f-ae57-de7b6b77d5ba. Solo se observó `.git`; raíz exacta `/opt/Dev/Projects/UserManager03`, `main` sin commits y gobernanza ausente. Es evidencia fechada anterior a cualquier instalación. Los tres comandos Git de solo lectura terminaron 0. No se modifica el destino.
+Inspección histórica del destino durante HAR-89: 2026-10-26T10:00:36.566553+00:00, HAR-89, run 340d756d-5d71-4c5f-ae57-de7b6b77d5ba. Solo se observó `.git`; raíz exacta `/opt/Dev/Projects/UserManager03`, `main` sin commits y gobernanza ausente. Es evidencia fechada anterior a cualquier instalación. Los tres comandos Git de solo lectura terminaron 0. No se modifica el destino.
 
 ## Repository structure — inspección histórica de HAR-83
 
@@ -34,6 +34,14 @@ Estado documental de esta revisión: S02-NIOBE-2P, confirmada por Neo mediante e
 ```
 
 En aquella inspección no se inspeccionaron ni reutilizaron otras aplicaciones. Cwd real de aquel run: `/opt/paperclip/instances/default/workspaces/fe140296-b893-4ced-bd18-6986e242ff09`. projectId, projectWorkspaceId y executionWorkspaceId nulos. Este cwd no es el destino autorizado del proyecto.
+
+## Inspección actual HAR-99 — 2026-10-26T12:20:49.428804+00:00
+
+Run `6308ec45-91c9-441e-936b-6a858f229dd6`, Niobe. Cwd real y Git top-level `/opt/Dev/Projects/UserManager03`; workspace `dd624f4d-37ba-4938-994a-d600f8b0bd98`, main. Gobernanza instalada: siete archivos S02-NIOBE-2P leídos y hashes coincidentes. `.git`, AGENTS.md y seis archivos .ai existen; api/, backend/, frontend/, platform/ y README.md no existen, siguen planificados. No hay aplicación/descriptores/contrato/despliegue verificados.
+
+Repositorio creado público y publicado desde este runtime: https://github.com/davidgpol/UserManager03.git, main local/remoto `3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9`; árbol limpio. Solo siete archivos confirmados, sin este candidato. Identidad gh `davidgpol`; primer push exit 128 por helper ausente; push con helper gh limitado al comando exit 0. Sin cambios globales. Evidencia HAR-99, work product commit. Neo actualiza repoUrl del workspace; la configuración observada inicialmente tenía repoUrl nulo.
+
+Checker real de project-bootstrap 2.2.0, --workspace cwd --expected-workspace ruta autorizada --stage final: exit 0 para paquete instalado. Runner Linux aarch64, Git 2.43.0, Python 3.12.3, Node 24.21.0 y npm 11.19.0; Java/Maven/psql no disponibles en PATH. Node/npm difieren de identidad 24.22.1/11.19.1. No se cambian versiones normativas ni se instalan paquetes. Docker CLI 29.8.2 observado solo con --version; daemon, imágenes y servicios no comprobados. Build integrado fuera de alcance. Anexo y capturas HAR-99 conservan comandos y resultados; static PASS no acredita compatibilidad ni aceptación.
 
 ## Main flow
 
@@ -73,7 +81,7 @@ React → REST → Servicio → Persistencia JPA → PostgreSQL
 
 | Artefacto | Estado | Relación |
 |---|---|---|
-| https://github.com/davidgpol/UserManager03.git público | Autorizado; no creado ni acceso comprobado por S02 | HAR-79; S04 posterior |
+| https://github.com/davidgpol/UserManager03.git público | Público, main publicado en HAR-99; ver inspección actual | HAR-79/HAR-99; S04 ejecutado |
 | Despliegue Compose usermanager03 | Planificado | Niobe bajo encargo operativo de Neo |
 | Portainer existente | Visibilidad no comprobada | Evidencia final requerida, sin reconfiguración global |
 | Informe final con capturas por caso | Pendiente implementación/QA | HAR-79 y matriz HAR-82 |
@@ -82,7 +90,9 @@ React → REST → Servicio → Persistencia JPA → PostgreSQL
 
 ## Dependencias y límites
 
-HAR-82 revisión 8c107607-8ee5-4f56-a2ff-ed68731b0771: PD-01 (límites de nombre/apellidos), PD-02 (DNI/normalización), PD-03 (coincidencia por campo), PD-04 (mayúsculas/tildes/espacios), PD-05 (combinación y páginas), PD-06 (baja repetida), PD-07 (IDs/errores de negocio), PD-08 (campos editables/PUT/desconocidos) y PD-09 (orden/desempate) siguen pendientes de decisión funcional. Trinity concreta y Neo encauza decisiones materiales; no se implementará el endpoint afectado sin resolución trazada. Preparación independiente continúa. PD-10 se concreta técnicamente por Niobe en HAR-83: inactividad 30 min configurable, sesiones independientes, logout invalida la sesión usada y reinicio invalida todas; no se prescribe un límite funcional de concurrencia.
+Estado vigente de decisiones: Q-F01–Q-F04=A autenticadas en HAR-85 y concretadas por Trinity en HAR-84 revisión 97c325a4-4516-463b-bb07-500a0bcb80ac; PD-05–10 decididas por Niobe en HAR-86 revisión e8e12e4e-90c2-4657-bc58-9a3f1095f9c1; preparación integrada HAR-96 revisión cd64f9ae-11bf-424d-9272-f3f9b937f288, Unicode 16.0.0. Se incorporan a la identidad del candidato; no queda pregunta humana funcional pendiente. Se conservan 56 RE/CD y 4 COND hasta las puertas de publicación de contrato/fixtures del expediente. OpenAPI todavía no existe; Neo coordina su encargo posterior a la preparación inicial. Las reservas antiguas de HAR-86 solo ceden en lo resuelto por las fuentes Q-F.
+
+Antecedente: el mapa S02-NIOBE-2P registró PD-01–09 como pendientes funcionales y PD-10 como concreción de HAR-83. Ese estado histórico ha quedado superado por las decisiones anteriores; el archivo íntegro anterior se conserva en el commit inicial 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9 y en el diff del candidato HAR-99.
 
 Niobe comprobará en fase operativa: daemon/permisos, manifests/digests ARM64, puerto disponible, alias SSH autorizado, forwarding/host key, certificado SAN/confianza de David, rutas privadas y entrega de secretos, recursos y Portainer. Si requiere cambios globales, Neo encauza acción fuera de esta autorización. La etiqueta Temurin 25-jdk-noble observada en S01 tenía 25.0.4.1_1 frente al JDK seleccionado 25.0.5+8; conservar selección y usar distribución ARM64 exacta con checksum o imagen exacta comprobada. No hay build integrado ni medición Argon2. URL https://localhost:18443 es objetivo condicionado al túnel/certificado, no URL entregada u operativa.
 

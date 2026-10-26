@@ -8,3 +8,69 @@
 # completed describes the named action, not project acceptance.
 # next_step references pending work tracked in Paperclip.
 #
+---
+timestamp: 2026-10-26T12:20:49.428804+00:00
+agent: Niobe
+issue: HAR-99
+run: 6308ec45-91c9-441e-936b-6a858f229dd6
+action: validar workspace y leer gobernanza
+status: completed
+result: cwd y raíz exactos; main; siete hashes confirmados; checker final exit 0
+artifacts: HAR-99 candidato y anexo técnico
+evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
+next_step: Neo consolida S03/S06 en HAR-80
+---
+timestamp: 2026-10-26T12:20:49.428804+00:00
+agent: Niobe
+issue: HAR-99
+run: 6308ec45-91c9-441e-936b-6a858f229dd6
+action: publicar gobernanza confirmada
+status: completed
+result: gh davidgpol; repo público; commit y refs/heads/main 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9; primer push 128 corregido con helper por comando; árbol limpio
+artifacts: HAR-99 candidato y anexo técnico
+evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
+next_step: Neo actualiza repoUrl y Seraph verifica publicación
+---
+timestamp: 2026-10-26T12:20:49.428804+00:00
+agent: Niobe
+issue: HAR-99
+run: 6308ec45-91c9-441e-936b-6a858f229dd6
+action: inventariar runtime
+status: completed
+result: ARM64; Node 24.21.0/npm 11.19.0 distintos de identidad; Java/Maven/psql ausentes PATH; sin build ni instalación host
+artifacts: HAR-99 candidato y anexo técnico
+evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
+next_step: Neo conserva brecha de toolchain para encargo de build autorizado
+---
+timestamp: 2026-10-26T12:20:49.428804+00:00
+agent: Niobe
+issue: HAR-99
+run: 6308ec45-91c9-441e-936b-6a858f229dd6
+action: preparar conciliación documental en scratch
+status: completed
+result: candidato S02-NIOBE-3C; Q-F01–Q-F04 y PD-05–10 incorporadas; documentos no instalados; no QA ni aceptación
+artifacts: HAR-99 candidato y anexo técnico
+evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
+next_step: Seraph revisa candidato; Neo confirma manifiesto antes de instalación
+---
+timestamp: 2026-10-26T12:40:31.845716+00:00
+agent: Niobe
+issue: HAR-101
+run: ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2
+action: recuperar candidato validado e inspeccionar destino para preparar promoción documental
+status: completed
+result: cwd y Git top-level /opt/Dev/Projects/UserManager03; main limpio en 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9; siete bytes instalados iguales a HEAD; ZIP 3C 43868 bytes y SHA-256 9b98a5c8deeb18fa60bf35f660a1c0b7df40d01b5e6185c76d85529c47730471 verificados; leído PASS HAR-100 revisión 91ce925c-987e-4fc4-879e-0d420371e7e1
+artifacts: paquete S02-NIOBE-3P y manifiesto de siete rutas en HAR-101
+evidence: HAR-101 anexo-tecnico; run ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2; fuente HAR-99 revisión 683a3807-a17c-42f8-a008-3c4b2e04d891
+next_step: Neo confirma exactamente el nuevo manifiesto en HAR-80 antes de asignar instalación y QA; preparación inicial y producto permanecen posteriores
+---
+timestamp: 2026-10-26T12:41:32.160333+00:00
+agent: Niobe
+issue: HAR-101
+run: ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2
+action: ejecutar checker real sobre paquete promovido en scratch sin Git
+status: completed
+result: checker SHA-256 1c00f8b8936c6046c1603f8d79eba58b7ab69a7fca355ef89c6f2346788fa82b, --stage final, exit 1 exclusivamente GIT_ROOT_UNAVAILABLE, sin warnings; no PASS global, no Git artificial ni checker final en destino
+artifacts: HAR-101 anexo-tecnico y evidencia commands.json; paquete S02-NIOBE-3P no instalado
+evidence: HAR-101 run ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2; comando con --workspace y --expected-workspace iguales al directorio governance del scratch del run; salida íntegra durable en anexo
+next_step: Neo confirma manifiesto; ejecutor posterior instala solo bytes confirmados y ejecuta comparación y checker final en destino; Seraph verifica independientemente

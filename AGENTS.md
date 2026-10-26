@@ -11,7 +11,7 @@ Approved versions and architectural decisions belong in
 
 ## Estado documental
 
-Estado documental de esta revisión: S02-NIOBE-2P, confirmada por Neo mediante el manifiesto exacto registrado en HAR-91 después del dictamen conforme de Seraph en HAR-90 (`status=approved` en los tres XML). La confirmación documental no acredita instalación: la evidencia fechada de instalación, comparación de bytes y checker final se registra por separado en HAR-91.
+Estado documental: paquete de promoción S02-NIOBE-3P preparado en HAR-101 para confirmación exacta de Neo en HAR-80; todavía no confirmado, instalado ni publicado. Procede de S02-NIOBE-3C (HAR-99, revisión 683a3807-a17c-42f8-a008-3c4b2e04d891), con PASS documental de Seraph en HAR-100 (revisión 91ce925c-987e-4fc4-879e-0d420371e7e1). Los tres XML presentan status=approved como estado preparado para la promoción autorizada en HAR-101; este atributo no sustituye la confirmación del nuevo manifiesto. general.xml y security.xml conservan los bytes aprobados de S02-NIOBE-2P, sin nuevas reglas. Conforme a .ai/1-rules/general.xml AUTH_02/AUTH_03, Neo debe confirmar los siete hashes antes de asignar instalación y comparación/checker final en destino. Al preparar este paquete, la gobernanza instalada/publicada sigue siendo S02-NIOBE-2P. Esta entrega no acredita preparación inicial, aceptación ni PROJECT READY.
 
 La inspección histórica y las ubicaciones planificadas se distinguen en `.ai/2-infra/map.md`. Al promover, actualizar este estado y el del mapa junto con los tres XML; confirmar el nuevo manifiesto antes de instalar. No basta cambiar los atributos XML.
 
@@ -48,7 +48,7 @@ Use actual issue and run identifiers; do not invent them.
 
 ## Repository organization
 
-Ubicaciones planificadas: backend/src y backend/pom.xml; frontend/src y frontend/package.json; contrato api/openapi.yaml. Capas REST → Servicio → Persistencia → BD; no hexagonal. En la inspección de 2026-10-26T10:00:36.566553+00:00 no había aplicación ni descriptores creados; consultar el mapa y la tarea actual para cambios posteriores. Cargar la tarea actual de Paperclip y sus dependencias antes de actuar; HAR-80 contiene el plan único. Las PR/PD de HAR-82 no son requisitos aprobados. Véase el mapa para dependencias funcionales y límites operativos.
+Ubicaciones planificadas: backend/src y backend/pom.xml; frontend/src y frontend/package.json; contrato api/openapi.yaml. Capas REST → Servicio → Persistencia → BD; no hexagonal. En la inspección de 2026-10-26T10:00:36.566553+00:00 no había aplicación ni descriptores creados; consultar el mapa y la tarea actual para cambios posteriores. Cargar la tarea actual de Paperclip y sus dependencias antes de actuar; HAR-80 contiene el plan único. Las PR/PD de HAR-82 no son aprobaciones por sí mismas; aplicar las decisiones posteriores Q-F01–Q-F04 y PD-05–10 trazadas en project.xml, HAR-84, HAR-86 y HAR-96. Véase el mapa para dependencias funcionales y límites operativos.
 
 Project infrastructure belongs under `platform/`: Dockerfiles and their
 build-context exclusions, Compose definitions, infrastructure configuration,
