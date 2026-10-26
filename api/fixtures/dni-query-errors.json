@@ -1,0 +1,285 @@
+{
+  "status": "contractual expectations; product tests not executed",
+  "dni": [
+    {
+      "input": " 00000000t ",
+      "canonical": "00000000T",
+      "valid": true
+    },
+    {
+      "input": "00000001r",
+      "canonical": "00000001R",
+      "valid": true
+    },
+    {
+      "input": "00000000T",
+      "canonical": "00000000T",
+      "valid": true
+    },
+    {
+      "input": "00000000-T",
+      "canonical": null,
+      "valid": false
+    },
+    {
+      "input": "0000 0000T",
+      "canonical": null,
+      "valid": false
+    },
+    {
+      "input": "0000000T",
+      "canonical": null,
+      "valid": false
+    },
+    {
+      "input": "\uff10\uff10\uff10\uff10\uff10\uff10\uff10\uff10T",
+      "canonical": null,
+      "valid": false
+    },
+    {
+      "input": "X0000000T",
+      "canonical": null,
+      "valid": false
+    },
+    {
+      "input": "00000000A",
+      "canonical": null,
+      "valid": false
+    }
+  ],
+  "query": [
+    {
+      "q": "alva",
+      "firstName": "\u00c1lvaro",
+      "match": true
+    },
+    {
+      "q": "nunez",
+      "lastName": "N\u00fa\u00f1ez Sur",
+      "match": true
+    },
+    {
+      "q": "PRUEBA@EXAMPLE",
+      "email": "ana.prueba@example.test",
+      "match": true
+    },
+    {
+      "q": " 00000000t ",
+      "dni": "00000000T",
+      "match": true
+    },
+    {
+      "q": "00000000-T",
+      "dni": "00000000T",
+      "match": false,
+      "http": 200
+    },
+    {
+      "q": "00000000-T",
+      "firstName": "Caso 00000000-T",
+      "match": true
+    },
+    {
+      "q": "00000000T",
+      "records": [
+        {
+          "dni": "00000000T"
+        },
+        {
+          "email": "00000000t@example.test"
+        }
+      ],
+      "matchingRecords": [
+        0,
+        1
+      ]
+    },
+    {
+      "q": "jose",
+      "email": "jos\u00e9@example.test",
+      "match": false
+    },
+    {
+      "q": "Ana Mar\u00eda",
+      "firstName": "Ana  Mar\u00eda",
+      "match": false
+    },
+    {
+      "q": "%",
+      "firstName": "Ana",
+      "match": false
+    },
+    {
+      "q": "_",
+      "firstName": "Ana",
+      "match": false
+    },
+    {
+      "q": "",
+      "textPredicate": false
+    },
+    {
+      "q": "   ",
+      "textPredicate": false
+    },
+    {
+      "q": null,
+      "textPredicate": false
+    }
+  ],
+  "queryRejections": [
+    {
+      "query": "page=",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "page=-1",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "page=1.5",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "page=1e2",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "page=1000001",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "size=0",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "size=101",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "size=",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "status=",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "status=ACTIVE",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "q=a&q=b",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "page=0&page=1",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "sort=id",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    },
+    {
+      "query": "unknown=1",
+      "http": 400,
+      "code": "INVALID_QUERY"
+    }
+  ],
+  "bodyErrors": [
+    {
+      "field": "id",
+      "http": 400,
+      "code": "VALIDATION_ERROR",
+      "fieldCode": "READ_ONLY_FIELD"
+    },
+    {
+      "field": "active",
+      "http": 400,
+      "code": "VALIDATION_ERROR",
+      "fieldCode": "READ_ONLY_FIELD"
+    },
+    {
+      "field": "createdAt",
+      "http": 400,
+      "code": "VALIDATION_ERROR",
+      "fieldCode": "READ_ONLY_FIELD"
+    },
+    {
+      "field": "updatedAt",
+      "http": 400,
+      "code": "VALIDATION_ERROR",
+      "fieldCode": "READ_ONLY_FIELD"
+    },
+    {
+      "inputProperty": "unknown",
+      "field": "$",
+      "http": 400,
+      "code": "VALIDATION_ERROR",
+      "fieldCode": "UNKNOWN_FIELD"
+    },
+    {
+      "rawJson": "{\"firstName\":\"A\",\"firstName\":\"B\"}",
+      "http": 400,
+      "code": "MALFORMED_JSON"
+    },
+    {
+      "field": "firstName",
+      "value": 1,
+      "http": 400,
+      "code": "VALIDATION_ERROR",
+      "fieldCode": "INVALID_TYPE"
+    }
+  ],
+  "security": [
+    {
+      "operation": "GET /api/users",
+      "session": false,
+      "http": 401,
+      "code": "AUTHENTICATION_REQUIRED"
+    },
+    {
+      "operation": "POST /api/users",
+      "session": false,
+      "csrf": false,
+      "http": 403,
+      "code": "CSRF_INVALID"
+    },
+    {
+      "operation": "POST /api/users",
+      "session": false,
+      "csrf": true,
+      "http": 401,
+      "code": "AUTHENTICATION_REQUIRED"
+    },
+    {
+      "operation": "POST /api/auth/login",
+      "csrf": false,
+      "http": 403,
+      "code": "CSRF_INVALID"
+    }
+  ],
+  "statefulExpectations": [
+    "DNI conflict against another active or inactive record: 409 DNI_CONFLICT; no mutation or disclosure.",
+    "Two concurrent equivalent DNI writes: exactly one succeeds and the other returns 409.",
+    "PUT own canonical DNI and same effective fields: 200, all audit unchanged.",
+    "PUT inactive: remains inactive.",
+    "DELETE repeated inactive: 204, all fields and audit unchanged.",
+    "Malformed UUID: 400 INVALID_ID; well formed absent: 404 USER_NOT_FOUND.",
+    "All query fixtures combined with active/inactive/all, using status AND text.",
+    "Precomposed to combining name is a real change; surrounding Zs alone is no-op."
+  ]
+}

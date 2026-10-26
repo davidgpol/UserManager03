@@ -99,3 +99,26 @@ Niobe comprobará en fase operativa: daemon/permisos, manifests/digests ARM64, p
 ## Map maintenance
 
 Al promover, sustituir el bloque de estado documental junto con AGENTS.md y los tres XML; confirmar los hashes resultantes antes de instalar. Conservar la inspección histórica fechada. Una instalación comprobada se documentará como nueva inspección fechada, con rutas y evidencia, sin reescribir el pasado. Actualizar mapa cuando cambien ubicaciones; registrar ejecución real en `.ai/3-runtime/progress.log`. No interpretar planificado como existente.
+
+## Inspección y trabajo HAR-107 — 2026-10-26T15:40:46.916563+00:00
+
+Run `7e663ce2-43fc-488e-a1ee-d1a44950d594`, Niobe. Main inicial limpia en
+`1ab754f9582f1731d4684370036543fc48ccf2ab`; preparación confirmada por S07 de HAR-80
+revisión `07cb1d8c-c921-46de-8a4a-6e2bcf1b601c`. Las referencias anteriores de
+promoción pendiente son fotografías históricas, no puertas reabiertas.
+
+Existen ahora `README.md`, `api/openapi.yaml`, `api/fixtures/`, `api/unicode/`,
+`platform/toolchain/` y `platform/openapi/`. Contrato validado y generación de
+sondeo en scratch, sin endpoints ni aplicación. Publicación pendiente de tarjeta
+GitHub de HAR-107. No existen todavía backend/, frontend/, Compose, volumen
+permanente ni servicio de producto creados por esta entrega.
+
+Toolchain exacto construido ARM64. Configuraciones de generación y probes de
+correo/DTO conservados en platform; Java y TypeScript de sondeo no son componentes
+instalados. SHA del contrato, comandos, versiones, capturas y recursos en HAR-107.
+La imagen propia de toolchain se retiene para continuar; no es despliegue final.
+
+Incidente: Buildx docker-container creó auxiliar privilegiado, contrario a
+security.xml OPS_02. Constructor propio y volumen retirados; cambio a driver
+Docker existente sin auxiliar. Evidencia y corrección en HAR-107, comunicada a
+Neo en HAR-80. No se modifica la regla ni se afirma conformidad del intento inicial.

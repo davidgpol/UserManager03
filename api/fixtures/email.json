@@ -1,0 +1,59 @@
+{
+  "status": "provider-only probe executed; endpoint validation not executed",
+  "provider": "Hibernate Validator 9.1.5.Final",
+  "jakartaValidation": "3.1.1",
+  "springBoot": "4.1.2",
+  "note": "@Email alone accepts empty; service separately rejects required/null/blank. Preserve value without trimming. No DNS/send/uniqueness checks.",
+  "cases": [
+    {
+      "value": "ana.prueba@example.test",
+      "emailAnnotationAccepts": true,
+      "domainAccepts": true
+    },
+    {
+      "value": "a+b@example.test",
+      "emailAnnotationAccepts": true,
+      "domainAccepts": true
+    },
+    {
+      "value": "not-an-email",
+      "emailAnnotationAccepts": false,
+      "domainAccepts": false
+    },
+    {
+      "value": "a@",
+      "emailAnnotationAccepts": false,
+      "domainAccepts": false
+    },
+    {
+      "value": "@example.test",
+      "emailAnnotationAccepts": false,
+      "domainAccepts": false
+    },
+    {
+      "value": "a b@example.test",
+      "emailAnnotationAccepts": false,
+      "domainAccepts": false
+    },
+    {
+      "value": " a@example.test ",
+      "emailAnnotationAccepts": false,
+      "domainAccepts": false
+    },
+    {
+      "value": "a@localhost",
+      "emailAnnotationAccepts": true,
+      "domainAccepts": true
+    },
+    {
+      "value": "",
+      "emailAnnotationAccepts": true,
+      "domainAccepts": false
+    },
+    {
+      "value": "a..b@example.test",
+      "emailAnnotationAccepts": false,
+      "domainAccepts": false
+    }
+  ]
+}

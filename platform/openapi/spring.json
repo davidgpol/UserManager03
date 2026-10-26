@@ -1,0 +1,21 @@
+{
+  "generatorName": "spring",
+  "library": "spring-boot",
+  "apiPackage": "com.hariklabs.usermanager03.rest.generated.api",
+  "modelPackage": "com.hariklabs.usermanager03.rest.generated.model",
+  "interfaceOnly": true,
+  "skipDefaultInterface": true,
+  "useSpringBoot4": true,
+  "useSpringBoot3": false,
+  "useJackson3": true,
+  "useJakartaEe": true,
+  "useBeanValidation": true,
+  "annotationLibrary": "none",
+  "documentationProvider": "none",
+  "openApiNullable": false,
+  "dateLibrary": "java8",
+  "useTags": true,
+  "hideGenerationTimestamp": true,
+  "generateJsonIncludeAnnotations": false,
+  "generateJsonSetterNullsAnnotations": false
+}

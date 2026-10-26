@@ -1,0 +1,43 @@
+{
+  "source": "project.xml; official distribution checksums retrieved 2026-10-26",
+  "platform": "linux/arm64",
+  "distributions": [
+    {
+      "name": "temurin-25.0.5+8",
+      "url": "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.5%2B8/OpenJDK25U-jdk_aarch64_linux_hotspot_25.0.5_8.tar.gz",
+      "algorithm": "sha256",
+      "digest": "bb5b2ded252f21c6090cf780b0a408ad0d83bbb557e702955643557f13231880",
+      "destination": "/opt/java"
+    },
+    {
+      "name": "maven-3.10.0",
+      "url": "https://dlcdn.apache.org/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz",
+      "algorithm": "sha512",
+      "digest": "908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa",
+      "destination": "/opt/maven"
+    },
+    {
+      "name": "node-24.22.1",
+      "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-arm64.tar.xz",
+      "algorithm": "sha256",
+      "digest": "dbabf7a1cbf947e6059ffad2c27b80041db97dea1e553b62afdee7f13fca336e",
+      "destination": "/opt/node"
+    },
+    {
+      "name": "npm-11.19.1",
+      "url": "https://registry.npmjs.org/npm/-/npm-11.19.1.tgz",
+      "algorithm": "sha512",
+      "digest": "ztsxKxt/kkIaAs+2i0GU6I+DRmUdrNasxTZKJe9TCdSjKxlhah/4r/hl5ygMD6XAg1qZ9c2TNomR4qgOydp10g==",
+      "encoding": "base64",
+      "destination": "/opt/npm"
+    },
+    {
+      "name": "openapi-generator-7.26.0",
+      "url": "https://repo.maven.apache.org/maven2/org/openapitools/openapi-generator-cli/7.26.0/openapi-generator-cli-7.26.0.jar",
+      "algorithm": "sha1",
+      "digest": "b96b148fcf482808037f68fbad99cb4d7e65d40b",
+      "destination": "/opt/openapi-generator.jar",
+      "archive": false
+    }
+  ]
+}

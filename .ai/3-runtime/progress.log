@@ -74,3 +74,37 @@ result: checker SHA-256 1c00f8b8936c6046c1603f8d79eba58b7ab69a7fca355ef89c6f2346
 artifacts: HAR-101 anexo-tecnico y evidencia commands.json; paquete S02-NIOBE-3P no instalado
 evidence: HAR-101 run ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2; comando con --workspace y --expected-workspace iguales al directorio governance del scratch del run; salida íntegra durable en anexo
 next_step: Neo confirma manifiesto; ejecutor posterior instala solo bytes confirmados y ejecuta comparación y checker final en destino; Seraph verifica independientemente
+
+---
+timestamp: 2026-10-26T15:40:46.916563+00:00
+agent: Niobe
+issue: HAR-107
+run: 7e663ce2-43fc-488e-a1ee-d1a44950d594
+action: resolver toolchain y preparar contrato previo a endpoints
+status: partial
+result: inicio main limpia 1ab754f9582f1731d4684370036543fc48ccf2ab; leídas fuentes exactas de HAR-80/82/84/86/96; Temurin 25.0.5+8, Maven 3.10.0, Node 24.22.1, npm 11.19.1 y OpenAPI Generator 7.26.0 construidos y ejecutados en ARM64 con checksums oficiales; API CRUD/auth validada; generación Java/TS, compilación --release 25 con Boot 4.1.2, Jackson 3 UTC y fronteras suplementarias PASS de sondeo; tsc 7.0.2 PASS; proveedor correo 9.1.5.Final sondeado; fixtures de producto no ejecutados
+artifacts: platform/toolchain, platform/openapi, api/openapi.yaml SHA256 02752a57912cf391b8efcf8af5a5a15e48f96831994c3006c3c832518e1cc70a, api/fixtures, api/unicode; anexo y capturas HAR-107
+limitations: no publicación remota, endpoints, aplicación, QA ni despliegue; tarjeta de conexión GitHub 1a2faa84-1629-4bd4-a94f-b7c8bb9c77ad pendiente; 56 RE/CD + 4 COND sin aprobar
+next_step: Niobe publica contrato al resolverse conexión; verifica SHA remoto anterior a endpoints y continúa implementación bajo HAR-107; Neo conserva coordinación
+---
+timestamp: 2026-10-26T15:40:46.916563+00:00
+agent: Niobe
+issue: HAR-107
+run: 7e663ce2-43fc-488e-a1ee-d1a44950d594
+action: detectar y corregir mecanismo de construcción no conforme
+status: correction_in_progress
+result: docker-container de Buildx creó auxiliar propio con HostConfig.Privileged=true contrario a security.xml OPS_02; constructor y volumen retirados con buildx rm, ausencia comprobada; reconstrucción mediante driver docker existente, sin nuevo auxiliar privilegiado
+artifacts: inventario, buildkit-privileged-check.log, builder-cleanup.log, toolchain-corrected-build.log en anexo HAR-107
+evidence: comunicado a Neo en HAR-80 comentario 2af2b7e8-5868-4425-a60f-2d365af0b876; sin modificación normativa ni datos permanentes
+next_step: verificar imagen correctiva y conservar incidente; no presentar ejecución inicial como conforme
+
+---
+timestamp: 2026-10-26T15:42:17.842456+00:00
+agent: Niobe
+issue: HAR-107
+run: 7e663ce2-43fc-488e-a1ee-d1a44950d594
+action: verificar reconstrucción correctiva y retirada de temporales propios
+status: completed
+result: driver docker existente; imagen sha256:cdbdfd5711c800b4743c7887e14d3c08d30b31b8c38a84a256510a6a9c962aeb, linux/arm64; contenedor de verificación HostConfig.Privileged=false, ExitCode=0; versiones, DTO Jackson3/UTC/fronteras y TypeScript verificadas; retirados contenedor de sondeo, constructor inicial y su volumen; vieja imagen ausente tras importar nueva (rm exit 1 No such image, inspect confirma ausencia); imagen correctiva retenida para continuación, cache driver default inventariada sin prune global
+artifacts: HAR-107 anexo, inventario y registros de corrección
+next_step: publicar contrato tras conexión; continuar producto sin declarar conforme el intento inicial ni aceptación

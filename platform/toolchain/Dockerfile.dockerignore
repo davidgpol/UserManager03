@@ -1,0 +1,5 @@
+**
+!platform/
+!platform/toolchain/
+!platform/toolchain/install.py
+!platform/toolchain/distributions.json
