@@ -70,8 +70,11 @@ public class UserService {
     private void save(UserEntity e) {
         try {repository.saveAndFlush(e);} catch(DataIntegrityViolationException ex) {
             // Only the named UNIQUE invariant is translated; unrelated integrity failures remain internal errors.
-            for(Throwable t=ex;t!=null;t=t.getCause()) if(t instanceof org.postgresql.util.PSQLException pg && "23505".equals(pg.getSQLState()) && pg.getServerErrorMessage()!=null && "user_record_dni_key".equals(pg.getServerErrorMessage().getConstraint()))
+            for(Throwable t=ex;t!=null;t=t.getCause()) if(t instanceof org.postgresql.util.PSQLException pg && "23505".equals(pg.getSQLState()) && pg.getServerErrorMessage()!=null && "user_record_dni_key".equals(pg.getServerErrorMessage().getConstraint())) {
+                LOG.atWarn().addKeyValue("event_type","dni_conflict").addKeyValue("sqlstate","23505")
+                    .addKeyValue("constraint","user_record_dni_key").log("Conflicto de unicidad de ficha");
                 throw new DomainException(409,"DNI_CONFLICT","Ya existe una ficha con ese DNI.",List.of(new DomainException.FieldError("body","dni","DUPLICATE","El DNI ya está registrado.")));
+            }
             throw ex;
         }
     }

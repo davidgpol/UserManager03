@@ -1,7 +1,7 @@
 const { chromium, expect } = require('/opt/browser/node_modules/@playwright/test');
 const fs = require('node:fs');
 const assert = require('node:assert/strict');
-const base = 'https://localhost:18443';
+const base = (process.env.UM03_BASE_URL || 'https://localhost:18443');
 const evidence = '/evidence';
 const results = [];
 async function record(ids, action) { await action(); results.push({ ids, result: 'PASS', at: new Date().toISOString() }); fs.writeFileSync(`${evidence}/results.json`, JSON.stringify(results, null, 2)); }

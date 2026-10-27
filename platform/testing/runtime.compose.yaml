@@ -1,0 +1,28 @@
+# Isolated HTTPS regression service. Never use the permanent data volume.
+services:
+  db:
+    extends:
+      file: ../runtime/compose.yaml
+      service: db
+    restart: 'no'
+    volumes: !override
+      - ${UM03_PRIVATE_DIR}/db:/run/secrets:ro
+      - ../runtime/init-role.sh:/docker-entrypoint-initdb.d/10-role.sh:ro
+      - ../runtime/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+      - ../runtime/postgres-logging.conf:/etc/postgresql/um03-logging.conf:ro
+    tmpfs:
+      - /var/lib/postgresql:uid=1001,gid=1001,mode=0700
+    labels: &temporary
+      com.hariklabs.project: usermanager03
+      com.hariklabs.lifecycle: temporary
+      com.hariklabs.run: ${PAPERCLIP_RUN_ID:?run required}
+  app:
+    extends:
+      file: ../runtime/compose.yaml
+      service: app
+    restart: 'no'
+    ports: !override ['127.0.0.1:19443:8443']
+    labels: *temporary
+networks:
+  default:
+    labels: *temporary

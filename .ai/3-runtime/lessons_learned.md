@@ -64,3 +64,19 @@ Resultados del run 49ae115d-1d5f-4267-a4a0-9da3232761c6; no sustituyen QA.
   tmpfs o usar listas de bloque. El fallo se produjo antes de arrancar aplicación.
 
 Evidencia: HAR-107, run dfe7ab16-7266-4572-a30f-a7edf940e910. No reemplaza QA.
+
+
+### HAR-110 — Conflictos y privacidad de logs
+
+- PostgreSQL emite el valor de UNIQUE en DETAIL; reducir parámetros por sí solo
+  no lo elimina. El perfil compartido usa terse y omite sentencias/parámetros,
+  conservando severidad, SQLSTATE y sesión. Verificado con conflicto real y SHOW.
+- Hibernate7 usa `org.hibernate.orm.jdbc.error`; apagar solo el logger legacy
+  SqlExceptionHelper no evita exponer detalles JDBC. El encoder sanea ambas
+  categorías conservando mensajes técnicos seguros; no se apaga el logger.
+- El scratch de un run fallido puede desaparecer mientras sobreviven contenedores
+  detenidos con mounts a esa ruta. Preservar entregables en Paperclip; no asumir
+  que una ruta del historial aún existe. HAR-110 reprodujo evidencia tras esa pérdida.
+
+Evidencia: HAR-110 backend19 PASS, HTTPS409/concurrencia, 82 marcadores sin
+coincidencias en logs app/BD. No sustituye HAR-111 ni borra el FAIL HAR-108.

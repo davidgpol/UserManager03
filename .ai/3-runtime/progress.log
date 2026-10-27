@@ -158,3 +158,17 @@ result: David confirma funcionamiento de acceso y Portainer en interacción 6987
 cleanup: retirada únicamente copia privada access/operator-password, regular UID1001/0600 sin montaje activo; hash runtime, certificados y volumen preservados; solo dos contenedores permanentes
 limitations: evidencia Portainer declarada por David, sin sesión/captura independiente Niobe ni secreto concedido; alias/navegador/SO no informados; no se repiten builds ni matriz funcional; QA/aceptación pendientes
 next_step: Seraph verifica entrega en HAR-108 con entorno sintético aislado; Neo coordina aceptación y limpieza de temporales posteriores; no cerrar HAR-80
+
+
+---
+timestamp: 2026-10-27T10:15:23.190795+00:00
+agent: Niobe
+issue: HAR-110
+run: 6aee3eea-3c48-4a4a-9a0b-c301ccfc896b
+action: retomar corrección DEF-QA-001; sanear JDBC/BD; verificar PostgreSQL/HTTPS/Chromium
+status: verified
+result: backend19 PASS sin skipped; QRY-05 empates exactos y UUID, QRY-07 mutación entre páginas; HTTPS409 activo/inactivo/edición y carrera201+409 con rollback; tres recorridos Chromium PASS;82 valores sintéticos con0 coincidencias app/BD
+review: UNIQUE y transacciones intactos; SQLSTATE/correlación conservados; perfil logs compartido; arquitectura/contrato/versiones sin cambios
+cleanup: QA227be823 cuatro contenedores/dos redes/tag ausentes; retiro previo registrado en comentario47bd6951; imagen browser87d209b4 compartida conservada; scratch previo eliminado por plataforma, evidencia reproducida
+limitations: Portainer sin sesión/captura independiente; declaración autenticada David se conserva; FAIL HAR-108 e incidente Buildx OPS_02 permanecen
+next_step: publicar commit ordinario y recrear despliegue con comparación privada; informe/anexo durable HAR-110; reverificación Seraph HAR-111

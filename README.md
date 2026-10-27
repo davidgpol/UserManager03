@@ -197,3 +197,73 @@ rotar la cuenta de David ni recrear la copia de entrega. La imagen de navegador
 retenida usa el tag del run `dfe7ab16-7266-4572-a30f-a7edf940e910`; el runner
 construye el tag a partir del run actual, por lo que este requiere construir o
 etiquetar su imagen de prueba antes de ejecutarlo.
+
+
+## Corrección y reverificación HAR-110
+
+`platform/runtime/postgres-logging.conf` conserva diagnósticos PostgreSQL con
+SQLSTATE, PID y sesión, y excluye DETAIL, texto SQL y parámetros de errores.
+El encoder JSON sanea las categorías JDBC actual y anterior de Hibernate;
+`UserService` conserva evento `dni_conflict`, SQLSTATE y correlación de petición.
+No cambian UNIQUE, migraciones, aislamiento ni contrato HTTP.
+
+Entorno de prueba aislado (ejecutado en HAR-110; elegir directorio privado nuevo):
+
+```bash
+export UM03_UID=$(id -u) UM03_GID=$(id -g)
+export UM03_TEST_SECRETS="$PAPERCLIP_RUN_SCRATCH_DIR/test-secrets"
+export UM03_MAVEN_CACHE="$PAPERCLIP_RUN_SCRATCH_DIR/maven"
+mkdir -p "$UM03_MAVEN_CACHE"
+python3 platform/testing/prepare.py "$UM03_TEST_SECRETS"
+docker compose -p "usermanager03-test-$PAPERCLIP_RUN_ID"   -f platform/testing/compose.yaml up --abort-on-container-exit --exit-code-from verify
+```
+
+Incluye QRY-05: tres UUID explícitos con exactamente el mismo createdAt, tres
+recorridos de páginas size=1; QRY-07: alta y baja entre peticiones, totales frescos
+y desplazamiento documentado. Los fixtures SQL solo modifican la BD sintética tmpfs.
+
+Para HTTPS y navegador, construir la imagen con el comando HAR-107 anterior y
+seleccionar su tag en `UM03_APP_IMAGE`. Reutilizar la imagen de navegador retenida:
+
+```bash
+export UM03_PRIVATE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/isolated"
+export UM03_EVIDENCE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/evidence"
+export UM03_BASE_URL=https://localhost:19443
+export UM03_BROWSER_IMAGE=usermanager03-browser:dfe7ab16-7266-4572-a30f-a7edf940e910
+mkdir -p "$UM03_EVIDENCE_DIR"
+python3 platform/testing/prepare-runtime.py "$UM03_PRIVATE_DIR"
+docker compose -p "usermanager03-test-http-$PAPERCLIP_RUN_ID"   -f platform/testing/runtime.compose.yaml up -d --wait --wait-timeout 150
+python3 platform/testing/http-regression.py
+export UM03_DATASET=82000000
+bash platform/browser/run.sh
+bash platform/browser/run.sh platform/browser/regression.cjs
+bash platform/browser/run.sh platform/browser/states.cjs
+docker logs "usermanager03-test-http-$PAPERCLIP_RUN_ID-app-1" > "$UM03_EVIDENCE_DIR/app.log" 2>&1
+docker logs "usermanager03-test-http-$PAPERCLIP_RUN_ID-db-1" > "$UM03_EVIDENCE_DIR/db.log" 2>&1
+python3 platform/testing/audit-logs.py "$UM03_EVIDENCE_DIR/synthetic-records.json"   "$UM03_EVIDENCE_DIR/app.log" "$UM03_EVIDENCE_DIR/db.log"
+```
+
+El script HTTP requiere una BD aislada nueva para sus DNI fijos; el rango de
+navegador debe ser distinto de cualquier fixture previo. `synthetic-records.json`
+cubre el dataset del recorrido HTTP; para auditar también navegador exportar todas
+las fichas únicamente de esa BD sintética. No publicar secretos, cookies ni
+cabeceras de sesión. Preservar evidencia antes de retirar recursos temporales.
+Seraph conserva las imágenes de toolchain/navegador para HAR-111; entrega inventario
+con etiquetas, mounts y referencias para que Niobe retire sus temporales conforme
+a general.xml AUTH_08. No ejecutar prune ni down -v permanente.
+
+Recreación permanente: solo en mantenimiento asignado, cerrar escrituras y usar
+el SHA de imagen verificado. `UM03_PRIVATE_DIR=/opt/Dev/Secrets/UserManager03`,
+`UM03_APP_IMAGE=usermanager03-app:<SHA verificado>` y
+`python3 platform/runtime/verify-recreation.py` comprueban propiedad/montajes,
+paran app antes de la línea base y recrean ambos servicios. Comparan fichas completas,
+recuento, volumen y bytes de la credencial solo en memoria; la evidencia expone
+booleanos/recuento, nunca filas, contraseña o hash. Una diferencia exige investigar;
+no restaurar/borrar datos automáticamente. El reinicio invalida sesiones; no cambia
+la cuenta de David ni recrea `access/operator-password`.
+
+La confirmación autenticada de acceso/Portainer de HAR-107 sigue vigente. La
+observación independiente de Portainer requiere sesión autorizada o captura del
+operador con stack usermanager03, ambos servicios, estados y volumen; no se ha
+concedido sesión Niobe/Seraph. Esa limitación se entrega a Neo, sin repetir la
+pregunta de funcionamiento ni solicitar secretos en comentarios.

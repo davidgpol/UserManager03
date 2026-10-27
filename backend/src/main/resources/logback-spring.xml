@@ -2,6 +2,5 @@
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder class="com.hariklabs.usermanager03.config.SafeJsonEncoder"/>
   </appender>
-  <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="OFF"/>
   <root level="INFO"><appender-ref ref="CONSOLE"/></root>
 </configuration>

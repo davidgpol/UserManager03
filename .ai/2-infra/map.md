@@ -230,3 +230,20 @@ de prueba; la copia de entrega de producción ya no está disponible. Seraph deb
 usar entorno aislado y cuenta sintética propios, sin rotar la cuenta de David ni
 recrear su copia eliminada. Se mantiene la evidencia durable de las pruebas previas.
 Entrega de desarrollo preparada para QA; no aceptación ni cierre de HAR-80.
+
+
+## Corrección HAR-110 — 2026-10-27T10:15:23.190795+00:00
+
+Run `6aee3eea-3c48-4a4a-9a0b-c301ccfc896b`. Nuevos archivos existentes: `platform/runtime/postgres-logging.conf`
+(configuración común de logs BD para Compose permanente y pruebas),
+`platform/runtime/verify-recreation.py` (comparación privada de datos/credencial),
+`platform/testing/runtime.compose.yaml` (HTTPS aislado19443, tmpfs sin volumen
+permanente), `prepare-runtime.py`, `http-regression.py`, `audit-logs.py`.
+El encoder sanea categorías JDBC Hibernate7/legacy; servicio conserva evento de
+conflicto correlacionado. No cambia arquitectura, contrato, migraciones o identidad.
+Backend19 pruebas PASS, incluidos QRY-05/QRY-07; HTTPS y Chromium PASS;
+auditoría de82 valores sintéticos: cero coincidencias app/BD. Publicación y
+recreación se registran en el anexo durable HAR-110 con SHA e imagen exactos.
+Temporales QA del run227be823 ausentes; imagen compartida browser87d209b4 retenida.
+HAR-111 es la reverificación independiente existente; Portainer conserva declaración
+autenticada David, sin sesión/captura independiente desde este runtime.

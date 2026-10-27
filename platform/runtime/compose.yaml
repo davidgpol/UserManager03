@@ -10,8 +10,9 @@ services:
       POSTGRES_DB: usermanager03
       POSTGRES_PASSWORD_FILE: /run/secrets/bootstrap-password
       POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=C.UTF-8 --auth-host=scram-sha-256
-    command: [postgres, -c, ssl=on, -c, ssl_cert_file=/run/secrets/db.crt, -c, ssl_key_file=/run/secrets/db.key, -c, hba_file=/etc/postgresql/pg_hba.conf, -c, log_statement=none]
+    command: [postgres, -c, ssl=on, -c, ssl_cert_file=/run/secrets/db.crt, -c, ssl_key_file=/run/secrets/db.key, -c, hba_file=/etc/postgresql/pg_hba.conf, -c, config_file=/etc/postgresql/um03-logging.conf]
     volumes:
+      - ./postgres-logging.conf:/etc/postgresql/um03-logging.conf:ro
       - usermanager03-postgres-data:/var/lib/postgresql
       - ${UM03_PRIVATE_DIR:?private configuration required}/db:/run/secrets:ro
       - ./init-role.sh:/docker-entrypoint-initdb.d/10-role.sh:ro

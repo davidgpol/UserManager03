@@ -2,7 +2,7 @@ const {chromium,expect}=require('/opt/browser/node_modules/@playwright/test');co
 (async()=>{
  const browser=await chromium.launch({args:['--no-sandbox','--ignore-certificate-errors-spki-list='+process.env.UM03_TLS_SPKI]});const context=await browser.newContext({viewport:{width:1440,height:1000}});const page=await context.newPage();page.setDefaultTimeout(10000);
  const password=fs.readFileSync('/private/operator-password','utf8');
- async function login(){await page.goto('https://localhost:18443/login');await page.getByLabel('Usuario').fill('operador');await page.getByLabel('Contraseña').fill(password);await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await expect(page.getByRole('button',{name:'Nueva ficha',exact:true})).toBeVisible();await expect(page.getByRole('progressbar')).toHaveCount(0);}
+ async function login(){await page.goto((process.env.UM03_BASE_URL || 'https://localhost:18443')+'/login');await page.getByLabel('Usuario').fill('operador');await page.getByLabel('Contraseña').fill(password);await page.getByRole('button',{name:'Iniciar sesión',exact:true}).click();await expect(page.getByRole('button',{name:'Nueva ficha',exact:true})).toBeVisible();await expect(page.getByRole('progressbar')).toHaveCount(0);}
  await login();await page.getByRole('button',{name:'Nueva ficha',exact:true}).click();
  for(const [name,value] of [['Nombre','Control Sintético'],['Apellidos','Sesión'],['DNI','74000000M'],['Correo electrónico','session@example.test']])await page.getByLabel(name,{exact:false}).fill(value);
  // Generate a valid DNI, avoiding any frontend short circuit.
