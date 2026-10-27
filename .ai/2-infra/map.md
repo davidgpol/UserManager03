@@ -255,3 +255,19 @@ Recreación permanente conserva49 fichas y credencial; ambos healthy. Quedan sol
 los dos contenedores permanentes y su red. Los6 contenedores/3 redes temporales
 propios de desarrollo se retiraron después de preservar logs/capturas/inventario;
 toolchain y navegador retenidos para HAR-111. Sin QA ni aceptación declaradas.
+
+
+## Limpieza QA HAR-112 — 2026-10-27T10:39:41.076118+00:00
+
+Tras la QA HAR-111 se retiraron los cuatro contenedores y dos redes de los proyectos
+`usermanager03-test-03bb908f-ba9e-42fa-9c31-6c5bf643ec71` y
+`usermanager03-test-http-03bb908f-ba9e-42fa-9c31-6c5bf643ec71`.
+Inventario actual: solo `usermanager03-app-1` (`3947fc85d700`) y
+`usermanager03-db-1` (`60c1ad9bab99`), ambos healthy; red permanente
+`usermanager03_default` (`fde711019b4c`), volumen `usermanager03-postgres-data`.
+No se retiraron imágenes, archivos bind, cache, configuración privada ni certificados.
+Se conservan código desplegado `dabdab62eeb8791ddfa5daa0b287317301d068fe` e imagen
+`sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc`.
+El paquete QA permanece en Paperclip; informe e inventarios antes/después en HAR-112.
+Run Niobe `c7277537-77b0-4625-af36-b58e129e38a9`; verificación independiente posterior HAR-113.
+Esta entrada actualiza estado de recursos, no gobernanza normativa ni aceptación.

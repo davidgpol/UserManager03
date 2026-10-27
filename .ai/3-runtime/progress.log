@@ -187,3 +187,18 @@ cleanup: retirados6 contenedores y3 redes temporales de runs b9025505 y actual t
 failures: primer commit falló128 por identidad Git ausente en entorno; resuelto con user.name/email por comando, sin configuración global; primer push sin nuevo commit no cambió remoto
 limitations: consulta conexiones no ofrece Portainer; falta sesión autorizada o captura autenticada del stack para observación independiente; confirmación David no se repite
 next_step: entrega informe/anexo HAR-110; Seraph reverifica en HAR-111 ya dependiente; Neo conserva aceptación y seguimiento operativo
+
+
+---
+timestamp: 2026-10-27T10:39:41.076118+00:00
+agent: Niobe
+issue: HAR-112
+run: c7277537-77b0-4625-af36-b58e129e38a9
+action: retirar exclusivamente temporales QA HAR-111 tras preservar evidencia durable
+status: completed
+result: paquete QA descargado exit0, SHA256 ca37ba21f9dac3d81bde26f855049cef0b973e096f8da9974296a0c501481856 exacto y50 entradas internas verificadas; retirados4 contenedores y2 redes por ID tras etiquetas/proyecto/lifecycle/mounts/referencias; sin volumen temporal
+preservation: app3947fc85d700/db60c1ad9bab99 siguen healthy, mismos IDs/StartedAt/restartCount0/mounts; redfde711019b4c y volumen usermanager03-postgres-data intactos; imagen2fac22b2a475 e inventario ID/tag/digest idénticos;17 archivos privados iguales en contenido/metadatos sin publicar valores ni hashes; HTTPS login200/TLSverify0
+commands: docker stop --time 20 solo2 temporales activos, docker rm sin-v para4 IDs, docker network rm para2 IDs; todos exit0; inspecciones antes/después en anexo HAR-112
+observations: app temporal unhealthy al iniciar, permanentes healthy; comparación inicial de JSON de imágenes falló por contador Containers reducido, comparación estable ID/tag/digest PASS; primer lector usó python inexistente(exit127) y normalización inicial del manifiesto absoluto falló(exit1), ambos corregidos antes de retirada
+limitations: sin builds, pruebas funcionales nuevas, SQL, recreación, rotación, prune ni cambios normativos; verificación de Niobe no sustituye QA Seraph ni aceptación
+next_step: Seraph verifica independientemente limpieza/evidencia en HAR-113; Neo conserva OPS-04/05 externos y aceptación HAR-80

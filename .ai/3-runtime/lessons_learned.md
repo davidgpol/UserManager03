@@ -80,3 +80,17 @@ Evidencia: HAR-107, run dfe7ab16-7266-4572-a30f-a7edf940e910. No reemplaza QA.
 
 Evidencia: HAR-110 backend19 PASS, HTTPS409/concurrencia, 82 marcadores sin
 coincidencias en logs app/BD. No sustituye HAR-111 ni borra el FAIL HAR-108.
+
+
+### HAR-112 — Identificación y comparación durante limpieza
+
+- La recreación de QA dejó app/DB/red permanentes con el mismo label run que sus
+  temporales. El run por sí solo no autoriza retirar: contrastar nombres/IDs,
+  proyecto Compose, lifecycle, montajes y referencias conforme AUTH_08/OPS_07.
+- El JSON de `docker image ls --format '{{json .}}'` incluye `Containers`, que
+  disminuye al retirar contenedores sin cambiar la imagen. Para comprobar
+  preservación comparar ID, Repository, Tag y Digest, no ese contador de uso.
+
+Evidencia: HAR-112, inventarios antes/después y comparación de imágenes; los únicos
+campos distintos fueron contadores de uso. Cuatro contenedores y dos redes retirados,
+permanentes e imágenes preservados. No sustituye la QA independiente HAR-113.
