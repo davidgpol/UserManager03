@@ -172,3 +172,18 @@ review: UNIQUE y transacciones intactos; SQLSTATE/correlación conservados; perf
 cleanup: QA227be823 cuatro contenedores/dos redes/tag ausentes; retiro previo registrado en comentario47bd6951; imagen browser87d209b4 compartida conservada; scratch previo eliminado por plataforma, evidencia reproducida
 limitations: Portainer sin sesión/captura independiente; declaración autenticada David se conserva; FAIL HAR-108 e incidente Buildx OPS_02 permanecen
 next_step: publicar commit ordinario y recrear despliegue con comparación privada; informe/anexo durable HAR-110; reverificación Seraph HAR-111
+
+
+---
+timestamp: 2026-10-27T10:18:23.140797+00:00
+agent: Niobe
+issue: HAR-110
+run: 6aee3eea-3c48-4a4a-9a0b-c301ccfc896b
+action: publicar corrección y recrear despliegue; preservar evidencia y retirar temporales propios
+status: completed
+result: commit publicado/desplegado dabdab62eeb8791ddfa5daa0b287317301d068fe; imagen sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc ARM64; perfil BD sha256:1dc880e11185936248857a1e17b9e065e129fb6186e11a9a32db8d5a98b9528b comprobado efectivo
+persistence: app detenida antes de baseline; ambos contenedores recreados;49 fichas antes/después y checksum completo idéntico; credencial idéntica; volumen conservado; copia contraseña ausente; app/db healthy; login200 TLSverify0 y gestión anónima401
+cleanup: retirados6 contenedores y3 redes temporales de runs b9025505 y actual tras inventario; quedan solo2 contenedores permanentes; toolchain/browser y versiones app conservadas; QA227be823 ausentes previamente; no prune ni down-v
+failures: primer commit falló128 por identidad Git ausente en entorno; resuelto con user.name/email por comando, sin configuración global; primer push sin nuevo commit no cambió remoto
+limitations: consulta conexiones no ofrece Portainer; falta sesión autorizada o captura autenticada del stack para observación independiente; confirmación David no se repite
+next_step: entrega informe/anexo HAR-110; Seraph reverifica en HAR-111 ya dependiente; Neo conserva aceptación y seguimiento operativo

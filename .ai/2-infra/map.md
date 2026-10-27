@@ -247,3 +247,11 @@ recreación se registran en el anexo durable HAR-110 con SHA e imagen exactos.
 Temporales QA del run227be823 ausentes; imagen compartida browser87d209b4 retenida.
 HAR-111 es la reverificación independiente existente; Portainer conserva declaración
 autenticada David, sin sesión/captura independiente desde este runtime.
+
+
+Estado desplegado verificado HAR-110: `dabdab62eeb8791ddfa5daa0b287317301d068fe`,
+imagen `sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc`.
+Recreación permanente conserva49 fichas y credencial; ambos healthy. Quedan solo
+los dos contenedores permanentes y su red. Los6 contenedores/3 redes temporales
+propios de desarrollo se retiraron después de preservar logs/capturas/inventario;
+toolchain y navegador retenidos para HAR-111. Sin QA ni aceptación declaradas.
