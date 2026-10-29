@@ -1,96 +1,195 @@
-# UserManager03 — Lessons Learned
+# UserManager03 — Lecciones aprendidas
 
-## Purpose
+Aprendizajes técnicos del proyecto que permiten evitar errores ya identificados.
 
-Preserve verified project knowledge useful for future work.
-Execution history belongs in `progress.log`; this document records reusable conclusions.
+Cada entrada describe un problema concreto, la solución aplicable y una
+referencia técnica del repositorio. Las referencias a pruebas identifican
+dónde se comprueba el comportamiento; no certifican su última ejecución.
 
-## Recording criteria
+Las rutas indicadas son relativas a la raíz del repositorio.
 
-- Record one learning per entry.
-- Support each learning with traceable evidence.
-- Distinguish observed behavior from an explanation of its cause.
-- State the conditions under which the learning applies.
-- Keep unresolved hypotheses in the associated Paperclip issue.
-- Mark outdated entries as superseded while preserving their references.
-- A lesson does not override project.xml, general.xml or security.xml.
+## Longitud de nombres y caracteres Unicode
 
-## Lessons
+**Problema:** La validación generada mediante @Size puede medir unidades
+UTF-16, mientras que el contrato del proyecto limita puntos de código.
+Esto puede rechazar nombres válidos que contienen caracteres suplementarios.
 
+**Aprendizaje:** Mantener los límites de nombres en la extensión Unicode
+del contrato y aplicar la validación explícita del dominio. Comprobar
+también los modelos generados con caracteres suplementarios.
 
+**Referencias:**
+- `api/openapi.yaml`
+- `api/fixtures/unicode.json`
+- `platform/toolchain/generated-probe/SerializationProbe.java`
 
-### HAR-107 — Generación Unicode y mecanismo Docker
+## Versiones del proyecto y código generado
 
-- OpenAPI Generator 7.26.0 traduce maxLength de nombres de respuesta a @Size,
-  que usa unidades UTF-16. Conservar límites por puntos de código en la extensión
-  Unicode del contrato y validar dominio explícitamente; el sondeo de DTO generado
-  demuestra fronteras suplementarias válidas tras la corrección. No editar generado.
-- El driver docker-container de Buildx crea un auxiliar con Privileged=true aunque
-  no se pase esa opción. Es incompatible con security.xml OPS_02. Se retiró el
-  auxiliar propio y su volumen; usar el driver docker existente para este proyecto.
-  La capacidad técnica de Buildx no exceptúa las reglas de seguridad.
-- El POM de ejemplo del generador usa Boot 4.0.1/Java 17; no define la identidad
-  del proyecto. Generar solo interfaces/modelos y compilar con el POM normativo.
+**Problema:** Las versiones predeterminadas de los proyectos de ejemplo
+generados pueden diferir de la identidad tecnológica del proyecto.
 
-Evidencia: HAR-107, run 7e663ce2-43fc-488e-a1ee-d1a44950d594; registros de generación,
-compilación, SerializationProbe y revisión HostConfig en su anexo. Estas observaciones
-no equivalen a QA independiente ni validación funcional de la aplicación.
+**Aprendizaje:** Compilar las interfaces y modelos generados mediante el
+descriptor de build propio, que implementa las versiones de project.xml.
 
-### HAR-107 — Verificación HTTP y Unicode con PostgreSQL
+**Referencias:**
+- `backend/pom.xml`
+- `platform/openapi/spring.json`
+- `platform/toolchain/generated-probe/pom.xml`
 
-- En pruebas MockMvc, suministrar sesión no representa automáticamente una cookie
-  previa válida: declarar requestedSessionId y su validez para verificar rotación
-  real del mecanismo estándar de Spring. Evidencia HttpContractTest.
-- El borrado mediante CookieClearingLogoutHandler no conservó SameSite=Lax en la
-  verificación. El handler de éxito usa ResponseCookie explícito conservando los
-  atributos; la invalidación/contexto siguen en el filtro estándar.
-- Las interfaces generadas incluyen medios de error en produces. La negociación
-  de éxito se acota a application/json y 406 publica Problem solo cuando el cliente
-  lo admite. HttpContractTest verifica ambos casos; no editar código generado.
+## Rotación de sesión en pruebas MockMvc
 
-Resultados del run 49ae115d-1d5f-4267-a4a0-9da3232761c6; no sustituyen QA.
+**Problema:** Asociar un objeto de sesión a una petición de prueba no
+representa por sí solo una petición que aporta un identificador de sesión
+previo válido.
 
-### HAR-107 — Integración navegador y operación
+**Aprendizaje:** Para comprobar la rotación tras el login, configurar el
+identificador solicitado y su validez, y comparar el identificador de
+sesión anterior con el posterior.
 
-- Los localizadores exactos por etiqueta MUI deben considerar el marcador required;
-  validar selectores en navegador real, no inferir desde JSX.
-- La confianza Chromium mediante pin de clave no configura el cliente Node de
-  route.fetch. Proporcionar NODE_EXTRA_CA_CERTS con certificado del proyecto; los
-  errores de red pueden incluir cabeceras, por lo que deben redactarse antes de
-  publicar y las sesiones involucradas invalidarse.
-- Una tabla sin desbordamiento global aún puede ser ilegible en móvil. La inspección
-  de captura390px motivó tarjetas con acciones visibles y prueba de apertura real.
-- Compose interpreta comas de listas YAML inline: citar completamente opciones
-  tmpfs o usar listas de bloque. El fallo se produjo antes de arrancar aplicación.
+**Referencia:**
+- `backend/src/test/java/com/hariklabs/usermanager03/rest/HttpContractTest.java`,
+  método `login()`.
 
-Evidencia: HAR-107, run dfe7ab16-7266-4572-a30f-a7edf940e910. No reemplaza QA.
+## Atributos de la cookie al cerrar sesión
 
+**Problema:** La respuesta de logout debe comprobarse expresamente;
+invalidar la sesión no demuestra que la cabecera de borrado conserve
+los atributos esperados de la cookie.
 
-### HAR-110 — Conflictos y privacidad de logs
+**Aprendizaje:** El proyecto construye explícitamente la cookie de
+borrado con sus atributos. La prueba de logout comprueba SameSite=Lax
+y la invalidación de la sesión.
 
-- PostgreSQL emite el valor de UNIQUE en DETAIL; reducir parámetros por sí solo
-  no lo elimina. El perfil compartido usa terse y omite sentencias/parámetros,
-  conservando severidad, SQLSTATE y sesión. Verificado con conflicto real y SHOW.
-- Hibernate7 usa `org.hibernate.orm.jdbc.error`; apagar solo el logger legacy
-  SqlExceptionHelper no evita exponer detalles JDBC. El encoder sanea ambas
-  categorías conservando mensajes técnicos seguros; no se apaga el logger.
-- El scratch de un run fallido puede desaparecer mientras sobreviven contenedores
-  detenidos con mounts a esa ruta. Preservar entregables en Paperclip; no asumir
-  que una ruta del historial aún existe. HAR-110 reprodujo evidencia tras esa pérdida.
+**Referencias:**
+- `backend/src/main/java/com/hariklabs/usermanager03/security/SecurityConfiguration.java`
+- `backend/src/test/java/com/hariklabs/usermanager03/rest/HttpContractTest.java`
 
-Evidencia: HAR-110 backend19 PASS, HTTPS409/concurrencia, 82 marcadores sin
-coincidencias en logs app/BD. No sustituye HAR-111 ni borra el FAIL HAR-108.
+## Negociación de respuestas JSON
 
+**Problema:** Las declaraciones de medios generadas desde OpenAPI pueden
+incluir tanto el formato de éxito como el de error. Esa declaración no
+garantiza por sí sola la negociación requerida por cada respuesta.
 
-### HAR-112 — Identificación y comparación durante limpieza
+**Aprendizaje:** Verificar separadamente application/json,
+application/problem+json y los medios no admitidos. En este contrato,
+una respuesta 406 no incluye cuerpo si el cliente excluye
+application/problem+json.
 
-- La recreación de QA dejó app/DB/red permanentes con el mismo label run que sus
-  temporales. El run por sí solo no autoriza retirar: contrastar nombres/IDs,
-  proyecto Compose, lifecycle, montajes y referencias conforme AUTH_08/OPS_07.
-- El JSON de `docker image ls --format '{{json .}}'` incluye `Containers`, que
-  disminuye al retirar contenedores sin cambiar la imagen. Para comprobar
-  preservación comparar ID, Repository, Tag y Digest, no ese contador de uso.
+**Referencias:**
+- `api/openapi.yaml`
+- `backend/src/test/java/com/hariklabs/usermanager03/rest/HttpContractTest.java`,
+  prueba `responseNegotiationPreservesJsonAndProblemTypes()`.
 
-Evidencia: HAR-112, inventarios antes/después y comparación de imágenes; los únicos
-campos distintos fueron contadores de uso. Cuatro contenedores y dos redes retirados,
-permanentes e imágenes preservados. No sustituye la QA independiente HAR-113.
+## Selectores de campos obligatorios en MUI
+
+**Problema:** El marcador de campo obligatorio puede afectar al nombre
+accesible utilizado por los localizadores de las pruebas.
+
+**Aprendizaje:** Elegir los localizadores a partir del componente
+renderizado y comprobar que identifican el campo correcto.
+
+**Referencias:**
+- `frontend/src/App.tsx`
+- `platform/browser/regression.cjs`
+
+## Usabilidad de la lista en móvil
+
+**Problema:** Una vista puede carecer de desbordamiento horizontal y
+seguir mostrando información o acciones difíciles de utilizar.
+
+**Aprendizaje:** Comprobar la legibilidad y las acciones en un ancho
+móvil real. El proyecto utiliza una presentación adaptada y comprueba
+la apertura del detalle desde esa vista.
+
+**Referencias:**
+- `frontend/src/App.tsx`
+- `platform/browser/smoke.cjs`
+
+## Confianza TLS del navegador y del proceso Node
+
+**Problema:** La configuración de confianza aplicada a Chromium no
+configura automáticamente la confianza TLS del proceso Node que
+ejecuta las pruebas.
+
+**Aprendizaje:** Configurar también el certificado de confianza para
+el proceso Node. El runner del proyecto utiliza NODE_EXTRA_CA_CERTS
+para ese contexto.
+
+**Referencias:**
+- `platform/browser/run.sh`
+- `platform/browser/regression.cjs`
+
+## Datos personales en errores de PostgreSQL
+
+**Problema:** Los detalles de una violación de unicidad pueden incluir
+el valor que ha provocado el conflicto. Desactivar el registro de
+parámetros no cubre por sí solo todos los detalles del error.
+
+**Aprendizaje:** Revisar conjuntamente la verbosidad de errores,
+el registro de sentencias y el de parámetros. La configuración del
+proyecto conserva información diagnóstica como SQLSTATE y evita
+registrar los valores de las filas en esos detalles.
+
+**Referencias:**
+- `platform/runtime/postgres-logging.conf`
+- `platform/testing/audit-logs.py`
+
+## Categorías de logging JDBC de Hibernate
+
+**Problema:** Sanear únicamente la categoría histórica
+SqlExceptionHelper deja sin cubrir la categoría
+org.hibernate.orm.jdbc.error utilizada por Hibernate 7.
+
+**Aprendizaje:** El encoder contempla ambas categorías y sustituye
+los mensajes sensibles, conservando los campos diagnósticos seguros.
+
+**Referencias:**
+- `backend/src/main/java/com/hariklabs/usermanager03/config/SafeJsonEncoder.java`
+- `backend/src/test/java/com/hariklabs/usermanager03/config/SafeJsonEncoderTest.java`
+
+## Opciones tmpfs en Compose
+
+**Problema:** Las comas de las opciones tmpfs pueden interpretarse
+como separadores cuando se escriben dentro de una lista YAML inline
+sin entrecomillar el elemento completo.
+
+**Aprendizaje:** Utilizar una lista de bloque o entrecomillar
+completamente cada elemento tmpfs de una lista inline.
+
+**Referencias:**
+- `platform/runtime/compose.yaml`
+- `platform/testing/compose.yaml`
+
+## Identificación de recursos Docker temporales
+
+**Problema:** Un identificador de ejecución puede estar presente tanto
+en recursos temporales como en recursos permanentes.
+
+**Aprendizaje:** Determinar el carácter temporal mediante la identidad
+del proyecto, la etiqueta lifecycle y los montajes o dependencias del
+recurso. El identificador de ejecución, por sí solo, no permite decidir
+qué puede eliminarse.
+
+**Referencias:**
+- `platform/runtime/compose.yaml`
+- `platform/testing/compose.yaml`
+- `platform/runtime/verify-recreation.py`
+
+## Contrato de servicio y modelos internos
+
+**Problema:** Un controlador que inyecta una implementación concreta y un mapper
+que consume records anidados de ella no mantiene la frontera Interface-Driven.
+Una consulta interna que interpreta directamente `Map<String,String[]>` también
+conserva un detalle HTTP fuera del mapper.
+
+**Aprendizaje:** Exponer un contrato de servicio con modelos internos propios,
+mantener lógica y límites transaccionales en su implementación, y convertir los
+parámetros HTTP en `rest/mapper/`. Comprobar en Spring el proxy del contrato y
+los atributos transaccionales de la implementación contra PostgreSQL real.
+
+**Referencias:**
+- `backend/src/main/java/com/hariklabs/usermanager03/service/api/UserService.java`
+- `backend/src/main/java/com/hariklabs/usermanager03/service/impl/UserServiceImpl.java`
+- `backend/src/main/java/com/hariklabs/usermanager03/service/model/`
+- `backend/src/main/java/com/hariklabs/usermanager03/rest/mapper/UserRestMapper.java`
+- `backend/src/test/java/com/hariklabs/usermanager03/service/PostgresTest.java`

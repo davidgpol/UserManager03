@@ -11,16 +11,15 @@
     </empirical_validation>
     <technology_guidelines>
         <rule id="TECH_01" priority="high">Los descriptores de build implementarán la identidad aprobada de .ai/0-core/project.xml.</rule>
-        <rule id="TECH_02" priority="high">Fijar dependencias directas a las versiones exactas de project.xml.</rule>
+        <rule id="TECH_02" priority="high">Resolver cada dependencia directa a una versión exacta mediante declaración propia o gestión de dependencias fijada.</rule>
         <rule id="TECH_03" priority="high">Conservar el lockfile íntegro de npm de la implementación.</rule>
         <rule id="TECH_04" priority="high">Verificar el checksum oficial de cada distribución de toolchain antes de usarla.</rule>
         <rule id="TECH_05" priority="high">Verificar arquitectura linux/arm64 del digest de imagen antes de construir o desplegar.</rule>
-        <rule id="TECH_06" priority="high">Implementar infraestructura, Dockerfiles, Compose y scripts operativos exclusivamente bajo platform/.</rule>
         <rule id="TECH_07" priority="high">Usar migraciones SQL Flyway versionadas para evolucionar el esquema.</rule>
         <rule id="TECH_08" priority="high">Configurar Hibernate ddl-auto=validate.</rule>
         <rule id="TECH_09" priority="high">Probar el conflicto concurrente de DNI contra PostgreSQL real.</rule>
         <rule id="TECH_10" priority="high">Verificar el tipo frontend con tsc --noEmit en el flujo de build.</rule>
-        <rule id="TECH_11" priority="high">Resolver antes del endpoint afectado las decisiones funcionales pendientes con Trinity y Neo.</rule>
+        <rule id="TECH_11" priority="high">Resolver las decisiones funcionales pendientes antes de implementar el endpoint afectado.</rule>
     </technology_guidelines>
     <structured_logging_and_tracing>
         <format>
@@ -72,11 +71,12 @@
         <rule id="LAYER_05" priority="high">La persistencia no dependerá de la capa REST.</rule>
         <rule id="LAYER_06" priority="high">Realizar mapeo HTTP mediante componentes manuales explícitos en rest.mapper.</rule>
         <rule id="LAYER_07" priority="high">Devolver resultados propios de servicio en lugar de entidades JPA hacia REST.</rule>
+        <rule id="LAYER_08" priority="high">Utilizar contratos de interfaz en las fronteras entre capas definidas en .ai/0-core/project.xml.</rule>
     </layer_interaction_rules>
     <api_first_implementation>
         <rule id="API_01" priority="high">Versionar api/openapi.yaml antes de implementar o modificar el endpoint correspondiente.</rule>
         <rule id="API_02" priority="high">Definir entradas, salidas, validaciones, paginación y errores del endpoint en su contrato previo.</rule>
-        <rule id="API_03" priority="high">Generar interfaces REST y DTO con la configuración exacta de project.xml.</rule>
+        <rule id="API_03" priority="high">Generar interfaces REST y DTO con la configuración de platform/openapi/spring.json.</rule>
         <rule id="API_04" priority="high">Implementar los controladores sobre las interfaces REST generadas.</rule>
         <rule id="API_05" priority="high">No editar manualmente código generado.</rule>
         <rule id="API_06" priority="high">Generar el cliente typescript-fetch desde la misma versión del contrato del servidor.</rule>
@@ -86,40 +86,40 @@
         <rule id="API_10A" priority="high">Comprobar serialización Jackson 3 con modelos generados en build integrado.</rule>
         <rule id="API_10B" priority="high">Comprobar UTC con modelos generados en build integrado.</rule>
     </api_first_implementation>
-    <authorization_and_delivery>
-        <rule id="AUTH_01" priority="critical">Limitar las operaciones Git autorizadas a UserManager03 según la fase asignada por Neo; HAR-79 permite remoto público HTTPS, commits y push inicial/posteriores.</rule>
-        <rule id="AUTH_02" priority="critical">Instalar únicamente el paquete de gobernanza cuyo manifiesto exacto haya confirmado Neo.</rule>
-        <rule id="AUTH_03" priority="critical">Comparar los hashes instalados con el manifiesto confirmado.</rule>
-        <rule id="AUTH_04" priority="critical">Operar Docker solo en el ámbito UserManager03 autorizado por HAR-79 apartado 5.</rule>
-        <rule id="AUTH_05" priority="critical">Usar usermanager03 como identidad Compose permanente.</rule>
-        <rule id="AUTH_06" priority="critical">Usar usermanager03-test-&lt;run-id&gt; como identidad Compose temporal.</rule>
-        <rule id="AUTH_07" priority="critical">Registrar propiedad de contenedores, imágenes, redes, volúmenes y cache mediante etiquetas/inventario de project.xml.</rule>
-        <rule id="AUTH_08" priority="critical">Retirar temporales solo por Niobe cuando inventario demuestre pertenencia, carácter desechable y ausencia de referencias protegidas tras preservar evidencia.</rule>
-        <rule id="AUTH_09" priority="critical">Preservar el despliegue final y datos permanentes durante limpieza temporal.</rule>
-        <rule id="AUTH_10" priority="critical">Preservar recursos de otros proyectos o de propiedad desconocida.</rule>
-        <rule id="AUTH_11" priority="critical">Prohibir limpieza Docker global.</rule>
-        <rule id="AUTH_12" priority="critical">Configurar restart unless-stopped en servicios permanentes.</rule>
-        <rule id="AUTH_13" priority="critical">Definir healthchecks de aplicación y PostgreSQL conforme a project.xml.</rule>
-        <rule id="AUTH_14" priority="critical">Comprobar continuidad de datos tras recrear contenedores permanentes.</rule>
-        <rule id="AUTH_15" priority="critical">Verificar visibilidad del despliegue en Portainer existente.</rule>
-        <rule id="AUTH_16" priority="critical">No ejecutar down -v del despliegue permanente.</rule>
-    </authorization_and_delivery>
+    <repository_and_runtime>
+        <rule id="REPO_01" priority="high">Mantener infraestructura, Dockerfiles, archivos Compose y scripts operativos bajo platform/.</rule>
+        <rule id="REPO_02" priority="critical">Usar usermanager03 como identidad Compose permanente.</rule>
+        <rule id="REPO_03" priority="critical">Usar el prefijo usermanager03-test- seguido de un identificador de ejecución único como identidad Compose temporal.</rule>
+        <rule id="REPO_04" priority="critical">Configurar restart unless-stopped en los servicios permanentes.</rule>
+        <rule id="REPO_05" priority="critical">Definir un healthcheck para la aplicación.</rule>
+        <rule id="REPO_06" priority="critical">Definir un healthcheck para PostgreSQL.</rule>
+        <rule id="REPO_07" priority="critical">Comprobar la continuidad de los datos tras recrear contenedores permanentes.</rule>
+        <rule id="REPO_08" priority="critical">Verificar la visibilidad del despliegue en el Portainer existente.</rule>
+        <rule id="DOCKER_01" priority="critical">Registrar la propiedad y el carácter permanente o temporal de contenedores, imágenes, redes, volúmenes y cachés dedicadas mediante etiquetas o inventario equivalente.</rule>
+        <rule id="DOCKER_02" priority="critical">Verificar la propiedad de cada recurso antes de retirarlo.</rule>
+        <rule id="DOCKER_03" priority="critical">Preservar los datos persistentes durante la limpieza de recursos temporales.</rule>
+        <rule id="DOCKER_04" priority="critical">Preservar los recursos del despliegue activo durante la limpieza de recursos temporales.</rule>
+        <rule id="DOCKER_05" priority="critical">Preservar los recursos ajenos al proyecto o de propiedad desconocida.</rule>
+        <rule id="DOCKER_06" priority="critical">No retirar recursos que continúen siendo necesarios para otros recursos protegidos.</rule>
+        <rule id="DOCKER_07" priority="critical">Conservar la evidencia de verificación antes de retirar los recursos temporales que la contienen.</rule>
+        <rule id="DOCKER_08" priority="critical">Retirar los recursos temporales propios al finalizar su uso únicamente cuando se demuestre su carácter desechable y su retirada esté autorizada.</rule>
+        <rule id="DOCKER_09" priority="critical">No ejecutar operaciones de limpieza global de Docker.</rule>
+        <rule id="DOCKER_10" priority="critical">No ejecutar down -v del despliegue permanente.</rule>
+    </repository_and_runtime>
     <reporting>
         <rule id="RPT_01" priority="high">Structure reports for David into Introducción ejecutiva resumida, Casos de uso presentados, and Conclusión final y acciones a realizar.</rule>
-        <rule id="RPT_02" priority="high">Identify applicable project-bootstrap sections by their real code and a short description when reporting bootstrap findings.</rule>
+        <rule id="RPT_02" priority="high">Identify the document and section or rule identifier when citing a project requirement.</rule>
         <rule id="RPT_03" priority="high">Distinguish real execution evidence from hypothetical examples and explanatory illustrations.</rule>
         <rule id="RPT_04" priority="high">Provide diagrams as readable text or accessible rendered images rather than Mermaid source alone.</rule>
         <rule id="RPT_05" priority="high">Present required next actions with their responsible owner and completion criterion.</rule>
-        <rule id="EVID_01A" priority="high">Aportar resultado de cada flujo/caso ejecutado según HAR-79.</rule>
-        <rule id="EVID_01B" priority="high">Aportar captura legible sintética de cada flujo/caso ejecutado según HAR-79.</rule>
+        <rule id="EVID_01A" priority="high">Aportar el resultado de cada flujo o caso de prueba ejecutado.</rule>
+        <rule id="EVID_01B" priority="high">Aportar una captura legible con datos sintéticos de cada flujo o caso de prueba ejecutado.</rule>
         <rule id="EVID_02" priority="high">Identificar revisión, entorno y contexto de ejecución en la evidencia.</rule>
         <rule id="EVID_03" priority="high">Registrar comando, código y salida sanitizada de cada check no visual.</rule>
         <rule id="EVID_04" priority="high">Mantener evidencia técnica extensa en anexo enlazado al informe.</rule>
         <rule id="EVID_05" priority="high">Presentar casos del informe en 3–6 filas comprensibles con consecuencia práctica.</rule>
         <rule id="EVID_06" priority="high">Redactar introducción ejecutiva breve indicando ejecución real y alcance demostrado.</rule>
         <rule id="EVID_07" priority="high">Agrupar acciones finales en un máximo de cinco filas priorizadas.</rule>
-        <rule id="EVID_08" priority="high">Mantener el veredicto de QA independiente de Seraph separado de la verificación de desarrollo.</rule>
-        <rule id="EVID_09A" priority="high">Ante QA FAIL, Neo coordinará corrección asignada.</rule>
-        <rule id="EVID_09B" priority="high">Ante QA FAIL, Neo coordinará nueva verificación.</rule>
+        <rule id="EVID_08" priority="high">Mantener el veredicto de QA independiente separado de la verificación de desarrollo.</rule>
     </reporting>
 </coding_standards>

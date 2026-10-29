@@ -4,12 +4,12 @@
         <rule id="CRED_01" priority="critical">Exclude credential values from version-controlled files.</rule>
         <rule id="CRED_02" priority="critical">Load required credentials from deployment-provided configuration at runtime.</rule>
         <rule id="CRED_03" priority="critical">Restrict access to deployed credentials to the service and explicitly authorized administrators.</rule>
+        <rule id="CRED_04" priority="critical">No incluir secretos en los argumentos de los procesos.</rule>
         <rule id="SECRET_01" priority="high">Excluir el hash real de la cuenta operadora de Git y artefactos públicos.</rule>
         <rule id="SECRET_02" priority="high">Montar secretos de ejecución como archivos de solo lectura bajo /run/secrets.</rule>
         <rule id="SECRET_03" priority="high">Conservar el origen de secretos y certificados privados fuera del repositorio.</rule>
         <rule id="SECRET_04" priority="high">Generar el hash mediante entrada interactiva oculta.</rule>
         <rule id="SECRET_05" priority="high">Fallar el arranque ante ausencia de usuario o hash válido de la cuenta operadora.</rule>
-        <rule id="SECRET_06" priority="critical">Excluir contraseñas de los argumentos de proceso.</rule>
     </credential_protection>
     <private_access>
         <rule id="ACCESS_01" priority="critical">Exigir HTTPS TLS 1.2/1.3 para el acceso de David.</rule>
@@ -20,7 +20,7 @@
         <rule id="ACCESS_06" priority="critical">No permitir orígenes CORS comodín.</rule>
         <rule id="ACCESS_07" priority="critical">Autenticar todas las rutas de gestión de usuarios en el servidor.</rule>
         <rule id="ACCESS_08" priority="critical">Proteger la navegación de negocio en la interfaz.</rule>
-        <rule id="ACCESS_09" priority="critical">Limitar rutas anónimas a login, recursos imprescindibles y CSRF conforme a project.xml.</rule>
+        <rule id="ACCESS_09" priority="critical">En la superficie de aplicación accesible al usuario, limitar las rutas anónimas a /login, /index.html, /assets/**, /favicon.ico, /api/auth/csrf y /api/auth/login.</rule>
         <rule id="ACCESS_10" priority="critical">No exponer información administrativa de healthchecks al acceso externo.</rule>
         <rule id="ACCESS_11" priority="critical">Validar certificado TLS y confianza del servidor en el equipo de David.</rule>
     </private_access>
@@ -30,6 +30,7 @@
         <rule id="DATA_03" priority="critical">Evitar detalles internos sensibles en respuestas de error.</rule>
         <rule id="DATA_04" priority="critical">Proteger usermanager03-postgres-data frente a limpieza temporal.</rule>
         <rule id="DATA_05" priority="critical">Usar TLS verify-full en JDBC hacia PostgreSQL.</rule>
+        <rule id="DATA_06" priority="critical">Excluir secretos y material de sesión de todas las evidencias publicadas.</rule>
     </data_protection>
     <operational_boundaries>
         <rule id="OPS_01" priority="critical">Ejecutar la aplicación como usuario no root.</rule>
@@ -37,8 +38,8 @@
         <rule id="OPS_03" priority="critical">No montar el socket Docker en contenedores de aplicación.</rule>
         <rule id="OPS_04" priority="critical">Usar un rol BD de ejecución con permisos limitados a sus operaciones.</rule>
         <rule id="OPS_05" priority="critical">Ejecutar migraciones con un rol distinto del rol de aplicación.</rule>
-        <rule id="OPS_06" priority="critical">No modificar configuración global del host, agentes ni servicios ajenos.</rule>
-        <rule id="OPS_07" priority="critical">Verificar propiedad de recursos antes de cualquier retirada.</rule>
+        <rule id="OPS_06" priority="critical">No modificar la configuración global del host ni los servicios ajenos.</rule>
+        <rule id="OPS_07" priority="critical">Utilizar únicamente los privilegios necesarios para cada componente</rule>
     </operational_boundaries>
     <session_authentication>
         <rule id="SESS_01" priority="critical">Cargar la cuenta operadora desde configuración separada de las entidades CRUD.</rule>
@@ -70,9 +71,10 @@
         <rule id="CSRF_08" priority="critical">Marcar la respuesta del token CSRF con Cache-Control: no-store.</rule>
     </csrf_protection>
     <password_hashing>
-        <rule id="HASH_01" priority="critical">Usar Argon2id con Argon2PasswordEncoder(16,32,1,19456,2) y Bouncy Castle de project.xml.</rule>
+        <rule id="HASH_01" priority="critical">Usar Argon2id con Argon2PasswordEncoder(16,32,1,19456,2).</rule>
         <rule id="HASH_02" priority="critical">Aceptar exclusivamente esquema de hash Argon2 configurado, nunca noop.</rule>
         <rule id="HASH_03" priority="critical">Medir coste de verificación en OCI antes de entrega.</rule>
         <rule id="HASH_04" priority="critical">No reducir los parámetros mínimos de Argon2id seleccionados.</rule>
+        <rule id="HASH_05" priority="critical">Usar Bouncy Castle como proveedor criptográfico de Argon2id.</rule>
     </password_hashing>
 </security_rules>

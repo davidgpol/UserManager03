@@ -1,204 +1,435 @@
-# UserManager03 — Progress log
+# UserManager03 — Registro de progreso
 #
-# Append entries in chronological order.
-# Record actual actions and observed outcomes.
-# Preserve previous entries; corrections reference the original entry.
-# Use real Paperclip identifiers when available, otherwise none.
-# Do not store credentials or sensitive payloads.
-# completed describes the named action, not project acceptance.
-# next_step references pending work tracked in Paperclip.
-#
----
-timestamp: 2026-10-26T12:20:49.428804+00:00
-agent: Niobe
-issue: HAR-99
-run: 6308ec45-91c9-441e-936b-6a858f229dd6
-action: validar workspace y leer gobernanza
-status: completed
-result: cwd y raíz exactos; main; siete hashes confirmados; checker final exit 0
-artifacts: HAR-99 candidato y anexo técnico
-evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
-next_step: Neo consolida S03/S06 en HAR-80
----
-timestamp: 2026-10-26T12:20:49.428804+00:00
-agent: Niobe
-issue: HAR-99
-run: 6308ec45-91c9-441e-936b-6a858f229dd6
-action: publicar gobernanza confirmada
-status: completed
-result: gh davidgpol; repo público; commit y refs/heads/main 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9; primer push 128 corregido con helper por comando; árbol limpio
-artifacts: HAR-99 candidato y anexo técnico
-evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
-next_step: Neo actualiza repoUrl y Seraph verifica publicación
----
-timestamp: 2026-10-26T12:20:49.428804+00:00
-agent: Niobe
-issue: HAR-99
-run: 6308ec45-91c9-441e-936b-6a858f229dd6
-action: inventariar runtime
-status: completed
-result: ARM64; Node 24.21.0/npm 11.19.0 distintos de identidad; Java/Maven/psql ausentes PATH; sin build ni instalación host
-artifacts: HAR-99 candidato y anexo técnico
-evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
-next_step: Neo conserva brecha de toolchain para encargo de build autorizado
----
-timestamp: 2026-10-26T12:20:49.428804+00:00
-agent: Niobe
-issue: HAR-99
-run: 6308ec45-91c9-441e-936b-6a858f229dd6
-action: preparar conciliación documental en scratch
-status: completed
-result: candidato S02-NIOBE-3C; Q-F01–Q-F04 y PD-05–10 incorporadas; documentos no instalados; no QA ni aceptación
-artifacts: HAR-99 candidato y anexo técnico
-evidence: HAR-99, run 6308ec45-91c9-441e-936b-6a858f229dd6, comandos/salidas y manifiestos adjuntos
-next_step: Seraph revisa candidato; Neo confirma manifiesto antes de instalación
----
-timestamp: 2026-10-26T12:40:31.845716+00:00
-agent: Niobe
-issue: HAR-101
-run: ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2
-action: recuperar candidato validado e inspeccionar destino para preparar promoción documental
-status: completed
-result: cwd y Git top-level /opt/Dev/Projects/UserManager03; main limpio en 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9; siete bytes instalados iguales a HEAD; ZIP 3C 43868 bytes y SHA-256 9b98a5c8deeb18fa60bf35f660a1c0b7df40d01b5e6185c76d85529c47730471 verificados; leído PASS HAR-100 revisión 91ce925c-987e-4fc4-879e-0d420371e7e1
-artifacts: paquete S02-NIOBE-3P y manifiesto de siete rutas en HAR-101
-evidence: HAR-101 anexo-tecnico; run ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2; fuente HAR-99 revisión 683a3807-a17c-42f8-a008-3c4b2e04d891
-next_step: Neo confirma exactamente el nuevo manifiesto en HAR-80 antes de asignar instalación y QA; preparación inicial y producto permanecen posteriores
----
-timestamp: 2026-10-26T12:41:32.160333+00:00
-agent: Niobe
-issue: HAR-101
-run: ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2
-action: ejecutar checker real sobre paquete promovido en scratch sin Git
-status: completed
-result: checker SHA-256 1c00f8b8936c6046c1603f8d79eba58b7ab69a7fca355ef89c6f2346788fa82b, --stage final, exit 1 exclusivamente GIT_ROOT_UNAVAILABLE, sin warnings; no PASS global, no Git artificial ni checker final en destino
-artifacts: HAR-101 anexo-tecnico y evidencia commands.json; paquete S02-NIOBE-3P no instalado
-evidence: HAR-101 run ca78d1b1-5a99-411b-bfd2-2a26a8c6cee2; comando con --workspace y --expected-workspace iguales al directorio governance del scratch del run; salida íntegra durable en anexo
-next_step: Neo confirma manifiesto; ejecutor posterior instala solo bytes confirmados y ejecuta comparación y checker final en destino; Seraph verifica independientemente
+# Registrar hitos técnicos en orden cronológico, con fecha UTC.
+# Cada entrada describe un cambio y su resultado.
+# Añadir las correcciones como nuevas entradas.
+# Distinguir la implementación de su verificación.
+# Las referencias deben permitir localizar el código o la evidencia.
 
 ---
-timestamp: 2026-10-26T15:40:46.916563+00:00
-agent: Niobe
-issue: HAR-107
-run: 7e663ce2-43fc-488e-a1ee-d1a44950d594
-action: resolver toolchain y preparar contrato previo a endpoints
-status: partial
-result: inicio main limpia 1ab754f9582f1731d4684370036543fc48ccf2ab; leídas fuentes exactas de HAR-80/82/84/86/96; Temurin 25.0.5+8, Maven 3.10.0, Node 24.22.1, npm 11.19.1 y OpenAPI Generator 7.26.0 construidos y ejecutados en ARM64 con checksums oficiales; API CRUD/auth validada; generación Java/TS, compilación --release 25 con Boot 4.1.2, Jackson 3 UTC y fronteras suplementarias PASS de sondeo; tsc 7.0.2 PASS; proveedor correo 9.1.5.Final sondeado; fixtures de producto no ejecutados
-artifacts: platform/toolchain, platform/openapi, api/openapi.yaml SHA256 02752a57912cf391b8efcf8af5a5a15e48f96831994c3006c3c832518e1cc70a, api/fixtures, api/unicode; anexo y capturas HAR-107
-limitations: no publicación remota, endpoints, aplicación, QA ni despliegue; tarjeta de conexión GitHub 1a2faa84-1629-4bd4-a94f-b7c8bb9c77ad pendiente; 56 RE/CD + 4 COND sin aprobar
-next_step: Niobe publica contrato al resolverse conexión; verifica SHA remoto anterior a endpoints y continúa implementación bajo HAR-107; Neo conserva coordinación
+fecha_utc: '2026-10-26T12:20:49.428804Z'
+areas:
+  - Gobernanza
+cambio: Validación inicial del workspace y de los siete documentos de gobernanza.
+resultado: Coincidieron cwd y raíz Git; rama main; siete hashes verificados. El checker final de la versión entonces instalada
+  terminó con exit 0.
+verificacion: El registro histórico consigna comandos, hashes y salida del checker; esta conversión no los vuelve a ejecutar.
+referencias:
+  - AGENTS.md
+  - .ai/0-core/project.xml
+  - .ai/1-rules/security.xml
+  - .ai/1-rules/general.xml
+limitaciones:
+  - El informe y los manifiestos originales no tienen referencia independiente accesible desde el repositorio. El resultado
+    corresponde a la versión instalada en aquella fecha.
 ---
-timestamp: 2026-10-26T15:40:46.916563+00:00
-agent: Niobe
-issue: HAR-107
-run: 7e663ce2-43fc-488e-a1ee-d1a44950d594
-action: detectar y corregir mecanismo de construcción no conforme
-status: correction_in_progress
-result: docker-container de Buildx creó auxiliar propio con HostConfig.Privileged=true contrario a security.xml OPS_02; constructor y volumen retirados con buildx rm, ausencia comprobada; reconstrucción mediante driver docker existente, sin nuevo auxiliar privilegiado
-artifacts: inventario, buildkit-privileged-check.log, builder-cleanup.log, toolchain-corrected-build.log en anexo HAR-107
-evidence: comunicado a Neo en HAR-80 comentario 2af2b7e8-5868-4425-a60f-2d365af0b876; sin modificación normativa ni datos permanentes
-next_step: verificar imagen correctiva y conservar incidente; no presentar ejecución inicial como conforme
-
+fecha_utc: '2026-10-26T12:20:49.428804Z'
+areas:
+  - Repositorio
+cambio: Publicación inicial de la gobernanza.
+resultado: Repositorio público; commit y refs/heads/main 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9. El primer push terminó
+  con exit 128 por falta de helper; se corrigió con el helper de credenciales limitado al comando y el push posterior terminó
+  con exit 0. Árbol limpio.
+verificacion: La referencia técnica conservada es el commit publicado; la transcripción de comandos original no tiene enlace
+  independiente.
+referencias:
+  - commit 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9
+limitaciones:
+  - No se reproduce aquí la publicación ni se verifica el estado remoto actual.
 ---
-timestamp: 2026-10-26T15:42:17.842456+00:00
-agent: Niobe
-issue: HAR-107
-run: 7e663ce2-43fc-488e-a1ee-d1a44950d594
-action: verificar reconstrucción correctiva y retirada de temporales propios
-status: completed
-result: driver docker existente; imagen sha256:cdbdfd5711c800b4743c7887e14d3c08d30b31b8c38a84a256510a6a9c962aeb, linux/arm64; contenedor de verificación HostConfig.Privileged=false, ExitCode=0; versiones, DTO Jackson3/UTC/fronteras y TypeScript verificadas; retirados contenedor de sondeo, constructor inicial y su volumen; vieja imagen ausente tras importar nueva (rm exit 1 No such image, inspect confirma ausencia); imagen correctiva retenida para continuación, cache driver default inventariada sin prune global
-artifacts: HAR-107 anexo, inventario y registros de corrección
-next_step: publicar contrato tras conexión; continuar producto sin declarar conforme el intento inicial ni aceptación
-
+fecha_utc: '2026-10-26T12:20:49.428804Z'
+areas:
+  - Entorno
+cambio: Inventario de herramientas del entorno inicial.
+resultado: Arquitectura ARM64; Node 24.21.0 y npm 11.19.0 diferían de la identidad del proyecto; Java, Maven y psql no estaban
+  en PATH. No se realizó build ni instalación en host.
+verificacion: Observación histórica de versiones y PATH; no se repite el inventario.
+referencias:
+  - .ai/0-core/project.xml
+limitaciones:
+  - El informe de comandos original no tiene referencia independiente accesible desde el repositorio.
 ---
-timestamp: 2026-10-26T15:59:45.175225+00:00
-agent: Niobe
-issue: HAR-107
-run: 49ae115d-1d5f-4267-a4a0-9da3232761c6
-action: retirar conector innecesario y publicar contrato mediante Git/gh OCI
-status: completed
-result: identidad davidgpol, ADMIN; tarjeta 1a2faa84-1629-4bd4-a94f-b7c8bb9c77ad cancelled; push ordinario exit 0 y SHA remoto exacto 4b282103f7c4d1f7d9399c184cd4c408b44f9c29 antes de endpoints; sin reescritura ni configuración global
-evidence: work product commit HAR-107; Neo informado HAR-80
-next_step: implementar producto dentro del contrato publicado; revisión Niobe y QA Seraph posteriores
-
+fecha_utc: '2026-10-26T12:20:49.428804Z'
+areas:
+  - Gobernanza
+cambio: Preparación de una conciliación documental en área temporal.
+resultado: Se preparó un candidato documental que incorporaba Q-F01–Q-F04 y PD-05–10. En este hito no se instaló, probó ni
+  aceptó el candidato.
+verificacion: El historial anterior distingue preparación de instalación; no hay verificación de producto asociada.
+referencias:
+  - .ai/0-core/project.xml
+limitaciones:
+  - El paquete e informe originales no tienen referencia independiente accesible desde el repositorio.
 ---
-timestamp: 2026-10-26T16:21:30.897668+00:00
-agent: Niobe
-issue: HAR-107
-run: 49ae115d-1d5f-4267-a4a0-9da3232761c6
-action: implementar backend y verificar capas HTTP/servicio/PostgreSQL real
-status: partial
-result: 14 tests PASS, 0 fallos/errores/omitidas; Java25/Boot4.1.2/Generator7.26.0; Unicode1114112 puntos; PostgreSQL18.6 TLS verify-full con roles separados; conflicto concurrente DNI, no-op/baja, paginación y DTO UTC/suplementarios
-corrections: Maven inicial sin repositorio escribible corregido con /cache; configuración de slice HTTP y API de validación Spring7 corregidas; rutas MockMvc y cookie previa modeladas; borrado cookie ahora conserva SameSite=Lax; negociación 406 explícita
-review: primera entrega Mouse HAR-109 rechazada técnicamente con ocho correcciones; se reanuda encargo, no integrada
-cleanup: contenedores Compose temporal del run y red retirados tras evidencia y etiquetas; privileged=false/exit0; sin volúmenes permanentes/prune
-limitations: no browser/UI integrado, despliegue persistente, acceso David, Portainer, QA ni aceptación; faltan revisión completa y evidencia integral
-next_step: Niobe revisa correcciones HAR-109, integra frontend, amplía flujos reales y entrega operación dentro de HAR-107; sin nuevas aprobaciones de alcance
-
+fecha_utc: '2026-10-26T12:40:31.845716Z'
+areas:
+  - Gobernanza
+cambio: Recuperación de candidato documental e inspección del destino anterior a su instalación.
+resultado: Cwd y raíz Git coincidían con /opt/Dev/Projects/UserManager03; main limpio en 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9;
+  siete archivos instalados iguales a HEAD. ZIP candidato de 43868 bytes, SHA-256 9b98a5c8deeb18fa60bf35f660a1c0b7df40d01b5e6185c76d85529c47730471,
+  verificado sin instalar.
+verificacion: El registro histórico consigna comparación de bytes y ZIP; no se repite aquí sobre el paquete antiguo.
+referencias:
+  - commit 3b5c7debdd9c6c75211f5bab5a70fa0ae359cef9
+  - SHA-256 ZIP 9b98a5c8deeb18fa60bf35f660a1c0b7df40d01b5e6185c76d85529c47730471
+limitaciones:
+  - El ZIP y el informe de ejecución originales no tienen referencia independiente accesible desde el repositorio. El estado
+    del destino era una observación fechada.
 ---
-timestamp: 2026-10-26T16:47:01.699038+00:00
-agent: Niobe
-issue: HAR-107
-run: dfe7ab16-7266-4572-a30f-a7edf940e910
-action: revisar e integrar HAR-109; desplegar y verificar producto HTTPS ARM64
-status: partial
-result: build normativo PASS; Chromium CRUD/auth/consulta/paginación/móvil PASS; regresión real403→csrf200→session401 y respuesta detalle tardía PASS; recreación conserva24/hash; readiness503 con DB detenida y recuperaciónhealthy; rotación operador401/204 y Argon2id56.7ms
-corrections: Compose tmpfs flow-list requería comillas; localizadores MUI de prueba ajustados por asterisco required; Node route.fetch requería CA explícita; tabla móvil reemplazada por tarjetas; logout limpia UI al confirmarse aunque renovación CSRF falle
-security_evidence: error inicial route.fetch incluyó cookie efímera en log técnico; registro redactado antes de artefacto y sesiones invalidadas por recreación/reinicio; no se publica material de sesión
-limitations: acceso desde equipo David y Portainer autenticado pendientes; casos con cobertura parcial identificados en matriz; QA independiente no ejecutada
-next_step: publicar SHA ordinario, entregar evidencias y concretar acceso existente con Neo/David mediante interacción; no aceptar producto ni cerrar HAR-80
-
+fecha_utc: '2026-10-26T12:41:32.160333Z'
+areas:
+  - Gobernanza
+cambio: Ejecución del checker antiguo sobre el paquete candidato en área temporal sin Git.
+resultado: Checker SHA-256 1c00f8b8936c6046c1603f8d79eba58b7ab69a7fca355ef89c6f2346788fa82b; --stage final terminó con exit
+  1 exclusivamente por GIT_ROOT_UNAVAILABLE, sin warnings. No se obtuvo PASS global ni se ejecutó checker final en destino
+  en este hito.
+verificacion: La salida histórica identifica el fallo y el contexto de ejecución; no se reproduce aquí.
+referencias:
+  - SHA-256 checker 1c00f8b8936c6046c1603f8d79eba58b7ab69a7fca355ef89c6f2346788fa82b
+limitaciones:
+  - El comando y la salida completos originales no tienen referencia independiente accesible desde el repositorio.
 ---
-timestamp: 2026-10-26T17:14:05.578890+00:00
-agent: Niobe
-issue: HAR-107
-run: c5df0af5-5923-4231-85ae-088494b61546
-action: incorporar respuestas autenticadas, verificar salud y retirar copia de entrega
-status: completed
-result: David confirma funcionamiento de acceso y Portainer en interacción 6987f0ce-be0b-46db-aba5-4a604bbd18ec (2026-10-26T17:11:38.570Z); app/db healthy, restart unless-stopped, UID1001, privileged=false; HTTPS login 200/verify0; remoto770383f exacto antes del commit documental
-cleanup: retirada únicamente copia privada access/operator-password, regular UID1001/0600 sin montaje activo; hash runtime, certificados y volumen preservados; solo dos contenedores permanentes
-limitations: evidencia Portainer declarada por David, sin sesión/captura independiente Niobe ni secreto concedido; alias/navegador/SO no informados; no se repiten builds ni matriz funcional; QA/aceptación pendientes
-next_step: Seraph verifica entrega en HAR-108 con entorno sintético aislado; Neo coordina aceptación y limpieza de temporales posteriores; no cerrar HAR-80
-
-
+fecha_utc: '2026-10-26T15:40:46.916563Z'
+areas:
+  - API
+  - Toolchain
+cambio: Preparación de toolchain y contrato antes de implementar endpoints.
+resultado: 'Desde main 1ab754f9582f1731d4684370036543fc48ccf2ab: Temurin 25.0.5+8, Maven 3.10.0, Node 24.22.1, npm 11.19.1
+  y OpenAPI Generator 7.26.0 construidos y ejecutados en ARM64 con checksums oficiales. Contrato CRUD/auth validado; generación
+  Java/TS y sondeos Java 25, Boot 4.1.2, Jackson 3 UTC, Unicode suplementario, tsc 7.0.2 y proveedor de correo 9.1.5.Final
+  satisfactorios.'
+verificacion: Sondeos y validación de contrato consignados históricamente; fixtures de producto no ejecutados en este hito.
+referencias:
+  - api/openapi.yaml
+  - api/fixtures/
+  - api/unicode/
+  - platform/toolchain/
+  - platform/openapi/
+  - SHA-256 contrato 02752a57912cf391b8efcf8af5a5a15e48f96831994c3006c3c832518e1cc70a
+limitaciones:
+  - No había endpoints, aplicación ni despliegue en este hito. Los informes de sondeo originales no tienen referencia independiente
+    accesible desde el repositorio.
 ---
-timestamp: 2026-10-27T10:15:23.190795+00:00
-agent: Niobe
-issue: HAR-110
-run: 6aee3eea-3c48-4a4a-9a0b-c301ccfc896b
-action: retomar corrección DEF-QA-001; sanear JDBC/BD; verificar PostgreSQL/HTTPS/Chromium
-status: verified
-result: backend19 PASS sin skipped; QRY-05 empates exactos y UUID, QRY-07 mutación entre páginas; HTTPS409 activo/inactivo/edición y carrera201+409 con rollback; tres recorridos Chromium PASS;82 valores sintéticos con0 coincidencias app/BD
-review: UNIQUE y transacciones intactos; SQLSTATE/correlación conservados; perfil logs compartido; arquitectura/contrato/versiones sin cambios
-cleanup: QA227be823 cuatro contenedores/dos redes/tag ausentes; retiro previo registrado en comentario47bd6951; imagen browser87d209b4 compartida conservada; scratch previo eliminado por plataforma, evidencia reproducida
-limitations: Portainer sin sesión/captura independiente; declaración autenticada David se conserva; FAIL HAR-108 e incidente Buildx OPS_02 permanecen
-next_step: publicar commit ordinario y recrear despliegue con comparación privada; informe/anexo durable HAR-110; reverificación Seraph HAR-111
-
-
+fecha_utc: '2026-10-26T15:40:46.916563Z'
+areas:
+  - Toolchain
+  - Seguridad
+cambio: Detección y corrección inicial de auxiliar privilegiado de Buildx.
+resultado: El driver docker-container creó un auxiliar con HostConfig.Privileged=true, contrario a security.xml OPS_02. Se
+  retiraron el constructor propio y su volumen; se inició reconstrucción con el driver docker existente sin nuevo auxiliar
+  privilegiado.
+verificacion: La inspección histórica de HostConfig confirmó el incumplimiento inicial y la retirada; la imagen correctiva
+  se verifica en el hito siguiente.
+referencias:
+  - .ai/1-rules/security.xml (OPS_02)
+  - platform/toolchain/
+limitaciones:
+  - El intento inicial no fue conforme. Inventarios y logs originales no tienen referencia independiente accesible desde el
+    repositorio.
 ---
-timestamp: 2026-10-27T10:18:23.140797+00:00
-agent: Niobe
-issue: HAR-110
-run: 6aee3eea-3c48-4a4a-9a0b-c301ccfc896b
-action: publicar corrección y recrear despliegue; preservar evidencia y retirar temporales propios
-status: completed
-result: commit publicado/desplegado dabdab62eeb8791ddfa5daa0b287317301d068fe; imagen sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc ARM64; perfil BD sha256:1dc880e11185936248857a1e17b9e065e129fb6186e11a9a32db8d5a98b9528b comprobado efectivo
-persistence: app detenida antes de baseline; ambos contenedores recreados;49 fichas antes/después y checksum completo idéntico; credencial idéntica; volumen conservado; copia contraseña ausente; app/db healthy; login200 TLSverify0 y gestión anónima401
-cleanup: retirados6 contenedores y3 redes temporales de runs b9025505 y actual tras inventario; quedan solo2 contenedores permanentes; toolchain/browser y versiones app conservadas; QA227be823 ausentes previamente; no prune ni down-v
-failures: primer commit falló128 por identidad Git ausente en entorno; resuelto con user.name/email por comando, sin configuración global; primer push sin nuevo commit no cambió remoto
-limitations: consulta conexiones no ofrece Portainer; falta sesión autorizada o captura autenticada del stack para observación independiente; confirmación David no se repite
-next_step: entrega informe/anexo HAR-110; Seraph reverifica en HAR-111 ya dependiente; Neo conserva aceptación y seguimiento operativo
-
-
+fecha_utc: '2026-10-26T15:42:17.842456Z'
+areas:
+  - Toolchain
+  - Seguridad
+cambio: Verificación de reconstrucción correctiva y limpieza de temporales propios.
+resultado: Imagen sha256:cdbdfd5711c800b4743c7887e14d3c08d30b31b8c38a84a256510a6a9c962aeb linux/arm64 con driver docker existente.
+  Contenedor de verificación Privileged=false y ExitCode=0; versiones, DTO Jackson 3/UTC/Unicode y TypeScript comprobados.
+  Se retiraron sondeo, constructor inicial y volumen. La retirada de imagen antigua devolvió exit 1 No such image y una inspección
+  confirmó su ausencia; imagen correctiva retenida sin prune global.
+verificacion: Comprobación histórica de imagen, contenedor, versiones y limpieza; no se ejecuta de nuevo.
+referencias:
+  - platform/toolchain/
+  - imagen sha256:cdbdfd5711c800b4743c7887e14d3c08d30b31b8c38a84a256510a6a9c962aeb
+limitaciones:
+  - El incidente inicial permanece como antecedente. Registros originales de reconstrucción no tienen referencia independiente
+    accesible desde el repositorio.
 ---
-timestamp: 2026-10-27T10:39:41.076118+00:00
-agent: Niobe
-issue: HAR-112
-run: c7277537-77b0-4625-af36-b58e129e38a9
-action: retirar exclusivamente temporales QA HAR-111 tras preservar evidencia durable
-status: completed
-result: paquete QA descargado exit0, SHA256 ca37ba21f9dac3d81bde26f855049cef0b973e096f8da9974296a0c501481856 exacto y50 entradas internas verificadas; retirados4 contenedores y2 redes por ID tras etiquetas/proyecto/lifecycle/mounts/referencias; sin volumen temporal
-preservation: app3947fc85d700/db60c1ad9bab99 siguen healthy, mismos IDs/StartedAt/restartCount0/mounts; redfde711019b4c y volumen usermanager03-postgres-data intactos; imagen2fac22b2a475 e inventario ID/tag/digest idénticos;17 archivos privados iguales en contenido/metadatos sin publicar valores ni hashes; HTTPS login200/TLSverify0
-commands: docker stop --time 20 solo2 temporales activos, docker rm sin-v para4 IDs, docker network rm para2 IDs; todos exit0; inspecciones antes/después en anexo HAR-112
-observations: app temporal unhealthy al iniciar, permanentes healthy; comparación inicial de JSON de imágenes falló por contador Containers reducido, comparación estable ID/tag/digest PASS; primer lector usó python inexistente(exit127) y normalización inicial del manifiesto absoluto falló(exit1), ambos corregidos antes de retirada
-limitations: sin builds, pruebas funcionales nuevas, SQL, recreación, rotación, prune ni cambios normativos; verificación de Niobe no sustituye QA Seraph ni aceptación
-next_step: Seraph verifica independientemente limpieza/evidencia en HAR-113; Neo conserva OPS-04/05 externos y aceptación HAR-80
+fecha_utc: '2026-10-26T15:59:45.175225Z'
+areas:
+  - API
+  - Repositorio
+cambio: Publicación del contrato mediante Git.
+resultado: Push ordinario terminó con exit 0 y refs/heads/main remoto coincidió exactamente con 4b282103f7c4d1f7d9399c184cd4c408b44f9c29
+  antes de implementar endpoints. Se retiró una conexión de servicio innecesaria; no hubo reescritura ni configuración global.
+verificacion: Comparación histórica de SHA remoto; no se consulta el remoto en esta conversión.
+referencias:
+  - commit 4b282103f7c4d1f7d9399c184cd4c408b44f9c29
+  - api/openapi.yaml
+limitaciones:
+  - La salida original de consulta remota no tiene referencia independiente accesible desde el repositorio.
+---
+fecha_utc: '2026-10-26T16:21:30.897668Z'
+areas:
+  - Backend
+  - Base de datos
+cambio: Implementación inicial del backend y verificación HTTP, servicio y PostgreSQL.
+resultado: 14 pruebas PASS sin fallos, errores ni omitidas; Java 25, Boot 4.1.2, Generator 7.26.0, Unicode de 1114112 puntos
+  y PostgreSQL 18.6 TLS verify-full con roles separados. Cubiertos conflicto DNI concurrente, no-op, baja, paginación y DTO
+  UTC/suplementarios. Se corrigieron repositorio Maven no escribible mediante /cache, slice HTTP y validación Spring 7, sesión/cookie
+  previa de MockMvc, borrado de cookie SameSite=Lax y negociación 406. Primera entrega de frontend requirió ocho correcciones
+  y quedó sin integrar. Temporales Compose y red retirados; sin volumen permanente ni prune.
+verificacion: Resultado histórico de pruebas de desarrollo y limpieza; no equivale a revisión independiente.
+referencias:
+  - backend/src/main/java/com/hariklabs/usermanager03/
+  - backend/src/test/
+  - backend/src/main/resources/db/migration/
+  - platform/backend/
+  - platform/testing/
+limitaciones:
+  - No había UI integrada ni despliegue persistente en este hito. Informe original de ejecución sin referencia independiente
+    accesible desde el repositorio.
+---
+fecha_utc: '2026-10-26T16:47:01.699038Z'
+areas:
+  - Frontend
+  - Backend
+  - Platform
+cambio: Integración de frontend y verificación de producto HTTPS ARM64.
+resultado: 'Build normativo y recorridos Chromium CRUD/auth/consulta/paginación/móvil PASS. Regresión 403→CSRF200→sesión401
+  y respuesta tardía PASS; recreación conservó 24 registros y hash; readiness503 con BD parada y recuperación healthy; rotación
+  de operador 401/204 y Argon2id 56.7 ms. Se corrigieron comillas de tmpfs Compose, selectores MUI, CA explícita de Node route.fetch,
+  presentación móvil con tarjetas y limpieza de UI tras logout confirmado. Un error inicial de route.fetch incluyó cookie
+  efímera en log técnico: registro redactado y sesiones invalidadas.'
+verificacion: Pruebas históricas de desarrollo en navegador, HTTPS y recreación; no se repiten aquí.
+referencias:
+  - frontend/src/
+  - platform/frontend/
+  - platform/browser/
+  - platform/runtime/
+limitaciones:
+  - Acceso externo y vista autenticada de Portainer no verificados de forma independiente en este hito; cobertura parcial en
+    matriz original. Informe y capturas originales sin referencia independiente accesible desde el repositorio.
+---
+fecha_utc: '2026-10-26T17:14:05.578890Z'
+areas:
+  - Operación
+  - Entrega
+cambio: Comprobación posterior de salud y retirada de copia privada de entrega.
+resultado: Se registró confirmación externa de funcionamiento de acceso y Portainer; app y BD healthy, restart unless-stopped,
+  UID1001, Privileged=false; HTTPS login 200 y TLS verify0. SHA remoto 770383f exacto antes del commit documental. Se retiró
+  solo la copia privada access/operator-password tras comprobar UID1001, modo 0600 y ausencia de montaje activo; hash runtime,
+  certificados y volumen conservados; solo dos contenedores permanentes.
+verificacion: Salud y HTTPS observados históricamente; el acceso externo y Portainer procedían de declaración externa, sin
+  sesión o captura independiente.
+referencias:
+  - platform/runtime/
+  - imagen sha256:20498efc9db351110cc978190a22e9a567b767852535c1f5a28159da8736e9d2
+limitaciones:
+  - No se repitieron builds ni matriz funcional. Alias, navegador y sistema externo no constaban. Informe original sin referencia
+    independiente accesible desde el repositorio; no implica aceptación.
+---
+fecha_utc: '2026-10-27T10:15:23.190795Z'
+areas:
+  - Backend
+  - Base de datos
+  - Logs
+cambio: Corrección de exposición de datos en logs JDBC y PostgreSQL.
+resultado: 19 pruebas backend PASS sin omitidas; QRY-05 empates exactos/UUID y QRY-07 mutación entre páginas. HTTPS409 activo/inactivo/edición
+  y carrera 201+409 con rollback; tres recorridos Chromium PASS; 82 valores sintéticos sin coincidencias en logs de app/BD.
+  UNIQUE y transacciones intactos; SQLSTATE y correlación conservados. Temporales de prueba previos ausentes, imagen de navegador
+  compartida retenida; evidencia reproducida tras pérdida de scratch anterior.
+verificacion: Pruebas, auditoría e inspección de limpieza consignadas históricamente.
+referencias:
+  - platform/runtime/postgres-logging.conf
+  - platform/testing/audit-logs.py
+  - backend/src/test/java/com/hariklabs/usermanager03/config/SafeJsonEncoderTest.java
+limitaciones:
+  - Portainer seguía sin sesión o captura independiente; un FAIL de revisión anterior y el incidente Buildx OPS_02 permanecen.
+    Informe original de ejecución sin referencia independiente accesible desde el repositorio.
+---
+fecha_utc: '2026-10-27T10:18:23.140797Z'
+areas:
+  - Backend
+  - Despliegue
+cambio: Publicación de corrección y recreación del despliegue con preservación de datos.
+resultado: 'Commit publicado/desplegado dabdab62eeb8791ddfa5daa0b287317301d068fe; imagen ARM64 sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc
+  y perfil BD sha256:1dc880e11185936248857a1e17b9e065e129fb6186e11a9a32db8d5a98b9528b. App detenida antes de baseline; dos
+  contenedores recreados; 49 fichas y checksum idénticos antes/después, credencial idéntica, volumen conservado, copia de
+  contraseña ausente. App/BD healthy, login200 TLSverify0 y gestión anónima401. Se retiraron seis contenedores y tres redes
+  temporales; no prune ni down -v. Primer commit falló 128 por identidad Git ausente: resuelto por comando sin configuración
+  global. Primer push sin commit nuevo no alteró remoto.'
+verificacion: Comparación privada histórica de datos, credencial, imagen, perfil y salud; no se ejecuta de nuevo.
+referencias:
+  - commit dabdab62eeb8791ddfa5daa0b287317301d068fe
+  - platform/runtime/postgres-logging.conf
+  - platform/runtime/verify-recreation.py
+limitaciones:
+  - No hubo observación independiente de Portainer ni aceptación. Informe y comparación originales sin referencia independiente
+    accesible desde el repositorio.
+---
+fecha_utc: '2026-10-27T10:39:41.076118Z'
+areas:
+  - Limpieza
+  - Despliegue
+cambio: Retirada acotada de temporales de prueba y comprobación de recursos permanentes.
+resultado: 'Paquete de evidencia descargado con exit 0, SHA-256 ca37ba21f9dac3d81bde26f855049cef0b973e096f8da9974296a0c501481856
+  y 50 entradas internas verificadas. Retirados cuatro contenedores y dos redes temporales por ID tras etiquetas, proyecto,
+  lifecycle, mounts y referencias; sin volumen temporal. App 3947fc85d700 y BD 60c1ad9bab99 siguieron healthy con IDs, StartedAt,
+  restartCount y mounts iguales; red fde711019b4c, volumen e imagen preservados; 17 archivos privados iguales en contenido/metadatos
+  sin publicar valores. HTTPS login200/TLSverify0. Imagen comparada por ID/tag/digest: el primer cotejo JSON falló por contador
+  Containers; lector python inicial exit127 y normalización de manifiesto absoluto exit1, ambos corregidos antes de retirada.'
+verificacion: Inspecciones históricas antes/después y comandos de retirada terminaron con exit 0; no se repiten.
+referencias:
+  - platform/testing/
+  - platform/runtime/
+  - imagen sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc
+limitaciones:
+  - Sin builds, SQL, pruebas funcionales nuevas, recreación ni rotación. Paquete e inventarios originales sin referencia independiente
+    accesible desde el repositorio; no implica aceptación.
+---
+fecha_utc: '2026-10-27T12:38:33.614223Z'
+areas:
+  - Informe técnico
+cambio: Consolidación de informe visual, matriz de 60 casos y PDF de primera fase.
+resultado: 'Versión inicial: introducción de 87 palabras, anexo de 60 casos, 27 imágenes originales, 38 apariciones inline
+  y PDF de 65 páginas con imágenes; 42 enlaces HTTP200 y hash de descarga coincidente. Se conservó una transición visual original
+  y 59 PASS / 1 FAIL técnico con excepción TLS tratada por separado.'
+verificacion: Comprobaciones documentales históricas de enlaces y descarga; no hubo pruebas funcionales nuevas.
+referencias:
+  - api/fixtures/
+  - platform/browser/
+limitaciones:
+  - La vista panorámica de Portainer iba acompañada de transcripción; legibilidad y correspondencia final estaban pendientes
+    en este hito. PDF, anexos y comprobaciones originales sin referencia independiente accesible desde el repositorio.
+---
+fecha_utc: '2026-10-27T12:45:13.592995Z'
+areas:
+  - Informe técnico
+cambio: Corrección documental y cierre de la entrega visual de primera fase.
+resultado: Se registró revisión documental satisfactoria; tabla QRY corregida en página 24 y conclusión completa en página
+  20. PDF final de 68 páginas y 38 imágenes; interfaz 11/11 más 27/27; 45 enlaces HTTP200. SHA-256 de descarga 7a67dfbc4428fcfc611c0963354e24fbd7c2196bc99ce70f85bbe08394458c4d.
+  Las 38 imágenes embebidas conservaron bytes y orden. Fallos iniciales curl7, python127 y sandbox Chromium corregidos mediante
+  ejecución permitida y python3.
+verificacion: Verificación documental histórica; no se ejecutaron pruebas funcionales ni cambios de despliegue en este hito.
+referencias:
+  - SHA-256 PDF 7a67dfbc4428fcfc611c0963354e24fbd7c2196bc99ce70f85bbe08394458c4d
+limitaciones:
+  - PDF, informe y anexo originales sin referencia independiente accesible desde el repositorio. Enlaces PDF dependían de entorno
+    local; no consta comprobación desde equipo externo. Vista panorámica de Portainer con transcripción. 59 PASS / 1 FAIL técnico
+    y excepción TLS conservados como resultados distintos.
+---
+fecha_utc: '2026-10-29T10:27:47Z'
+areas:
+  - Backend
+  - Frontend
+  - Pruebas
+cambio: Separación local de contrato, implementación y modelos de servicio de usuarios.
+resultado: El controlador depende de service/api/UserService; service/impl/UserServiceImpl conserva lógica y transacciones;
+  service/model contiene entrada, consulta y resultados internos. El mapper REST convierte también la consulta HTTP. Se
+  preservaron contrato y código generado, frontend, persistencia y configuración normativa. Generación OpenAPI, suite backend
+  con PostgreSQL temporal (20 pruebas), comprobaciones frontend, HTTPS sintético y recorridos de navegador terminaron sin
+  fallos. Se retiraron cuatro contenedores, dos redes y la imagen temporal propios; los dos contenedores permanentes
+  conservaron identidad, arranque, reinicios y montajes.
+verificacion: Comandos, salidas sanitizadas, hashes y manifiesto de ejecución conservados como evidencia de desarrollo en la
+  documentación externa de esa verificación. git diff --check sin incidencias. Verificación de desarrollo; no constituye QA independiente.
+referencias:
+  - backend/src/main/java/com/hariklabs/usermanager03/service/api/UserService.java
+  - backend/src/main/java/com/hariklabs/usermanager03/service/impl/UserServiceImpl.java
+  - backend/src/main/java/com/hariklabs/usermanager03/service/model/
+  - backend/src/main/java/com/hariklabs/usermanager03/rest/mapper/UserRestMapper.java
+  - backend/src/test/java/com/hariklabs/usermanager03/service/PostgresTest.java
+  - platform/testing/compose.yaml
+  - platform/testing/runtime.compose.yaml
+limitaciones:
+  - No se desplegó ni se verificó funcionalmente el servicio permanente; la evidencia es de entornos temporales sintéticos.
+  - Las referencias heredadas de general.xml y security.xml a secciones antiguas de project.xml siguen pendientes de una
+    migración normativa separada; este cambio no modifica esas reglas.
+---
+fecha_utc: '2026-10-29T10:45:56Z'
+areas:
+  - Limpieza
+  - QA
+cambio: Retirada acotada de recursos temporales de la verificación arquitectónica independiente.
+resultado: Cuatro contenedores detenidos y dos redes de prueba propios, etiquetados temporary, retirados por ID; seis comandos
+  terminaron con código 0. No había volúmenes temporales. Los dos contenedores permanentes conservaron ID, imagen, StartedAt,
+  RestartCount, montajes y redes, y siguieron healthy; la red, el volumen PostgreSQL y la imagen permanente conservaron identidad.
+  La imagen ARM64 de QA sha256:ac7c1b9cdc9d3d004d701c2db4b928c6d095a28bd1758c1f29781e78498103ff se retuvo porque
+  carece de contenedores asociados, pero lleva lifecycle=permanent y no se demuestra su carácter desechable conforme a la
+  restricción técnica entonces denominada AUTH_08 (actual DOCKER_08).
+verificacion: Inventarios Docker sanitizados antes/después, inspección de etiquetas, proyectos, estados, montajes y referencias;
+  comprobación programática de igualdad de recursos permanentes y ausencia de los seis temporales. Una primera rutina de inventario
+  falló por tratar Labels nulo como mapa; corregida antes de retirar recursos.
+referencias:
+  - platform/testing/compose.yaml
+  - platform/testing/runtime.compose.yaml
+  - platform/runtime/Dockerfile
+  - .ai/1-rules/general.xml (DOCKER_02, DOCKER_06, DOCKER_08)
+  - .ai/1-rules/security.xml (DATA_04)
+limitaciones:
+  - No se ejecutaron builds, pruebas funcionales, despliegue, comprobación HTTPS ni acceso externo en este hito.
+  - Los inventarios y comandos originales están conservados como evidencia externa; no se incluyen valores de secretos ni datos.
+---
+fecha_utc: '2026-10-29T15:00:19Z'
+areas:
+  - Gobernanza
+cambio: Conciliación documental de reglas técnicas y normalización del registro histórico.
+resultado: Se resolvieron referencias normativas obsoletas y se separaron los límites técnicos de la coordinación de tareas.
+  La identidad, el mapa y las lecciones se conservaron sin cambios. Los veinte hitos previos conservaron sus hechos y fechas;
+  se ajustó la sangría de listas para lectura YAML y se actualizaron referencias a identificadores de reglas vigentes.
+  Un primer checker final terminó con exit 1 por el formato de listas del registro; tras normalizarlo terminó con exit 0.
+verificacion: Lectura XML de las reglas y de la identidad, lectura YAML de los veinte hitos previos y checker estructural final
+  ejecutados en el repositorio. La revisión semántica y el manifiesto comparativo se conservan como evidencia documental externa.
+referencias:
+  - .ai/0-core/project.xml
+  - .ai/1-rules/general.xml
+  - .ai/1-rules/security.xml
+  - .ai/2-infra/map.md
+  - .ai/3-runtime/progress.log
+  - .ai/3-runtime/lessons_learned.md
+limitaciones:
+  - No se ejecutaron builds, pruebas de producto, Docker ni verificación funcional del despliegue.
+  - El checker estructural no certifica atomicidad, conformidad semántica ni aceptación funcional.
+---
+fecha_utc: '2026-10-29T15:21:26Z'
+areas:
+  - Seguridad
+  - Gobernanza
+cambio: Precisión documental del alcance de ACCESS_09 tras revisar la ruta interna de healthcheck.
+resultado: ACCESS_09 limita las rutas anónimas de la superficie de aplicación accesible al usuario. El healthcheck de
+  management existente permanece en el puerto interno 8081; ACCESS_10 mantiene la prohibición de exponer información
+  administrativa al acceso externo. No se modificaron código, configuración de ejecución ni otras reglas de seguridad.
+verificacion: Inspección estática de SecurityConfiguration, application.properties y Compose; lectura XML y YAML y checker
+  estructural final con exit 0, cero findings y cero warnings. No se verificó el comportamiento en ejecución.
+referencias:
+  - .ai/1-rules/security.xml (ACCESS_09, ACCESS_10)
+  - backend/src/main/java/com/hariklabs/usermanager03/security/SecurityConfiguration.java
+  - backend/src/main/resources/application.properties
+  - platform/runtime/compose.yaml
+limitaciones:
+  - No se ejecutaron builds, pruebas de producto, Docker, despliegue ni comprobación de acceso externo.
+  - La inspección estática y el checker no acreditan conformidad funcional ni aceptación independiente.
+---
+fecha_utc: '2026-10-29T16:43:00Z'
+areas:
+  - Seguridad
+  - Gobernanza
+cambio: Cobertura documental de secretos y material de sesión en todas las evidencias publicadas.
+resultado: Se añadió DATA_06 para cubrir evidencias publicadas más allá de logs y capturas. Se conservaron las reglas previas,
+  la identidad, el mapa y los aprendizajes; ACCESS_09 y ACCESS_10 mantienen su alcance. Los 22 hitos anteriores permanecen
+  semánticamente intactos.
+verificacion: Comparación de los seis documentos con plantillas fijadas, lectura XML y YAML, y checker estructural final con
+  exit 0 antes de esta entrada; la comprobación final de la entrada se documenta por separado.
+referencias:
+  - .ai/1-rules/security.xml (DATA_06, ACCESS_09, ACCESS_10)
+  - .ai/3-runtime/progress.log
+limitaciones:
+  - Revisión documental; no se ejecutaron builds, pruebas de producto, Docker, despliegue ni validación de acceso externo.
+  - El checker no acredita equivalencia semántica ni aceptación independiente.
+---
+fecha_utc: '2026-10-29T16:59:41Z'
+areas:
+  - Gobernanza
+  - Seguridad
+cambio: Corrección documental de la retirada condicionada de temporales y del mínimo privilegio por componente.
+resultado: DOCKER_08 expresa la retirada al finalizar el uso solo con carácter desechable demostrado y autorización.
+  Se añadió OPS_07 con el principio de privilegios necesarios para cada componente. Las reglas preexistentes y los
+  23 hitos anteriores se conservaron.
+verificacion: Comparación documental de la versión recibida y de las plantillas fijadas; lectura XML y YAML, cotejo de
+  identificadores y prioridades, comparación de paths y checker estructural final. Resultados detallados en evidencia externa.
+referencias:
+  - .ai/1-rules/general.xml (DOCKER_08)
+  - .ai/1-rules/security.xml (OPS_07, ACCESS_11, DATA_05)
+  - .ai/3-runtime/progress.log
+limitaciones:
+  - No se ejecutaron builds, pruebas de producto, Docker, limpieza, despliegue ni verificación funcional del runtime.
+  - La revisión documental propia y el checker estructural no sustituyen la revisión independiente ni la aceptación funcional.
