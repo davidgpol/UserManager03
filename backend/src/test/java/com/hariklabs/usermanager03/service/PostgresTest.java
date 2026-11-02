@@ -70,13 +70,13 @@ class PostgresTest {
             assertThrows(java.sql.SQLException.class,()->statement.execute("delete from user_record"));
         }
         var value=service.create(input("00000000T"," \uFEFF👩‍💻Jose\u0301 "));
-        assertEquals("\uFEFF👩‍💻Jose\u0301",service.get(value.id().toString()).firstName());
-        var unchanged=service.update(value.id().toString(),input(" 00000000t "," \uFEFF👩‍💻Jose\u0301 "));
+        assertEquals("\uFEFF👩‍💻Jose\u0301",service.get(value.id()).firstName());
+        var unchanged=service.update(value.id(),input(" 00000000t "," \uFEFF👩‍💻Jose\u0301 "));
         assertEquals(value,unchanged);
-        service.deactivate(value.id().toString());var inactive=service.get(value.id().toString());
+        service.deactivate(value.id());var inactive=service.get(value.id());
         assertFalse(inactive.active());assertTrue(inactive.updatedAt().isAfter(inactive.createdAt()));
-        service.deactivate(value.id().toString());assertEquals(inactive,service.get(value.id().toString()));
-        assertFalse(service.update(value.id().toString(),input("00000000T","Nuevo")).active());
+        service.deactivate(value.id());assertEquals(inactive,service.get(value.id()));
+        assertFalse(service.update(value.id(),input("00000000T","Nuevo")).active());
         assertEquals("DNI_CONFLICT",assertThrows(DomainException.class,()->service.create(input("00000000t","Otro"))).code());
     }
     @Test void concurrentCanonicalDniHasOneWinnerAndOneConflict()throws Exception {
@@ -120,11 +120,11 @@ class PostgresTest {
         var a=login();var b=login();
         var original=service.create(input("00000005M","Har110Original"));
         conflict(write(a,"POST","/api/users",input(" 00000005m ","Har110Duplicate"),"har110-ordinary"),"har110-ordinary");
-        service.deactivate(original.id().toString());
+        service.deactivate(original.id());
         conflict(write(a,"POST","/api/users",input("00000005M","Har110Inactive"),"har110-inactive"),"har110-inactive");
         var unchanged=service.create(input("00000006Y","Har110Unchanged"));
         conflict(write(a,"PUT","/api/users/"+unchanged.id(),input("00000005M","Har110Rollback"),"har110-update"),"har110-update");
-        assertEquals(unchanged,service.get(unchanged.id().toString()));
+        assertEquals(unchanged,service.get(unchanged.id()));
         var ready=new CountDownLatch(2);var go=new CountDownLatch(1);
         try(var pool=Executors.newVirtualThreadPerTaskExecutor()) {
             var futures=new ArrayList<Future<org.springframework.mock.web.MockHttpServletResponse>>();
@@ -135,7 +135,7 @@ class PostgresTest {
         }
         assertEquals(1,service.list(new UserQuery(0,20,"all","00000007F")).total());
         assertEquals(1,service.list(new UserQuery(0,20,"all","00000005M")).total());
-        assertFalse(service.get(original.id().toString()).active());
+        assertFalse(service.get(original.id()).active());
     }
     @Test void exactCreatedAtTiesUsePostgresUuidOrder() throws Exception {
         var ids=List.of("ffffffff-ffff-4fff-bfff-ffffffffffff","00000000-0000-4000-8000-000000000001","80000000-0000-4000-8000-000000000000");
@@ -157,7 +157,7 @@ class PostgresTest {
         var first=service.list(new UserQuery(0,1,"active","Har110Moving"));assertEquals(a.id(),first.items().getFirst().id());assertEquals(3,first.total());
         var d=service.create(input("00000014Z","Har110Moving"));
         var second=service.list(new UserQuery(1,1,"active","Har110Moving"));assertEquals(b.id(),second.items().getFirst().id());assertEquals(4,second.total());
-        service.deactivate(a.id().toString());
+        service.deactivate(a.id());
         var shifted=service.list(new UserQuery(1,1,"active","Har110Moving"));assertEquals(c.id(),shifted.items().getFirst().id());assertEquals(3,shifted.total());
         var refreshed=service.list(new UserQuery(0,20,"active","Har110Moving"));assertEquals(List.of(b.id(),c.id(),d.id()),refreshed.items().stream().map(UserResult::id).toList());
     }

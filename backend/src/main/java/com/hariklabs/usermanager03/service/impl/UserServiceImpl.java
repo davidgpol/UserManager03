@@ -21,13 +21,8 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOG=LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository repository; private final UserValues values; private final Clock clock;
     public UserServiceImpl(UserRepository repository,UserValues values,Clock clock) {this.repository=repository;this.values=values;this.clock=clock;}
-    public static UUID id(String text) {
-        if(text==null || !text.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
-            throw new DomainException(400,"INVALID_ID","Identificador no válido.",List.of(new DomainException.FieldError("path","id","INVALID_FORMAT","Use un identificador UUID completo.")));
-        return UUID.fromString(text);
-    }
     @Transactional(readOnly=true)
-    public UserResult get(String text) {return result(repository.findById(id(text)).orElseThrow(UserServiceImpl::missing));}
+    public UserResult get(UUID id) {return result(repository.findById(id).orElseThrow(UserServiceImpl::missing));}
     @Transactional(readOnly=true,isolation=Isolation.REPEATABLE_READ)
     public UserResults list(UserQuery query) {
         Specification<UserEntity> spec=(root,q,cb)-> {
@@ -52,8 +47,8 @@ public class UserServiceImpl implements UserService {
         LOG.atInfo().addKeyValue("event_type","user_created").log("Ficha creada"); return result(entity);
     }
     @Transactional
-    public UserResult update(String text,UserInput input) {
-        UUID id=id(text);var valid=values.validate(input);var entity=repository.lockById(id).orElseThrow(UserServiceImpl::missing);
+    public UserResult update(UUID id,UserInput input) {
+        var valid=values.validate(input);var entity=repository.lockById(id).orElseThrow(UserServiceImpl::missing);
         if(!new UserInput(entity.getFirstName(),entity.getLastName(),entity.getDni(),entity.getEmail()).equals(valid)) {
             edit(entity,valid,next(entity.getUpdatedAt()));save(entity);
             LOG.atInfo().addKeyValue("event_type","user_updated").log("Ficha modificada");
@@ -61,8 +56,8 @@ public class UserServiceImpl implements UserService {
         return result(entity);
     }
     @Transactional
-    public void deactivate(String text) {
-        var entity=repository.lockById(id(text)).orElseThrow(UserServiceImpl::missing);
+    public void deactivate(UUID id) {
+        var entity=repository.lockById(id).orElseThrow(UserServiceImpl::missing);
         if(entity.isActive()) {entity.deactivate(next(entity.getUpdatedAt()));repository.flush();
             LOG.atInfo().addKeyValue("event_type","user_deactivated").log("Ficha dada de baja");}
     }

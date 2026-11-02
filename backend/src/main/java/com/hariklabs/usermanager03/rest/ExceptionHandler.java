@@ -20,7 +20,10 @@ public class ExceptionHandler {
     public ResponseEntity<?> handle(Exception exception,HttpServletRequest request) {
         var headers=new HttpHeaders();headers.setContentType(MediaType.APPLICATION_PROBLEM_JSON);headers.setCacheControl("no-store");
         DomainException failure;
-        if(exception instanceof DomainException d) failure=d;
+        if(exception instanceof DomainException d) {
+            failure=d;
+            if(d.status()>=500) logFailure(d);
+        }
         else if(exception instanceof HttpMessageNotReadableException unreadable) failure=jsonError(unreadable);
         else if(exception instanceof jakarta.validation.ConstraintViolationException validation) {
             var errors=new ArrayList<DomainException.FieldError>();
@@ -47,10 +50,12 @@ public class ExceptionHandler {
             failure=new DomainException(405,"METHOD_NOT_ALLOWED","Método no permitido.");
         } else if(exception instanceof HttpMediaTypeNotSupportedException) failure=new DomainException(415,"UNSUPPORTED_MEDIA_TYPE","Tipo de contenido no admitido.");
         else if(exception instanceof HttpMediaTypeNotAcceptableException) failure=new DomainException(406,"NOT_ACCEPTABLE","La representación solicitada no está disponible.");
-        else if(exception instanceof TransientDataAccessException || exception instanceof DataAccessResourceFailureException) failure=new DomainException(503,"SERVICE_UNAVAILABLE","Inténtelo más tarde.");
+        else if(exception instanceof TransientDataAccessException || exception instanceof DataAccessResourceFailureException) {
+            logFailure(exception);
+            failure=new DomainException(503,"SERVICE_UNAVAILABLE","Inténtelo más tarde.");
+        }
         else {
-            // Deliberately exclude exception message/stack: JDBC exceptions can carry personal values.
-            LoggerFactory.getLogger(ExceptionHandler.class).atError().addKeyValue("event_type","operation_failed").addKeyValue("exception_type",exception.getClass().getSimpleName()).log("Operación fallida");
+            logFailure(exception);
             failure=new DomainException(500,"INTERNAL_ERROR","No se pudo completar la operación.");
         }
         if(failure.status()==406) {
@@ -61,6 +66,11 @@ public class ExceptionHandler {
             } catch(InvalidMediaTypeException ignored) {return ResponseEntity.status(406).cacheControl(CacheControl.noStore()).build();}
         }
         return ResponseEntity.status(failure.status()).headers(headers).body(problems.body(request,failure));
+    }
+    private static void logFailure(Exception exception) {
+        // The encoder extracts safe frames from the cause; it never serializes its message.
+        LoggerFactory.getLogger(ExceptionHandler.class).atError().addKeyValue("event_type","operation_failed")
+            .setCause(exception).log("Operación fallida");
     }
     private static String safe(String field) {return Set.of("firstName","lastName","dni","email","id","active","createdAt","updatedAt").contains(field)?field:"$";}
     private static DomainException jsonError(Throwable error) {

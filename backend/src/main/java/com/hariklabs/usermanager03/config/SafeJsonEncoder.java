@@ -6,8 +6,10 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.LinkedHashMap;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
-/** One JSON event per line; exceptions are classified by type without raw JDBC details. */
+/** One JSON event per line; exception messages and foreign stack frames are never serialized. */
 public class SafeJsonEncoder extends EncoderBase<ILoggingEvent> {
     private final JsonMapper mapper=JsonMapper.builder().build();
     @Override public byte[] headerBytes(){return new byte[0];}
@@ -30,7 +32,19 @@ public class SafeJsonEncoder extends EncoderBase<ILoggingEvent> {
         value.put("message",message);
         value.putAll(event.getMDCPropertyMap());
         if(event.getKeyValuePairs()!=null)for(var pair:event.getKeyValuePairs()) value.put(pair.key,pair.value);
-        if(event.getThrowableProxy()!=null)value.put("exception_type",event.getThrowableProxy().getClassName());
+        if(event.getThrowableProxy()!=null) {
+            value.put("exception_type",event.getThrowableProxy().getClassName());
+            List<String> frames=new ArrayList<>();
+            for(var proxy:event.getThrowableProxy().getStackTraceElementProxyArray()) {
+                var frame=proxy.getStackTraceElement();
+                String type=frame.getClassName(),method=frame.getMethodName();
+                if(!type.startsWith("com.hariklabs.usermanager03.") ||
+                    !type.matches("[A-Za-z0-9_.$]+") || !method.matches("[A-Za-z0-9_$<>]+")) continue;
+                frames.add(type+"."+method+":"+frame.getLineNumber());
+                if(frames.size()==32) break;
+            }
+            if(!frames.isEmpty()) value.put("stack_trace",frames);
+        }
         return (mapper.writeValueAsString(value)+"\n").getBytes(StandardCharsets.UTF_8);
     }
 }

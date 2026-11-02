@@ -17,9 +17,9 @@ public class UsersController implements UsersApi {
         var result=mapper.output(service.create(mapper.input(input)));
         return ResponseEntity.created(URI.create("/api/users/"+result.getId())).body(result);
     }
-    @Override public ResponseEntity<User> getUser(String id) {return ResponseEntity.ok(mapper.output(service.get(id)));}
-    @Override public ResponseEntity<User> updateUser(String id,UserUpdateRequest input) {return ResponseEntity.ok(mapper.output(service.update(id,mapper.input(input))));}
-    @Override public ResponseEntity<Void> deactivateUser(String id) {service.deactivate(id);return ResponseEntity.noContent().build();}
+    @Override public ResponseEntity<User> getUser(String id) {return ResponseEntity.ok(mapper.output(service.get(mapper.id(id))));}
+    @Override public ResponseEntity<User> updateUser(String id,UserUpdateRequest input) {return ResponseEntity.ok(mapper.output(service.update(mapper.id(id),mapper.input(input))));}
+    @Override public ResponseEntity<Void> deactivateUser(String id) {service.deactivate(mapper.id(id));return ResponseEntity.noContent().build();}
     @Override public ResponseEntity<UserPage> listUsers(String page,String size,String status,String q) {
         return ResponseEntity.ok(mapper.page(service.list(mapper.query(request.getParameterMap()))));
     }

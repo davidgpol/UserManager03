@@ -1,6 +1,7 @@
 package com.hariklabs.usermanager03.rest;
 
 import com.hariklabs.usermanager03.config.JsonConfiguration;
+import com.hariklabs.usermanager03.config.SafeJsonEncoder;
 import com.hariklabs.usermanager03.rest.mapper.UserRestMapper;
 import com.hariklabs.usermanager03.security.*;
 import com.hariklabs.usermanager03.service.*;
@@ -15,9 +16,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.junit.jupiter.api.Test;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.core.read.ListAppender;
 import tools.jackson.databind.json.JsonMapper;
 import java.time.Clock;
 import java.util.*;
+import java.nio.charset.StandardCharsets;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -83,8 +87,36 @@ class HttpContractTest {
     @Test void invalidQueryAndIdHaveContractCodes()throws Exception {
         var a=login();
         mvc.perform(get("/api/users").session(a.session()).param("page","-1")).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_QUERY"));
-        mvc.perform(get("/api/users/short").session(a.session())).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_ID"));
+        mvc.perform(get("/api/users/short").session(a.session())).andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value("INVALID_ID"))
+            .andExpect(jsonPath("$.errors[0].location").value("path"))
+            .andExpect(jsonPath("$.errors[0].field").value("id"));
         mvc.perform(get("/api/users").session(a.session()).param("sort","id")).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_QUERY"));
         verifyNoInteractions(service);
+    }
+    @Test void validRouteIdReachesServiceAsUuidAndMissingRecordRemains404()throws Exception {
+        var a=login();UUID id=UUID.fromString("A0B1C2D3-1234-5678-9ABC-DEF012345678");
+        when(service.get(id)).thenThrow(new DomainException(404,"USER_NOT_FOUND","La ficha no existe."));
+        mvc.perform(get("/api/users/"+id).session(a.session())).andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"));
+        verify(service).get(id);
+    }
+    @Test void unexpectedFailureReturnsGenericProblemAndLogsOneSanitizedTrace()throws Exception {
+        var a=login();UUID id=UUID.fromString("a0b1c2d3-1234-5678-9abc-def012345678");
+        when(service.get(id)).thenThrow(new IllegalStateException("synthetic-secret 00000005M synthetic@example.test"));
+        var logger=(Logger)org.slf4j.LoggerFactory.getLogger(ExceptionHandler.class);
+        var captured=new ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();captured.start();logger.addAppender(captured);
+        try {
+            mvc.perform(get("/api/users/"+id).session(a.session())).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
+                .andExpect(jsonPath("$.detail").value("No se pudo completar la operación."));
+            assertEquals(1,captured.list.size());
+            String encoded=new String(new SafeJsonEncoder().encode(captured.list.getFirst()),StandardCharsets.UTF_8);
+            assertTrue(encoded.contains("\"stack_trace\""));
+            assertTrue(encoded.contains("HttpContractTest.unexpectedFailureReturnsGenericProblemAndLogsOneSanitizedTrace"));
+            assertFalse(encoded.contains("synthetic-secret"));
+            assertFalse(encoded.contains("00000005M"));
+            assertFalse(encoded.contains("synthetic@example.test"));
+        } finally {logger.detachAppender(captured);captured.stop();}
     }
 }
