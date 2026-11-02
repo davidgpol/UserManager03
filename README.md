@@ -3,6 +3,34 @@
 Gestión de fichas de usuarios y cuenta operadora independiente. Identidad y
 versiones normativas en `.ai/0-core/project.xml`; instrucciones en `AGENTS.md`.
 
+## Despliegue permanente actual (2026-11-02)
+
+La imagen local `usermanager03-app:3c061aa99f3384fa1978d20150687b1b1887cfcd`
+(`linux/arm64`, ID `sha256:decc2f336cc856dad62ca003232a7df1593f1f4dc461ff783834161e96f0e28e`)
+se construyó desde ese commit publicado. Los servicios `usermanager03-app-1` y
+`usermanager03-db-1` quedaron healthy tras recreación controlada. Las 49 fichas,
+el volumen `usermanager03-postgres-data` y los archivos de la cuenta operadora
+coincidieron antes y después; se conserva una copia privada previa en el host.
+La verificación desde OCI cubrió TLS 1.2/1.3, salud, rutas anónimas y CSRF.
+No se ejecutaron login ni CRUD autenticado en la instancia permanente porque la
+contraseña en claro de David no está disponible para este run. Tampoco se observó
+Portainer autenticado ni la confianza TLS desde su equipo; esos resultados
+requieren comprobación independiente y no están acreditados por el estado healthy.
+
+Para acceder desde el equipo de David, usar el alias SSH privado ya autorizado
+y la confianza en el certificado público entregado previamente. Con el puerto
+local 18443 libre, establecer el túnel sin abrir puertos en el host remoto:
+
+```bash
+ssh -N -L 127.0.0.1:18443:127.0.0.1:18443 \
+  -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=yes ALIAS_SSH_AUTORIZADO
+```
+
+Abrir `https://localhost:18443` en el navegador con el certificado de servidor
+confiado; cerrar el proceso SSH termina el túnel. El alias y la instalación de
+confianza dependen de la configuración privada del equipo de David. Esta instrucción
+no acredita que se haya ejecutado allí en esta entrega.
+
 Estado de HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
 validado y publicado en `4b282103f7c4d1f7d9399c184cd4c408b44f9c29`
 mediante Git y helper `gh` de OCI (SHA remoto verificado). Backend implementado con 14 pruebas de desarrollo previas; frontend integrado y

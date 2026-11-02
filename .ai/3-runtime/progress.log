@@ -459,3 +459,26 @@ limitaciones:
   - Se verificó el candidato en entornos temporales; no se desplegó ni se recreó el servicio permanente ni se comprobó Portainer
     de forma independiente.
   - La imagen ARM64 nueva quedó retenida por su etiqueta lifecycle=permanent y las cachés compartidas no se limpiaron.
+---
+fecha_utc: '2026-11-02T09:31:00Z'
+areas:
+  - Despliegue
+  - Verificación
+  - Docker
+cambio: Despliegue permanente del commit publicado 3c061aa99f3384fa1978d20150687b1b1887cfcd y limpieza acotada.
+resultado: Imagen linux/arm64 sha256:decc2f336cc856dad62ca003232a7df1593f1f4dc461ff783834161e96f0e28e
+  desplegada. App y PostgreSQL recreados y healthy; 49 fichas, volumen y archivos de cuenta operadora idénticos antes/después.
+  Copia privada previa creada y validada por índice. TLS 1.2/1.3 validó certificado; 401 anónimo y 403 sin CSRF.
+  Cinco imágenes antiguas de pruebas propias sin contenedores asociados fueron retiradas por ID; imagen anterior,
+  navegador, toolchain y caché compartida retenidos.
+verificacion: Inventarios Docker sanitizados, comparación de filas y credenciales en memoria, copia pg_dump, build ARM64,
+  checks HTTPS y auditoría de logs ejecutados en OCI; comandos, códigos y límites en el anexo técnico de la tarea de despliegue.
+referencias:
+  - platform/runtime/Dockerfile
+  - platform/runtime/compose.yaml
+  - platform/runtime/verify-recreation.py
+  - README.md
+limitaciones:
+  - Sin contraseña operadora en claro en este run: no se ejecutaron login, CRUD autenticado ni creación sintética en la instancia permanente.
+  - Sin sesión autorizada de Portainer ni comprobación desde el equipo de David; QA independiente del despliegue pendiente.
+  - El primer listado de copia falló por ausencia de pg_restore en el host; su ejecución dentro del contenedor terminó correctamente.

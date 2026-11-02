@@ -204,3 +204,17 @@ del viewport para la evidencia móvil, de modo que el diálogo sea legible.
 
 **Referencia:**
 - `platform/browser/smoke.cjs`
+
+## Verificación de una copia PostgreSQL sin herramientas en el host
+
+**Problema:** `pg_dump` puede estar disponible dentro del contenedor de PostgreSQL,
+pero `pg_restore` no estar instalado en el host que conserva la copia privada.
+
+**Aprendizaje:** Guardar la salida de `pg_dump -Fc` fuera del repositorio con
+permisos privados y verificar su índice mediante `docker exec -i` y `pg_restore -l`
+en el contenedor existente. Esta lectura comprueba el formato y la lista de
+objetos; no sustituye una restauración de ensayo.
+
+**Referencias:**
+- `platform/runtime/compose.yaml`
+- `platform/runtime/verify-recreation.py`
