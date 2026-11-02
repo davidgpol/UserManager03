@@ -510,3 +510,34 @@ limitaciones:
   - No hubo vista autenticada de Portainer, comprobación TLS desde el equipo de David ni QA independiente.
   - Los logs del contenedor de aplicación anterior no se conservaron antes de recrearlo; la auditoría indicada cubre
     solo el contenedor actual y las operaciones posteriores a la recreación.
+---
+fecha_utc: '2026-11-02T12:06:42Z'
+areas:
+  - QA
+  - Despliegue
+  - Portainer
+cambio: Verificación independiente del despliegue permanente y de su visibilidad autenticada en Portainer.
+resultado: En la imagen linux/arm64 sha256:decc2f336cc856dad62ca003232a7df1593f1f4dc461ff783834161e96f0e28e,
+  se repitieron login/logout, sesión/CSRF, alta, detalle, modificación, baja lógica idempotente, búsqueda y paginación
+  con una única ficha sintética nueva. Tras recrear app y PostgreSQL, las 50 fichas preexistentes conservaron exactamente
+  su contenido y la ficha nueva persistió inactiva; ambos servicios quedaron healthy. Portainer autenticado mostró el
+  stack usermanager03, los dos servicios healthy y el volumen usermanager03-postgres-data. Los archivos privados,
+  volúmenes y redes ajenas conservaron su contenido o identidad aplicable.
+verificacion: Respuestas HTTP y UI real con once capturas sintéticas; comparación completa de las 50 fichas preexistentes
+  y la nueva antes/después; TLS 1.2/1.3 con ssl_verify_result 0; imagen ARM64 y revisión OCI comprobadas; logs previos
+  183/183 JSON y posteriores 107/107 JSON, con 138 y 62 eventos operativos respectivamente, correlaciones explícitas
+  y cero coincidencias de cinco marcadores sintéticos en aplicación o BD. Huella y SPKI de Portainer iguales al
+  certificado público fijado; API autenticada de solo lectura confirmó un endpoint, dos contenedores permanentes y el volumen.
+referencias:
+  - README.md
+  - api/openapi.yaml
+  - platform/runtime/compose.yaml
+  - platform/runtime/operate.sh
+  - platform/browser/run.sh
+  - platform/testing/audit-logs.py
+limitaciones:
+  - No se ejecutó la comprobación desde el equipo de David; TLS y navegador se observaron desde OCI.
+  - Tres intentos de la captura visual posterior fallaron por filtros o selectores MUI antes de repetirse satisfactoriamente;
+    las comparaciones API ya habían terminado sin diferencias y esos intentos no realizaron mutaciones.
+  - Un contenedor temporal ajeno apareció en el inventario intermedio y desapareció concurrentemente; los cinco
+    servicios ajenos presentes en la línea base inicial conservaron identidad y no fueron modificados por esta QA.

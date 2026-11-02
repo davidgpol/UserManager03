@@ -18,8 +18,11 @@ Tras recrear ambos contenedores, las 49 fichas previas permanecieron idénticas 
 la ficha nueva persistió inactiva; el volumen y los archivos privados se conservaron.
 La copia privada de entrega de la nueva contraseña sigue en
 `/opt/Dev/Secrets/UserManager03/access/operator-password` hasta que David confirme
-haberla guardado. Portainer autenticado, la confianza TLS desde su equipo y QA
-independiente siguen sin acreditarse por esta verificación.
+haberla guardado. La QA independiente posterior repitió login/logout, sesión/CSRF,
+CRUD lógico, consulta, paginación y persistencia de una ficha sintética propia;
+también observó de forma autenticada en Portainer el stack `usermanager03`, sus dos
+servicios healthy y el volumen protegido. La confianza TLS desde el equipo de David
+sigue sin acreditarse por una ejecución directa en ese equipo.
 
 Para acceder desde el equipo de David, usar el alias SSH privado ya autorizado
 y la confianza en el certificado público entregado previamente. Con el puerto
@@ -302,8 +305,10 @@ copia de entrega esté ausente y no sirve para la rotación actual mientras deba
 conservarse; HAR-163 usó una comprobación acotada en scratch que verificó su
 preservación junto a los demás archivos privados.
 
-La confirmación autenticada de acceso/Portainer de HAR-107 sigue vigente. La
-observación independiente de Portainer requiere sesión autorizada o captura del
-operador con stack usermanager03, ambos servicios, estados y volumen; no se ha
-concedido sesión Niobe/Seraph. Esa limitación se entrega a Neo, sin repetir la
-pregunta de funcionamiento ni solicitar secretos en comentarios.
+La confirmación autenticada de acceso/Portainer de HAR-107 sigue vigente. El
+2026-11-02, la QA independiente utilizó el acceso privado autorizado únicamente en
+memoria y obtuvo capturas de observación de Portainer con el stack `usermanager03`,
+ambos servicios healthy y `usermanager03-postgres-data`. La huella y el SPKI del
+certificado servido coincidieron con el certificado público fijado; no se modificó
+la configuración de Portainer. La comprobación desde el equipo de David continúa
+siendo una evidencia distinta.
