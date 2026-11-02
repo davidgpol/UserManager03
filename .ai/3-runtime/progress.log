@@ -541,3 +541,27 @@ limitaciones:
     las comparaciones API ya habían terminado sin diferencias y esos intentos no realizaron mutaciones.
   - Un contenedor temporal ajeno apareció en el inventario intermedio y desapareció concurrentemente; los cinco
     servicios ajenos presentes en la línea base inicial conservaron identidad y no fueron modificados por esta QA.
+---
+fecha_utc: '2026-11-02T12:19:50Z'
+areas:
+  - Docker
+  - Limpieza
+  - Documentación
+cambio: Limpieza final acotada de imágenes propias tras QA independiente satisfactoria del despliegue permanente.
+resultado: >-
+  Se retiraron por tag cuatro referencias de tres imágenes sin contenedores asociados: la imagen anterior de app
+  sha256:2fac22b2a4750cabae35a55d33e4079f0fcddf10a4a91e899d3855a8fbbfe8cc, la imagen temporal de navegador
+  sha256:87d209b484b4121e74725ac5db51fe49142777e617741d489bbda293d387b14a y la de toolchain
+  sha256:cdbdfd5711c800b4743c7887e14d3c08d30b31b8c38a84a256510a6a9c962aeb. Quedaron la imagen activa ARM64
+  sha256:decc2f336cc856dad62ca003232a7df1593f1f4dc461ff783834161e96f0e28e, los dos servicios healthy,
+  la red permanente y el volumen usermanager03-postgres-data. README refleja que las imágenes de prueba ya no están retenidas.
+verificacion: Inventario Docker anterior y posterior de contenedores, imágenes, redes y volúmenes; inspección de etiquetas,
+  tags y referencias de las tres imágenes; docker image rm terminó con exit 0. Evidencia extensa en la tarea de coordinación.
+referencias:
+  - README.md
+  - platform/runtime/compose.yaml
+  - platform/browser/Dockerfile
+  - platform/toolchain/Dockerfile
+limitaciones:
+  - 'No se eliminó caché BuildKit: sus entradas son compartidas y no se acreditó propiedad exclusiva del proyecto.'
+  - No se volvió a ejecutar la matriz funcional ni se verificó acceso desde el equipo de David durante esta limpieza.

@@ -233,10 +233,9 @@ autorizada de 2026-11-02 generó una nueva copia de entrega que permanece proteg
 Los comandos de navegador anteriores describen su ejecución histórica. La
 verificación de HAR-163 utilizó la nueva copia mediante montaje privado de solo
 lectura y creó solo una ficha sintética; no volvió a rotar la cuenta. La imagen
-de navegador
-retenida usa el tag del run `dfe7ab16-7266-4572-a30f-a7edf940e910`; el runner
-construye el tag a partir del run actual, por lo que este requiere construir o
-etiquetar su imagen de prueba antes de ejecutarlo.
+de navegador del run `dfe7ab16-7266-4572-a30f-a7edf940e910` fue retirada tras
+la QA satisfactoria del despliegue. Para una nueva ejecución, construirla con el
+tag del run actual antes de invocar el runner.
 
 
 ## Corrección y reverificación HAR-110
@@ -262,14 +261,19 @@ Incluye QRY-05: tres UUID explícitos con exactamente el mismo createdAt, tres
 recorridos de páginas size=1; QRY-07: alta y baja entre peticiones, totales frescos
 y desplazamiento documentado. Los fixtures SQL solo modifican la BD sintética tmpfs.
 
-Para HTTPS y navegador, construir la imagen con el comando HAR-107 anterior y
-seleccionar su tag en `UM03_APP_IMAGE`. Reutilizar la imagen de navegador retenida:
+Para HTTPS y navegador, construir la imagen de aplicación con el comando HAR-107
+anterior y seleccionar su tag en `UM03_APP_IMAGE`. La ejecución histórica reutilizó
+una imagen de navegador que ya fue retirada; para repetirla, construir la imagen
+de navegador con el Dockerfile de `platform/browser/` y usar el tag del run actual:
 
 ```bash
 export UM03_PRIVATE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/isolated"
 export UM03_EVIDENCE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/evidence"
 export UM03_BASE_URL=https://localhost:19443
-export UM03_BROWSER_IMAGE=usermanager03-browser:dfe7ab16-7266-4572-a30f-a7edf940e910
+export UM03_BROWSER_IMAGE="usermanager03-browser:$PAPERCLIP_RUN_ID"
+docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/browser/Dockerfile \
+  -t "$UM03_BROWSER_IMAGE" .
 mkdir -p "$UM03_EVIDENCE_DIR"
 python3 platform/testing/prepare-runtime.py "$UM03_PRIVATE_DIR"
 docker compose -p "usermanager03-test-http-$PAPERCLIP_RUN_ID"   -f platform/testing/runtime.compose.yaml up -d --wait --wait-timeout 150
@@ -288,9 +292,9 @@ navegador debe ser distinto de cualquier fixture previo. `synthetic-records.json
 cubre el dataset del recorrido HTTP; para auditar también navegador exportar todas
 las fichas únicamente de esa BD sintética. No publicar secretos, cookies ni
 cabeceras de sesión. Preservar evidencia antes de retirar recursos temporales.
-Seraph conserva las imágenes de toolchain/navegador para HAR-111; entrega inventario
-con etiquetas, mounts y referencias para que Niobe retire sus temporales conforme
-a general.xml AUTH_08. No ejecutar prune ni down -v permanente.
+En HAR-111, Seraph conservó temporalmente las imágenes de toolchain y navegador
+para la revisión posterior. Ambas fueron retiradas tras la QA satisfactoria del
+despliegue del 2026-11-02; no ejecutar prune ni down -v permanente.
 
 Recreación permanente: solo en mantenimiento asignado, cerrar escrituras y usar
 el SHA de imagen verificado. `UM03_PRIVATE_DIR=/opt/Dev/Secrets/UserManager03`,
