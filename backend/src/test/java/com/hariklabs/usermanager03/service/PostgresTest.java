@@ -1,5 +1,8 @@
 package com.hariklabs.usermanager03.service;
 
+import com.hariklabs.usermanager03.service.api.UserService;
+import com.hariklabs.usermanager03.service.impl.UserServiceImpl;
+import com.hariklabs.usermanager03.service.model.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -27,6 +30,19 @@ class PostgresTest {
         r.add("um03.operator.password-hash",()->hash);
     }
 
+    @Test void serviceContractIsProxiedWithImplementationTransactionBoundaries() throws Exception {
+        assertTrue(org.springframework.aop.support.AopUtils.isAopProxy(service));
+        assertEquals(UserServiceImpl.class,org.springframework.aop.support.AopUtils.getTargetClass(service));
+        var source=new org.springframework.transaction.annotation.AnnotationTransactionAttributeSource();
+        var list=source.getTransactionAttribute(UserServiceImpl.class.getMethod("list",UserQuery.class),UserServiceImpl.class);
+        assertNotNull(list);
+        assertTrue(list.isReadOnly());
+        assertEquals(org.springframework.transaction.TransactionDefinition.ISOLATION_REPEATABLE_READ,list.getIsolationLevel());
+        var create=source.getTransactionAttribute(UserServiceImpl.class.getMethod("create",UserInput.class),UserServiceImpl.class);
+        assertNotNull(create);
+        assertFalse(create.isReadOnly());
+    }
+
     @Test void httpToPostgresToGeneratedJsonPreservesUnicodeAndUtc() throws Exception {
         var csrf=mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/auth/csrf")).andReturn();
         var session=(org.springframework.mock.web.MockHttpSession)csrf.getRequest().getSession();
@@ -37,7 +53,7 @@ class PostgresTest {
         token=json.readTree(csrf.getResponse().getContentAsString()).get("token").asText();
         String name="👩".repeat(100);
         var response=mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/api/users").session(session).header("X-CSRF-TOKEN",token).contentType("application/json")
-            .content(json.writeValueAsString(new UserValues.Input(" "+name+" ","Jose\u0301","00000004G","a@localhost"))))
+            .content(json.writeValueAsString(new UserInput(" "+name+" ","Jose\u0301","00000004G","a@localhost"))))
             .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isCreated()).andReturn();
         var created=json.readTree(response.getResponse().getContentAsString());
         assertEquals(name,created.get("firstName").asText());assertTrue(created.get("createdAt").asText().endsWith("Z"));
@@ -45,7 +61,7 @@ class PostgresTest {
             .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk()).andReturn();
         assertEquals(created,json.readTree(read.getResponse().getContentAsString()));
     }
-    UserValues.Input input(String dni,String name) {return new UserValues.Input(name,"Prueba Núñez",dni,"synthetic@example.test");}
+    UserInput input(String dni,String name) {return new UserInput(name,"Prueba Núñez",dni,"synthetic@example.test");}
     @Test void postgresVersionTlsRestrictedRoleAndRoundTrip()throws Exception {
         try(var c=dataSource.getConnection();var statement=c.createStatement()) {
             try(var rs=statement.executeQuery("select current_user,current_setting('server_version'),current_setting('server_encoding'),ssl from pg_stat_ssl where pid=pg_backend_pid()")) {
@@ -75,10 +91,10 @@ class PostgresTest {
         var a=service.create(input("00000002W","Álvaro % Caso"));var b=service.create(input("00000003A","Núñez"));
         assertTrue(service.list(new UserQuery(0,20,"active","alva")).items().stream().anyMatch(v->v.id().equals(a.id())));
         assertTrue(service.list(new UserQuery(0,20,"active","nunez")).items().stream().anyMatch(v->v.id().equals(b.id())));
-        assertEquals(List.of(a.id()),service.list(new UserQuery(0,20,"active","%")).items().stream().map(UserService.Result::id).toList());
+        assertEquals(List.of(a.id()),service.list(new UserQuery(0,20,"active","%")).items().stream().map(UserResult::id).toList());
         var full=service.list(new UserQuery(0,100,"all",""));var ids=new ArrayList<UUID>();
         for(int page=0;page<full.total();page++) ids.add(service.list(new UserQuery(page,1,"all","")).items().getFirst().id());
-        assertEquals(full.items().stream().map(UserService.Result::id).toList(),ids);
+        assertEquals(full.items().stream().map(UserResult::id).toList(),ids);
         var empty=service.list(new UserQuery(1000000,100,"all",""));assertTrue(empty.items().isEmpty());assertEquals(full.total(),empty.total());
     }
     private record Login(org.springframework.mock.web.MockHttpSession session,String token) {}
@@ -91,7 +107,7 @@ class PostgresTest {
         c=mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/auth/csrf").session(session)).andReturn();
         return new Login(session,json.readTree(c.getResponse().getContentAsString()).get("token").asText());
     }
-    private org.springframework.mock.web.MockHttpServletResponse write(Login login,String method,String path,UserValues.Input input,String correlation) throws Exception {
+    private org.springframework.mock.web.MockHttpServletResponse write(Login login,String method,String path,UserInput input,String correlation) throws Exception {
         return mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request(org.springframework.http.HttpMethod.valueOf(method),path)
             .session(login.session()).header("X-CSRF-TOKEN",login.token()).header("X-Correlation-ID",correlation)
             .contentType("application/json").content(json.writeValueAsString(input))).andReturn().getResponse();
@@ -143,7 +159,7 @@ class PostgresTest {
         var second=service.list(new UserQuery(1,1,"active","Har110Moving"));assertEquals(b.id(),second.items().getFirst().id());assertEquals(4,second.total());
         service.deactivate(a.id().toString());
         var shifted=service.list(new UserQuery(1,1,"active","Har110Moving"));assertEquals(c.id(),shifted.items().getFirst().id());assertEquals(3,shifted.total());
-        var refreshed=service.list(new UserQuery(0,20,"active","Har110Moving"));assertEquals(List.of(b.id(),c.id(),d.id()),refreshed.items().stream().map(UserService.Result::id).toList());
+        var refreshed=service.list(new UserQuery(0,20,"active","Har110Moving"));assertEquals(List.of(b.id(),c.id(),d.id()),refreshed.items().stream().map(UserResult::id).toList());
     }
     @Test void databaseLoggingConfigurationIsEffective() throws Exception {
         var expected=Map.of("log_error_verbosity","terse","log_min_error_statement","panic","log_statement","none","log_parameter_max_length","0","log_parameter_max_length_on_error","0","log_min_messages","warning");

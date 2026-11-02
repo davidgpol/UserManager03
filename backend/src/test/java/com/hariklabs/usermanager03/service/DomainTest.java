@@ -1,5 +1,7 @@
 package com.hariklabs.usermanager03.service;
 
+import com.hariklabs.usermanager03.rest.mapper.UserRestMapper;
+import com.hariklabs.usermanager03.service.model.*;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import tools.jackson.databind.json.JsonMapper;
@@ -28,16 +30,17 @@ class DomainTest {
         assertEquals(1114112,checked);
     }
     @Test void dniAndQueryFixtures() throws Exception {
+        var mapper=new UserRestMapper();
         var fixtures=json.readTree(Files.readString(Path.of("../api/fixtures/dni-query-errors.json")));
         for(var test:fixtures.get("dni")) assertEquals(test.get("canonical").isNull()?null:test.get("canonical").asText(),UserValues.canonicalDni(test.get("input").asText()));
         for(var test:fixtures.get("queryRejections")) {
             var params=new HashMap<String,List<String>>();
             for(String entry:test.get("query").asText().split("&")) {String[] kv=entry.split("=",2);params.computeIfAbsent(kv[0],k->new ArrayList<>()).add(kv[1]);}
             var raw=new HashMap<String,String[]>();params.forEach((k,v)->raw.put(k,v.toArray(String[]::new)));
-            assertEquals("INVALID_QUERY",assertThrows(DomainException.class,()->UserQuery.parse(raw)).code());
+            assertEquals("INVALID_QUERY",assertThrows(DomainException.class,()->mapper.query(raw)).code());
         }
-        assertEquals(new UserQuery(0,20,"active",""),UserQuery.parse(Map.of()));
-        assertEquals(1,UserQuery.parse(Map.of("page",new String[]{"000001"})).page());
+        assertEquals(new UserQuery(0,20,"active",""),mapper.query(Map.of()));
+        assertEquals(1,mapper.query(Map.of("page",new String[]{"000001"})).page());
         assertEquals("nunez",UserValues.nameSearch("Núñez"));
         assertNotEquals(UserValues.emailSearch("josé"),UserValues.emailSearch("jose"));
     }
@@ -46,7 +49,7 @@ class DomainTest {
             var values=new UserValues(factory.getValidator());
             var fixtures=json.readTree(Files.readString(Path.of("../api/fixtures/email.json")));
             for(var test:fixtures.get("cases")) {
-                var input=new UserValues.Input(" Ana ","Prueba"," 00000000t ",test.get("value").asText());
+                var input=new UserInput(" Ana ","Prueba"," 00000000t ",test.get("value").asText());
                 if(test.get("domainAccepts").asBoolean()) {var result=values.validate(input);assertEquals(input.email(),result.email());assertEquals("Ana",result.firstName());assertEquals("00000000T",result.dni());}
                 else assertThrows(DomainException.class,()->values.validate(input));
             }

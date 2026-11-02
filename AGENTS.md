@@ -1,77 +1,223 @@
-# UserManager03 — Agent Instructions
+# UserManager03 — Guía del repositorio
 
-This file is the single entry point for project-specific agent instructions.
+## 1. Propósito del proyecto
 
-## Project purpose
+Aplicación web de gestión de usuarios con autenticación mediante
+una cuenta operadora independiente.
 
-Web de gestión de fichas de usuarios y autenticación de cuenta operadora separada. Spring Boot REST API-first, React Material Design y PostgreSQL; versiones normativas en project.xml.
+El proyecto comprende un contrato REST, un frontend React, un backend
+Spring Boot y la infraestructura necesaria para su ejecución.
 
-Approved versions and architectural decisions belong in
+La identidad tecnológica y arquitectónica se define en
 `.ai/0-core/project.xml`.
 
-## Estado documental
+## 2. Lectura obligatoria del contexto del proyecto
 
-Estado documental: paquete de promoción S02-NIOBE-3P preparado en HAR-101 para confirmación exacta de Neo en HAR-80; todavía no confirmado, instalado ni publicado. Procede de S02-NIOBE-3C (HAR-99, revisión 683a3807-a17c-42f8-a008-3c4b2e04d891), con PASS documental de Seraph en HAR-100 (revisión 91ce925c-987e-4fc4-879e-0d420371e7e1). Los tres XML presentan status=approved como estado preparado para la promoción autorizada en HAR-101; este atributo no sustituye la confirmación del nuevo manifiesto. general.xml y security.xml conservan los bytes aprobados de S02-NIOBE-2P, sin nuevas reglas. Conforme a .ai/1-rules/general.xml AUTH_02/AUTH_03, Neo debe confirmar los siete hashes antes de asignar instalación y comparación/checker final en destino. Al preparar este paquete, la gobernanza instalada/publicada sigue siendo S02-NIOBE-2P. Esta entrega no acredita preparación inicial, aceptación ni PROJECT READY.
+Estas instrucciones se aplican una vez establecida la documentación
+técnica del proyecto.
 
-La inspección histórica y las ubicaciones planificadas se distinguen en `.ai/2-infra/map.md`. Al promover, actualizar este estado y el del mapa junto con los tres XML; confirmar el nuevo manifiesto antes de instalar. No basta cambiar los atributos XML.
+El primer paso de cualquier trabajo será leer los siguientes archivos
+vigentes del repositorio, respetando este orden:
 
-## Project context
+| Prioridad | Documento | Contenido |
+|---|---|---|
+| P0 — Máxima | `.ai/0-core/project.xml` | Identidad esencial, tecnologías, versiones y arquitectura del proyecto. |
+| P1 | `.ai/1-rules/general.xml` | Reglas de implementación, desarrollo y logging. |
+| P2 | `.ai/1-rules/security.xml` | Requisitos de seguridad. |
+| P3 | `.ai/2-infra/map.md` | Estructura de paquetes y carpetas, con sus responsabilidades. |
+| P4 | `.ai/3-runtime/progress.log` | Historial cronológico de cambios, resultados y verificaciones. |
+| P5 | `.ai/3-runtime/lessons_learned.md` | Aprendizajes técnicos reutilizables y sus referencias. |
 
-Read the following documents before work that depends on them:
+Esta lectura es obligatoria antes de analizar, diseñar, construir,
+modificar, probar o revisar cualquier parte del proyecto.
 
-| Document | Purpose |
-| --- | --- |
-| `.ai/0-core/project.xml` | Project identity, scope, technology choices and architecture. |
-| `.ai/1-rules/security.xml` | Project security requirements. |
-| `.ai/1-rules/general.xml` | Development, validation and logging rules. |
-| `.ai/2-infra/map.md` | Component locations and relationships. |
-| `.ai/3-runtime/progress.log` | Actual execution history and pending next steps. |
-| `.ai/3-runtime/lessons_learned.md` | Verified knowledge applicable to the work. |
+Debe realizarse en cada nueva ejecución y al retomar un trabajo.
+Si alguno de estos documentos cambia durante la ejecución, volver
+a leer su versión actualizada antes de continuar con el trabajo afectado.
 
-For execution history, focus on entries relevant to the assigned task.
-Missing bootstrap artifacts are pending work; create them when in assigned scope.
-Do not treat planned files as existing files.
+Estos documentos constituyen el contexto esencial del proyecto.
+Sus definiciones, restricciones y aprendizajes deben orientar las
+decisiones durante todo el trabajo, respetando la función y autoridad
+de cada documento.
 
-## Source of project decisions
+## 3. Autoridad y prioridad de los documentos
 
-Implement the approved identity in build files and code.
-Do not redefine identity merely to match an implementation discrepancy.
-Use map.md to locate components, not to introduce architectural decisions.
-History and lessons provide context and do not override approved rules.
-Identify both the file and rule identifier when referring to a rule.
+El orden establecido en el apartado anterior determina tanto
+la lectura como la precedencia:
 
-## Working within Paperclip
+project.xml > general.xml > security.xml > map.md > progress.log > lessons_learned.md
 
-Follow the role, scope and authorization provided through Paperclip.
-This repository does not redefine personas, reporting lines or delegation.
-Use actual issue and run identifiers; do not invent them.
+### Regla de precedencia
 
-## Repository organization
+Ante una contradicción entre dos documentos, prevalece siempre
+el de mayor prioridad.
 
-Ubicaciones planificadas: backend/src y backend/pom.xml; frontend/src y frontend/package.json; contrato api/openapi.yaml. Capas REST → Servicio → Persistencia → BD; no hexagonal. En la inspección de 2026-10-26T10:00:36.566553+00:00 no había aplicación ni descriptores creados; consultar el mapa y la tarea actual para cambios posteriores. Cargar la tarea actual de Paperclip y sus dependencias antes de actuar; HAR-80 contiene el plan único. Las PR/PD de HAR-82 no son aprobaciones por sí mismas; aplicar las decisiones posteriores Q-F01–Q-F04 y PD-05–10 trazadas en project.xml, HAR-84, HAR-86 y HAR-96. Véase el mapa para dependencias funcionales y límites operativos.
+Un documento de menor prioridad puede complementar al superior
+dentro de su ámbito, pero no modificarlo, contradecirlo ni
+introducir excepciones a sus disposiciones.
 
-Project infrastructure belongs under `platform/`: Dockerfiles and their
-build-context exclusions, Compose definitions, infrastructure configuration,
-deployment templates and operational scripts.
-Detailed locations and status belong in `.ai/2-infra/map.md`.
+La fecha más reciente, el mayor nivel de detalle o la existencia
+de código que siga el documento inferior no alteran esta prioridad.
 
-## Container operations
+### Función de cada documento
 
-Use infrastructure definitions under `platform/`.
-Keep the repository root as build context when required to access application
-source or build descriptors.
-Resolve commands against actual infrastructure files.
-Document verified commands in README.md; label unexecuted proposals accordingly.
+- `project.xml` contiene la identidad inmutable del proyecto.
+  Su modificación requiere una decisión explícita sobre el cambio
+  concreto de identidad.
 
-## Maintaining project context
+- Los descriptores de build y el código deben implementar esa identidad.
+  Una discrepancia de la implementación no justifica modificar
+  automáticamente `project.xml`.
 
-Record actual actions and outcomes in `.ai/3-runtime/progress.log`.
-Update `.ai/2-infra/map.md` when locations or relationships change.
-Add verified reusable knowledge to `.ai/3-runtime/lessons_learned.md`.
-Keep decisions in project.xml and rules in their corresponding rule files.
+- `general.xml` contiene las reglas de implementación, desarrollo
+  y logging, subordinadas a la identidad definida en `project.xml`.
 
-## Comandos y estado de preparación
+- `security.xml` contiene los requisitos de seguridad, respetando
+  la precedencia de `project.xml` y `general.xml`.
 
-Verificados históricamente en HAR-83 (2026-10-26T09:31:59.414823+00:00): `git -C /opt/Dev/Projects/UserManager03 rev-parse --show-toplevel`, `git -C /opt/Dev/Projects/UserManager03 symbolic-ref --short HEAD`, `git -C /opt/Dev/Projects/UserManager03 status --short --branch` (exit 0; main sin commits). Esa inspección no verificó comandos de build/despliegue. No ejecutar comandos de infraestructura hasta disponer de definiciones reales en platform/ y una tarea asignada.
+- `map.md` describe la organización de paquetes y carpetas.
+  Debe mantenerse alineado con la estructura implementada.
+  No puede redefinir la arquitectura ni introducir nuevas reglas.
 
-La revisión de Neo confirma un manifiesto exacto antes de instalar; el checker final y comparación de bytes se ejecutarán después en destino. David ya autorizó publicación pública HTTPS y Docker específicos de este proyecto (HAR-79); HAR-83 no ejecuta esas fases. No hay autorización genérica para otros proyectos ni configuración global. Las decisiones técnicas delegadas no necesitan repetición de aprobación de David.
+- `progress.log` registra hechos, cambios y verificaciones.
+  Sus entradas no conceden autorizaciones ni modifican las
+  definiciones normativas.
+
+- `lessons_learned.md` recoge aprendizajes técnicos.
+  Sus entradas no sustituyen ni modifican las reglas vigentes.
+
+La prioridad no amplía la función de un documento.
+
+### Actuación ante contradicciones
+
+- Identificar los documentos y apartados afectados.
+  Citar el identificador de la regla cuando exista.
+
+- Aplicar la disposición del documento de mayor prioridad.
+
+- Comunicar la discrepancia encontrada.
+
+- Conservar las demás disposiciones compatibles del documento inferior.
+
+- No reescribir los documentos para resolver la discrepancia
+  sin autorización para ese cambio.
+
+Si la contradicción está dentro de un mismo documento o no puede
+resolverse mediante esta jerarquía, solicitar una aclaración antes
+de ejecutar la parte afectada.
+
+Continuar con el trabajo que no dependa de esa decisión.
+
+Los hechos históricos se conservan como tales, aunque describan
+una implementación que no cumplía las reglas vigentes.
+
+### Conservación de la documentación .ai
+
+Estas instrucciones se aplican una vez establecida la documentación
+del proyecto.
+
+- Conserva las etiquetas, atributos, secciones y campos establecidos
+  en cada documento.
+
+- No añadas, elimines, renombres ni reorganices esos elementos
+  sin una instrucción explícita que autorice el cambio concreto.
+
+- `project.xml` contiene la identidad inmutable del proyecto.
+  No modifiques sus valores para adaptarlos al código existente
+  ni para incorporar decisiones de implementación.
+
+- En `general.xml` y `security.xml`, no añadas, elimines ni cambies
+  obligaciones sin una instrucción explícita sobre esas reglas.
+  Tampoco introduzcas nuevas obligaciones mediante comentarios
+  o texto libre.
+
+- Mantén `map.md` actualizado con las carpetas, paquetes y
+  responsabilidades correspondientes, utilizando su formato existente.
+
+- Añade hechos a `progress.log` y aprendizajes contrastados a
+  `lessons_learned.md` utilizando los campos establecidos.
+  Estas entradas no pueden introducir ni modificar reglas del proyecto.
+
+- Una petición de implementar una funcionalidad no autoriza por sí
+  misma a ampliar o modificar la documentación normativa.
+
+- Si una necesidad requiere cambiar la estructura o las reglas,
+  presenta el cambio concreto y su motivo antes de aplicarlo.
+  Continúa con el trabajo que no dependa de esa decisión.
+
+## 4. Trabajo técnico y verificación
+
+### Contrato y código
+
+- Consultar el contrato REST en `api/openapi.yaml` antes de modificar
+  el comportamiento HTTP.
+
+- Utilizar la configuración de `platform/openapi/` para la generación
+  de interfaces, modelos y cliente API.
+
+- Realizar las correcciones del código generado en el contrato
+  o en la configuración del generador.
+
+- Aplicar la arquitectura por capas e Interface-Driven definida
+  en `project.xml`.
+
+- Localizar los componentes de API, Frontend, Backend y Platform
+  mediante `.ai/2-infra/map.md`.
+
+### Infraestructura
+
+- Mantener los Dockerfiles, archivos Compose, configuraciones de
+  infraestructura y scripts operativos bajo `platform/`.
+
+- Ejecutar builds y pruebas mediante los entornos Docker
+  definidos por el proyecto.
+
+- Utilizar la raíz del repositorio como contexto de construcción
+  cuando el Dockerfile necesite acceder a varios componentes.
+
+- Consultar los procedimientos del README y los scripts correspondientes,
+  comprobando que se ajustan a la configuración vigente.
+
+### Comprobaciones
+
+- Comprobar la existencia y el contenido de los archivos utilizados.
+
+- Verificar los cambios mediante las pruebas y comprobaciones
+  correspondientes a los componentes afectados.
+
+- Distinguir entre contenido inspeccionado, funcionalidad implementada,
+  pruebas ejecutadas y comportamiento observado en ejecución.
+
+- Identificar las comprobaciones fallidas y las que no se hayan ejecutado.
+
+- Respaldar los resultados comunicados con evidencias localizables.
+
+- La existencia de una prueba o de un commit no demuestra
+  que una ejecución haya resultado satisfactoria.
+
+- Antes de dar por terminado un cambio, comprobar su conformidad
+  con la identidad y las reglas aplicables, dejando constancia de
+  las verificaciones realizadas y las discrepancias pendientes.
+
+## 5. Mantenimiento de la documentación
+
+Actualizar los documentos afectados por los cambios realizados:
+
+- `map.md`: actualizar las ubicaciones y responsabilidades cuando
+  cambie la estructura de paquetes o carpetas.
+
+- `progress.log`: añadir los hitos técnicos con fecha UTC, áreas
+  afectadas, cambio, resultado, verificación, referencias y limitaciones.
+
+- `lessons_learned.md`: incorporar aprendizajes técnicos contrastados,
+  describiendo el problema, la solución aplicable y su referencia.
+
+- `README.md`: mantener los procedimientos de preparación, ejecución,
+  pruebas y operación correspondientes a la configuración vigente.
+
+Conservar los hechos históricos al actualizar formatos o referencias.
+Registrar las correcciones de resultados anteriores mediante nuevas
+entradas que permitan identificar el hecho corregido.
+
+Mantener las referencias actualizadas cuando se muevan archivos.
+Distinguir las referencias al código de las evidencias de ejecución.

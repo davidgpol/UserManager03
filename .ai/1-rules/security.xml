@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<security_rules priority="1" status="approved">
+<security_rules priority="2" status="approved">
     <credential_protection>
         <rule id="CRED_01" priority="critical">Exclude credential values from version-controlled files.</rule>
         <rule id="CRED_02" priority="critical">Load required credentials from deployment-provided configuration at runtime.</rule>

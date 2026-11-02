@@ -433,3 +433,29 @@ referencias:
 limitaciones:
   - No se ejecutaron builds, pruebas de producto, Docker, limpieza, despliegue ni verificación funcional del runtime.
   - La revisión documental propia y el checker estructural no sustituyen la revisión independiente ni la aceptación funcional.
+---
+fecha_utc: '2026-10-30T13:17:45Z'
+areas:
+  - Navegador
+  - Pruebas
+  - Limpieza
+cambio: Corrección de capturas de prueba durante animaciones y verificación del candidato de aplicación.
+resultado: Las capturas de detalle móvil se obtienen con animaciones deshabilitadas y tamaño de viewport legible. OpenAPI validó
+  y generó servidor y cliente; el cliente generado coincidió en sus 14 archivos. Backend con PostgreSQL real completó 20 pruebas
+  sin fallos ni omitidas; frontend completó tests, tipos y build; HTTPS y recorridos de navegador sintéticos pasaron. Logs de
+  aplicación 727/727 JSON con campos obligatorios, 679 eventos de operación con correlación, flujo y tipo, y cero coincidencias
+  de 130 marcadores sintéticos en app o BD. Cuatro contenedores y dos redes temporales propios fueron retirados; los recursos
+  permanentes conservaron identidad, arranque, reinicios, salud y montajes.
+verificacion: Salidas sanitizadas, capturas, inventarios y hashes de esta ejecución conservados como anexo de la tarea técnica.
+  La primera orden de retirada falló antes de modificar recursos por variables Compose omitidas; la repetición con variables
+  completas terminó con código 0. La primera captura móvil ilegible fue corregida y repetida con código 0.
+referencias:
+  - platform/browser/smoke.cjs
+  - platform/testing/compose.yaml
+  - platform/testing/runtime.compose.yaml
+  - api/openapi.yaml
+  - backend/src/test/java/com/hariklabs/usermanager03/service/PostgresTest.java
+limitaciones:
+  - Se verificó el candidato en entornos temporales; no se desplegó ni se recreó el servicio permanente ni se comprobó Portainer
+    de forma independiente.
+  - La imagen ARM64 nueva quedó retenida por su etiqueta lifecycle=permanent y las cachés compartidas no se limpiaron.

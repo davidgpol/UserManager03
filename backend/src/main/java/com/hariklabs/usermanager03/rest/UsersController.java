@@ -3,7 +3,7 @@ package com.hariklabs.usermanager03.rest;
 import com.hariklabs.usermanager03.rest.generated.api.UsersApi;
 import com.hariklabs.usermanager03.rest.generated.model.*;
 import com.hariklabs.usermanager03.rest.mapper.UserRestMapper;
-import com.hariklabs.usermanager03.service.*;
+import com.hariklabs.usermanager03.service.api.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +21,6 @@ public class UsersController implements UsersApi {
     @Override public ResponseEntity<User> updateUser(String id,UserUpdateRequest input) {return ResponseEntity.ok(mapper.output(service.update(id,mapper.input(input))));}
     @Override public ResponseEntity<Void> deactivateUser(String id) {service.deactivate(id);return ResponseEntity.noContent().build();}
     @Override public ResponseEntity<UserPage> listUsers(String page,String size,String status,String q) {
-        return ResponseEntity.ok(mapper.page(service.list(UserQuery.parse(request.getParameterMap()))));
+        return ResponseEntity.ok(mapper.page(service.list(mapper.query(request.getParameterMap()))));
     }
 }

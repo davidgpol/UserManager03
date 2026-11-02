@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coding_standards priority="2" status="approved">
+<coding_standards priority="1" status="approved">
     <empirical_validation>
         <rule id="VAL_01" priority="critical">Execute work within the authorized task scope.</rule>
         <rule id="VAL_02" priority="critical">Obtain authorization before performing actions outside the authorized task scope.</rule>

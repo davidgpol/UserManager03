@@ -193,3 +193,14 @@ los atributos transaccionales de la implementación contra PostgreSQL real.
 - `backend/src/main/java/com/hariklabs/usermanager03/service/model/`
 - `backend/src/main/java/com/hariklabs/usermanager03/rest/mapper/UserRestMapper.java`
 - `backend/src/test/java/com/hariklabs/usermanager03/service/PostgresTest.java`
+
+## Capturas de diálogos con animación
+
+**Problema:** Playwright puede capturar un diálogo MUI durante su transición,
+aunque el título ya sea visible. El texto queda superpuesto en la evidencia.
+
+**Aprendizaje:** Deshabilitar las animaciones al tomar capturas y usar el tamaño
+del viewport para la evidencia móvil, de modo que el diálogo sea legible.
+
+**Referencia:**
+- `platform/browser/smoke.cjs`

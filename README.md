@@ -73,7 +73,11 @@ persistencia, healthchecks, Portainer y limpieza final continúan pendientes.
 
 ## Backend y pruebas verificadas
 
-REST generado → mapper manual → servicio transaccional → JPA → PostgreSQL.
+REST generado → `rest/mapper/` → `service/api/UserService` →
+`service/impl/UserServiceImpl` (transacciones) → JPA → PostgreSQL.
+`service/model/` contiene entradas, consultas y resultados internos; el mapper
+convierte peticiones, parámetros de consulta y respuestas HTTP sin pasar DTO
+generados ni entidades JPA a través del contrato de servicio.
 `backend/pom.xml` mantiene las versiones aprobadas. No editar `backend/target`;
 Maven genera interfaces/DTO desde el contrato publicado. La fuente Unicode fijada
 genera el recurso TSV mediante `platform/backend/generate-unicode.py`.
@@ -204,7 +208,7 @@ etiquetar su imagen de prueba antes de ejecutarlo.
 `platform/runtime/postgres-logging.conf` conserva diagnósticos PostgreSQL con
 SQLSTATE, PID y sesión, y excluye DETAIL, texto SQL y parámetros de errores.
 El encoder JSON sanea las categorías JDBC actual y anterior de Hibernate;
-`UserService` conserva evento `dni_conflict`, SQLSTATE y correlación de petición.
+`UserServiceImpl` conserva evento `dni_conflict`, SQLSTATE y correlación de petición.
 No cambian UNIQUE, migraciones, aislamiento ni contrato HTTP.
 
 Entorno de prueba aislado (ejecutado en HAR-110; elegir directorio privado nuevo):

@@ -4,6 +4,7 @@ import com.hariklabs.usermanager03.config.JsonConfiguration;
 import com.hariklabs.usermanager03.rest.mapper.UserRestMapper;
 import com.hariklabs.usermanager03.security.*;
 import com.hariklabs.usermanager03.service.*;
+import com.hariklabs.usermanager03.service.api.UserService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.*;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
