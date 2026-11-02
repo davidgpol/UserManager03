@@ -10,12 +10,16 @@ La imagen local `usermanager03-app:3c061aa99f3384fa1978d20150687b1b1887cfcd`
 se construyó desde ese commit publicado. Los servicios `usermanager03-app-1` y
 `usermanager03-db-1` quedaron healthy tras recreación controlada. Las 49 fichas,
 el volumen `usermanager03-postgres-data` y los archivos de la cuenta operadora
-coincidieron antes y después; se conserva una copia privada previa en el host.
-La verificación desde OCI cubrió TLS 1.2/1.3, salud, rutas anónimas y CSRF.
-No se ejecutaron login ni CRUD autenticado en la instancia permanente porque la
-contraseña en claro de David no está disponible para este run. Tampoco se observó
-Portainer autenticado ni la confianza TLS desde su equipo; esos resultados
-requieren comprobación independiente y no están acreditados por el estado healthy.
+coincidieron antes y después; se conserva una copia privada previa de la BD en el host.
+La verificación inicial desde OCI cubrió TLS 1.2/1.3, salud, rutas anónimas y CSRF.
+Después de la rotación autorizada del 2026-11-02, HAR-163 verificó en esta imagen
+login/logout, sesión/CSRF, CRUD, búsqueda y paginación con una ficha sintética.
+Tras recrear ambos contenedores, las 49 fichas previas permanecieron idénticas y
+la ficha nueva persistió inactiva; el volumen y los archivos privados se conservaron.
+La copia privada de entrega de la nueva contraseña sigue en
+`/opt/Dev/Secrets/UserManager03/access/operator-password` hasta que David confirme
+haberla guardado. Portainer autenticado, la confianza TLS desde su equipo y QA
+independiente siguen sin acreditarse por esta verificación.
 
 Para acceder desde el equipo de David, usar el alias SSH privado ya autorizado
 y la confianza en el certificado público entregado previamente. Con el puerto
@@ -180,8 +184,8 @@ lifecycle=permanent y run real; inicialización de permisos1001/0700 con auxilia
 propio desechable. No repetir creación/preparación sobre datos existentes.
 `prepare.py` produce una entrega privada inicial en `access/operator-password`;
 no publicar ni copiar a tickets. La contraseña usada por Spring solo está en forma
-Argon2id en `app/um03.operator.password-hash`. Tras entrega segura al operador,
-retirar la copia de entrega mediante acción controlada. Cambiar cuenta con
+Argon2id en `app/um03.operator.password-hash`. Conservar la copia privada de la
+rotación actual hasta que David confirme haberla guardado. Cambiar cuenta con
 `python3 platform/runtime/set-operator.py "$UM03_PRIVATE_DIR"` (entrada oculta),
 y reiniciar app mediante `operate.sh restart-app`. La rotación fue comprobada:
 clave anterior401, nueva204, sin modificar fichas; verificación Argon2id56.7ms.
@@ -221,11 +225,12 @@ alias ni navegador/SO; Niobe no obtuvo sesión ni captura autenticada de Portain
 Esta evidencia del operador queda diferenciada de la futura QA independiente.
 No reconfigurar Portainer.
 
-Tras recepción se retiró la copia privada `access/operator-password`; el hash de
-runtime y el servicio permanecen intactos. Los comandos de navegador anteriores
-describen la ejecución acreditada antes de esa retirada. Para nuevas pruebas
-autenticadas, usar entorno aislado y credencial sintética privada propios; no
-rotar la cuenta de David ni recrear la copia de entrega. La imagen de navegador
+Tras la entrega de 2026-10-26 se retiró la copia privada de entonces. La rotación
+autorizada de 2026-11-02 generó una nueva copia de entrega que permanece protegida.
+Los comandos de navegador anteriores describen su ejecución histórica. La
+verificación de HAR-163 utilizó la nueva copia mediante montaje privado de solo
+lectura y creó solo una ficha sintética; no volvió a rotar la cuenta. La imagen
+de navegador
 retenida usa el tag del run `dfe7ab16-7266-4572-a30f-a7edf940e910`; el runner
 construye el tag a partir del run actual, por lo que este requiere construir o
 etiquetar su imagen de prueba antes de ejecutarlo.
@@ -292,7 +297,10 @@ paran app antes de la línea base y recrean ambos servicios. Comparan fichas com
 recuento, volumen y bytes de la credencial solo en memoria; la evidencia expone
 booleanos/recuento, nunca filas, contraseña o hash. Una diferencia exige investigar;
 no restaurar/borrar datos automáticamente. El reinicio invalida sesiones; no cambia
-la cuenta de David ni recrea `access/operator-password`.
+la cuenta de David ni recrea `access/operator-password`. Ese script exige que la
+copia de entrega esté ausente y no sirve para la rotación actual mientras deba
+conservarse; HAR-163 usó una comprobación acotada en scratch que verificó su
+preservación junto a los demás archivos privados.
 
 La confirmación autenticada de acceso/Portainer de HAR-107 sigue vigente. La
 observación independiente de Portainer requiere sesión autorizada o captura del

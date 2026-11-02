@@ -482,3 +482,31 @@ limitaciones:
   - Sin contraseña operadora en claro en este run: no se ejecutaron login, CRUD autenticado ni creación sintética en la instancia permanente.
   - Sin sesión autorizada de Portainer ni comprobación desde el equipo de David; QA independiente del despliegue pendiente.
   - El primer listado de copia falló por ausencia de pg_restore en el host; su ejecución dentro del contenedor terminó correctamente.
+---
+fecha_utc: '2026-11-02T11:54:37Z'
+areas:
+  - Verificación
+  - Despliegue
+  - Documentación
+cambio: Verificación autenticada de CRUD y persistencia permanente tras rotación autorizada de la cuenta operadora.
+resultado: En la imagen ARM64 sha256:decc2f336cc856dad62ca003232a7df1593f1f4dc461ff783834161e96f0e28e,
+  se verificaron login/logout, sesión/CSRF, alta, detalle, modificación, baja lógica e idempotente, búsqueda, listado y
+  paginación. Una única ficha sintética nueva quedó inactiva. Tras recrear app y PostgreSQL, las 49 fichas previas
+  conservaron su contenido y la nueva persistió; ambos servicios quedaron healthy. Se preservaron volumen, imagen,
+  21 archivos privados incluida la copia de entrega, cinco contenedores ajenos, volúmenes, imágenes y redes ajenas.
+  La red propia usermanager03_default fue recreada. README se actualizó para reflejar la rotación y esta ejecución.
+verificacion: Inventarios antes/después, comparación de fichas y archivos privados en memoria, respuestas HTTP y siete capturas
+  sintéticas, comprobación de logs del contenedor actual (83/83 líneas JSON, dos correlaciones observadas, cero coincidencias
+  de cinco marcadores sintéticos en app y BD). Resultados, comandos, códigos y límites en el informe y anexo de HAR-163.
+  La primera pasada de navegador falló por selector ambiguo después del alta 201; se reanudó sobre la misma ficha. Una
+  comprobación visual posterior también requirió ajustar selector; su repetición terminó satisfactoriamente.
+referencias:
+  - README.md
+  - api/openapi.yaml
+  - platform/runtime/compose.yaml
+  - platform/browser/run.sh
+  - platform/testing/audit-logs.py
+limitaciones:
+  - No hubo vista autenticada de Portainer, comprobación TLS desde el equipo de David ni QA independiente.
+  - Los logs del contenedor de aplicación anterior no se conservaron antes de recrearlo; la auditoría indicada cubre
+    solo el contenedor actual y las operaciones posteriores a la recreación.
