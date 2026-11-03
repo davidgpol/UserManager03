@@ -63,6 +63,14 @@ nueva falla, conservar la copia y volver al tag
 salud y datos. No ejecutar `prepare.py`, rotar la cuenta ni borrar el volumen
 para repetir estas comprobaciones.
 
+Tras la QA operativa del 2026-11-03 se retiraron los contenedores y redes de
+pruebas propios que quedaban, junto con siete imágenes temporales de navegador
+y toolchain sin dependientes. La imagen activa y la candidata previa indicada
+para recuperación, el volumen permanente y la copia privada se conservan.
+Las demás imágenes de aplicación etiquetadas `permanent` permanecen en inventario
+hasta acreditar que no se necesitan para recuperación y autorizar su retirada.
+Las cachés BuildKit compartidas o sin atribución exclusiva no se limpiaron.
+
 ### Construcción y pruebas del candidato
 
 Ejecutar desde la raíz en un run con `PAPERCLIP_RUN_ID` y
@@ -212,9 +220,12 @@ El build inicial y la verificación finalizaron con exit 0. La revisión detect�
 que el driver `docker-container` había creado un auxiliar privilegiado, contrario
 a security.xml OPS_02. Se retiró el constructor y su volumen; el anexo conserva
 el incidente y la reconstrucción correctiva mediante el driver `docker`. No
-reutilizar el mecanismo anterior. La imagen se conserva como
-dependencia del trabajo siguiente, con etiquetas de proyecto/run; su ID y el
-inventario de recursos están en el anexo. No es una imagen de aplicación.
+reutilizar el mecanismo anterior. La imagen se conservó como dependencia del
+trabajo siguiente en aquel hito, con etiquetas de proyecto/run; su ID y el
+inventario de entonces están en el anexo. Las imágenes temporales restantes
+de toolchain se retiraron tras la QA operativa del 2026-11-03. Para nuevas
+comprobaciones, construir la imagen con el procedimiento versionado. No es una
+imagen de aplicación.
 
 ## Contrato y comprobaciones previas
 
