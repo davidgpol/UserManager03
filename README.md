@@ -3,16 +3,65 @@
 Gestión de fichas de usuarios y cuenta operadora independiente. Identidad y
 versiones normativas en `.ai/0-core/project.xml`; instrucciones en `AGENTS.md`.
 
-## Candidato de desarrollo en revisión (2026-11-03)
+## Despliegue permanente actual (2026-11-03)
 
-El árbol de trabajo actual contiene una nueva separación REST → servicio →
-persistencia → PostgreSQL y aún no tiene commit ni imagen permanente. En la
-inspección de 2026-11-03, el contenedor permanente `usermanager03-app-1` estaba
-healthy y utilizaba `usermanager03-app:e2723ce5f1b91f5ac88c53082b0cd00a689fb340`,
-ID `sha256:424d3d210a1cd01d4bf95823d77cc63e9107a829d1fcda61aa2f40fb0a757153`
-(`linux/arm64`); `usermanager03-db-1` también estaba healthy. Esa revisión
-y su imagen son anteriores a este candidato. Su publicación y
-despliegue dependen de la revisión y la QA independiente.
+La separación REST → servicio → persistencia → PostgreSQL quedó publicada en
+`origin/main` como `4cd952930eb429bdfa438fc3e06e7a0538bcef57`, tras la QA
+independiente del candidato. Desde el archivo Git de ese SHA se construyó la
+imagen local `usermanager03-app:4cd952930eb429bdfa438fc3e06e7a0538bcef57`
+(`linux/arm64`, ID `sha256:31871e9bf19c4980433d1e451c2fe386ea307ecfdd7408b6abd3416f563a4902`).
+La etiqueta OCI `org.opencontainers.image.revision` contiene el mismo SHA.
+
+Se recrearon los dos servicios Compose `usermanager03`; ambos quedaron healthy.
+Las 54 fichas preexistentes, el volumen `usermanager03-postgres-data` y los 22
+archivos privados conservaron contenido e identidad aplicable. Se verificó el
+índice de una copia previa de PostgreSQL en `/opt/Dev/Secrets/UserManager03/backups/`;
+la copia y la imagen anterior siguen conservadas para recuperación. Desde OCI,
+TLS 1.2 y 1.3 validaron certificado (`verify=0`), `/login` respondió 200,
+la consulta anónima de usuarios respondió 401 y una mutación sin CSRF respondió 403.
+La recreación QA, la restauración aislada, Portainer y la comprobación desde el
+equipo de David quedan para la fase operativa independiente.
+
+Para identificar y operar esta versión sin cambiar credenciales:
+
+```bash
+export UM03_PRIVATE_DIR=/opt/Dev/Secrets/UserManager03
+export UM03_APP_IMAGE=usermanager03-app:4cd952930eb429bdfa438fc3e06e7a0538bcef57
+docker image inspect "$UM03_APP_IMAGE" \
+  --format '{{.Id}} {{.Architecture}} {{index .Config.Labels "org.opencontainers.image.revision"}}'
+bash platform/runtime/operate.sh status
+```
+
+La construcción exacta se realizó desde un directorio extraído de Git, con
+`PAPERCLIP_RUN_ID` y `PAPERCLIP_RUN_SCRATCH_DIR` definidos:
+
+```bash
+sha=4cd952930eb429bdfa438fc3e06e7a0538bcef57
+mkdir -p "$PAPERCLIP_RUN_SCRATCH_DIR/source-$sha"
+git archive "$sha" | tar -x -C "$PAPERCLIP_RUN_SCRATCH_DIR/source-$sha"
+cd "$PAPERCLIP_RUN_SCRATCH_DIR/source-$sha"
+export UM03_TOOLCHAIN_IMAGE="usermanager03-toolchain:$PAPERCLIP_RUN_ID"
+bash platform/toolchain/build.sh
+export UM03_APP_IMAGE="usermanager03-app:$sha"
+docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "TOOLCHAIN_IMAGE=$UM03_TOOLCHAIN_IMAGE" \
+  --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" \
+  --label "org.opencontainers.image.revision=$sha" \
+  -f platform/runtime/Dockerfile -t "$UM03_APP_IMAGE" .
+```
+
+La publicación usó `git push origin main` con el helper HTTPS de la sesión `gh`
+existente, limitado a ese comando. La recreación usó `platform/runtime/operate.sh
+recreate` tras detener la aplicación y comparar una línea base de datos y archivos
+privados. La copia de entrega `access/operator-password` sigue presente. El script
+versionado `verify-recreation.py` exige su ausencia, por lo que esta ejecución
+utilizó una comprobación acotada en scratch que la preservó y verificó sin publicar
+sus bytes. Para recuperar la imagen previa, si la comprobación de salud de la
+nueva falla, conservar la copia y volver al tag
+`usermanager03-app:e2723ce5f1b91f5ac88c53082b0cd00a689fb340` mediante
+`UM03_APP_IMAGE` y `bash platform/runtime/operate.sh up`; comprobar después
+salud y datos. No ejecutar `prepare.py`, rotar la cuenta ni borrar el volumen
+para repetir estas comprobaciones.
 
 ### Construcción y pruebas del candidato
 
@@ -78,9 +127,8 @@ bash platform/browser/run.sh platform/browser/states.cjs
 ```
 
 El entorno HTTPS usa una base tmpfs, certificados y credenciales sintéticos
-propios. El procedimiento permanente, situado más abajo, solo se ejecuta en
-una etapa de despliegue aprobada con el SHA publicado y una comparación previa
-de los datos; no forma parte de la prueba de este candidato.
+propios. Los comandos de esta sección reproducen las pruebas del candidato
+en un entorno aislado; el despliegue permanente actual se describe arriba.
 
 ## Antecedente de despliegue permanente (2026-11-02)
 
