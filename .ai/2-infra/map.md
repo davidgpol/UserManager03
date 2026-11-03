@@ -42,7 +42,11 @@ Paquete base: `com.hariklabs.usermanager03`.
 | `service/api/` | Interfaces que definen las operaciones de negocio disponibles para la capa REST. |
 | `service/impl/` | Implementaciones de los contratos de servicio, lógica de negocio y límites transaccionales. |
 | `service/model/` | Modelos internos de entrada, consulta y resultado utilizados por los contratos de servicio. |
+| `service/mapper/` | Conversión entre modelos del servicio y modelos del contrato de persistencia. |
 | `persistence/` | Entidades JPA e interfaces de repositorio cuya implementación proporciona Spring Data JPA. |
+| `persistence/api/` | Contrato de acceso a datos, modelos propios de entrada, consulta y resultado, y error de unicidad expuesto al servicio, sin dependencias JPA. |
+| `persistence/impl/` | Implementación JPA del contrato de persistencia, consultas y bloqueos, y traducción de errores específicos de PostgreSQL. |
+| `persistence/mapper/` | Conversión entre modelos del contrato de persistencia y entidades JPA. |
 | `security/` | Configuración de autenticación, protección de peticiones y gestión de los límites de sesión. |
 | `config/` | Configuración web, procesamiento JSON, correlación de peticiones y formato de logs. |
 
