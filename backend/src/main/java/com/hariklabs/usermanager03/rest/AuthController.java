@@ -18,7 +18,7 @@ public class AuthController implements AuthApi {
         return ResponseEntity.ok(new CsrfToken(CsrfToken.HeaderNameEnum.X_CSRF_TOKEN,token.getToken()));
     }
     @Override public ResponseEntity<Session> getSession() {
-        if(!sessions.valid(request.getSession(false)))throw new DomainException(401,"AUTHENTICATION_REQUIRED","Inicie sesión para continuar.");
+        if(!sessions.valid(request.getSession(false)))throw new DomainException("AUTHENTICATION_REQUIRED","Inicie sesión para continuar.");
         return ResponseEntity.ok(new Session(true,sessions.expires(request.getSession(false)).atOffset(ZoneOffset.UTC),sessions.idleSeconds()));
     }
     // The standard security filters consume these contract operations before MVC.

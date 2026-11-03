@@ -26,7 +26,7 @@ services:
       com.hariklabs.lifecycle: temporary
       com.hariklabs.run: ${PAPERCLIP_RUN_ID}
   verify:
-    image: usermanager03-toolchain:7e663ce2-43fc-488e-a1ee-d1a44950d594
+    image: ${UM03_TOOLCHAIN_IMAGE:?toolchain image required}
     platform: linux/arm64
     user: "${UM03_UID}:${UM03_GID}"
     environment:

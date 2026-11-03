@@ -1,4 +1,5 @@
-FROM usermanager03-toolchain:7e663ce2-43fc-488e-a1ee-d1a44950d594
+ARG TOOLCHAIN_IMAGE=usermanager03-toolchain:provide-build-arg
+FROM ${TOOLCHAIN_IMAGE}
 ARG RUN_ID
 LABEL com.hariklabs.project=usermanager03 com.hariklabs.lifecycle=temporary com.hariklabs.run=${RUN_ID}
 WORKDIR /opt/browser

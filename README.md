@@ -3,9 +3,88 @@
 Gestión de fichas de usuarios y cuenta operadora independiente. Identidad y
 versiones normativas en `.ai/0-core/project.xml`; instrucciones en `AGENTS.md`.
 
-## Despliegue permanente actual (2026-11-02)
+## Candidato de desarrollo en revisión (2026-11-03)
 
-La imagen local `usermanager03-app:3c061aa99f3384fa1978d20150687b1b1887cfcd`
+El árbol de trabajo actual contiene una nueva separación REST → servicio →
+persistencia → PostgreSQL y aún no tiene commit ni imagen permanente. En la
+inspección de 2026-11-03, el contenedor permanente `usermanager03-app-1` estaba
+healthy y utilizaba `usermanager03-app:e2723ce5f1b91f5ac88c53082b0cd00a689fb340`,
+ID `sha256:424d3d210a1cd01d4bf95823d77cc63e9107a829d1fcda61aa2f40fb0a757153`
+(`linux/arm64`); `usermanager03-db-1` también estaba healthy. Esa revisión
+y su imagen son anteriores a este candidato. Su publicación y
+despliegue dependen de la revisión y la QA independiente.
+
+### Construcción y pruebas del candidato
+
+Ejecutar desde la raíz en un run con `PAPERCLIP_RUN_ID` y
+`PAPERCLIP_RUN_SCRATCH_DIR` definidos. Se construyen las imágenes necesarias
+desde los archivos versionados; los tags del run actual evitan depender de
+imágenes históricas retiradas. Usar el driver Docker existente en ARM64.
+
+```bash
+export UM03_TOOLCHAIN_IMAGE="usermanager03-toolchain:$PAPERCLIP_RUN_ID"
+bash platform/toolchain/build.sh
+
+mkdir -p "$PAPERCLIP_RUN_SCRATCH_DIR/openapi" "$PAPERCLIP_RUN_SCRATCH_DIR/maven"
+docker run --rm --user "$(id -u):$(id -g)" \
+  --mount "type=bind,source=$PWD,target=/workspace,readonly" \
+  --mount "type=bind,source=$PAPERCLIP_RUN_SCRATCH_DIR/openapi,target=/output" \
+  --workdir /workspace "$UM03_TOOLCHAIN_IMAGE" \
+  bash platform/openapi/generate.sh /output
+
+export UM03_UID="$(id -u)" UM03_GID="$(id -g)"
+export UM03_TEST_SECRETS="$PAPERCLIP_RUN_SCRATCH_DIR/test-secrets"
+export UM03_MAVEN_CACHE="$PAPERCLIP_RUN_SCRATCH_DIR/maven"
+python3 platform/testing/prepare.py "$UM03_TEST_SECRETS"
+docker compose -p "usermanager03-test-$PAPERCLIP_RUN_ID" \
+  -f platform/testing/compose.yaml up --abort-on-container-exit --exit-code-from verify
+bash platform/frontend/run.sh generate
+bash platform/frontend/run.sh verify
+```
+
+La prueba backend levanta PostgreSQL 18.6 aislado con TLS y roles separados;
+incluye concurrencia de DNI. El frontend ejecuta tests, tipos y build. La
+generación OpenAPI escribe en scratch; Maven genera las interfaces y modelos
+Java conforme a `platform/openapi/spring.json` y el script de frontend regenera
+el cliente desde el contrato, sin edición manual. Comprobar el diff generado y
+conservar las salidas antes de retirar recursos temporales propios;
+no usar `prune`, `down -v` permanente ni borrar cachés compartidas.
+
+Para build de la imagen de aplicación y regresión HTTPS aislada:
+
+```bash
+export UM03_APP_IMAGE="usermanager03-app:$PAPERCLIP_RUN_ID"
+export UM03_BROWSER_IMAGE="usermanager03-browser:$PAPERCLIP_RUN_ID"
+docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "TOOLCHAIN_IMAGE=$UM03_TOOLCHAIN_IMAGE" \
+  --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/runtime/Dockerfile \
+  -t "$UM03_APP_IMAGE" .
+docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "TOOLCHAIN_IMAGE=$UM03_TOOLCHAIN_IMAGE" \
+  --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/browser/Dockerfile \
+  -t "$UM03_BROWSER_IMAGE" .
+export UM03_PRIVATE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/isolated"
+export UM03_EVIDENCE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/evidence"
+export UM03_BASE_URL=https://localhost:19443
+mkdir -p "$UM03_EVIDENCE_DIR"
+python3 platform/testing/prepare-runtime.py "$UM03_PRIVATE_DIR"
+docker compose -p "usermanager03-test-http-$PAPERCLIP_RUN_ID" \
+  -f platform/testing/runtime.compose.yaml up -d --wait --wait-timeout 150
+python3 platform/testing/http-regression.py
+export UM03_DATASET=82000000
+bash platform/browser/run.sh
+bash platform/browser/run.sh platform/browser/regression.cjs
+bash platform/browser/run.sh platform/browser/states.cjs
+```
+
+El entorno HTTPS usa una base tmpfs, certificados y credenciales sintéticos
+propios. El procedimiento permanente, situado más abajo, solo se ejecuta en
+una etapa de despliegue aprobada con el SHA publicado y una comparación previa
+de los datos; no forma parte de la prueba de este candidato.
+
+## Antecedente de despliegue permanente (2026-11-02)
+
+En el hito anterior, la imagen local `usermanager03-app:3c061aa99f3384fa1978d20150687b1b1887cfcd`
 (`linux/arm64`, ID `sha256:decc2f336cc856dad62ca003232a7df1593f1f4dc461ff783834161e96f0e28e`)
 se construyó desde ese commit publicado. Los servicios `usermanager03-app-1` y
 `usermanager03-db-1` quedaron healthy tras recreación controlada. Las 49 fichas,
@@ -38,13 +117,14 @@ confiado; cerrar el proceso SSH termina el túnel. El alias y la instalación de
 confianza dependen de la configuración privada del equipo de David. Esta instrucción
 no acredita que se haya ejecutado allí en esta entrega.
 
-Estado de HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
+Antecedente histórico HAR-107: toolchain ARM64 construido/verificado y contrato OpenAPI
 validado y publicado en `4b282103f7c4d1f7d9399c184cd4c408b44f9c29`
 mediante Git y helper `gh` de OCI (SHA remoto verificado). Backend implementado con 14 pruebas de desarrollo previas; frontend integrado y
 pruebas reales de navegador pasan. Servicio HTTPS persistente local operativo.
 David confirmó funcionamiento de acceso y Portainer el 2026-10-26; evidencia
 declarada por el operador, sin observación autenticada de Niobe en Portainer.
-QA independiente y aceptación pendientes.
+La QA y aceptación citadas aquí estaban pendientes en aquel hito; las verificaciones
+posteriores del despliegue previo se describen arriba.
 
 ## Toolchain verificado
 
@@ -109,7 +189,9 @@ persistencia, healthchecks, Portainer y limpieza final continúan pendientes.
 ## Backend y pruebas verificadas
 
 REST generado → `rest/mapper/` → `service/api/UserService` →
-`service/impl/UserServiceImpl` (transacciones) → JPA → PostgreSQL.
+`service/impl/UserServiceImpl` (transacciones) → `service/mapper/` →
+`persistence/api/UserStore` → `persistence/impl/JpaUserStore` →
+`persistence/mapper/` → JPA → PostgreSQL.
 `service/model/` contiene entradas, consultas y resultados internos; el mapper
 convierte peticiones, parámetros de consulta y respuestas HTTP sin pasar DTO
 generados ni entidades JPA a través del contrato de servicio.
@@ -172,6 +254,7 @@ Comandos ejecutados (variables no contienen valores de contraseña):
 export UM03_PRIVATE_DIR=/opt/Dev/Secrets/UserManager03
 export UM03_APP_IMAGE="usermanager03-app:$PAPERCLIP_RUN_ID"
 docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "TOOLCHAIN_IMAGE=$UM03_TOOLCHAIN_IMAGE" \
   --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/runtime/Dockerfile \
   -t "$UM03_APP_IMAGE" .
 # Solo NUEVA instalación; prepare.py rechaza sobrescritura y pide clave oculta.
@@ -197,6 +280,7 @@ Prueba navegador reproducible con dataset sintético nuevo (DNI no reutilizados)
 
 ```bash
 docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "TOOLCHAIN_IMAGE=$UM03_TOOLCHAIN_IMAGE" \
   --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/browser/Dockerfile \
   -t "usermanager03-browser:$PAPERCLIP_RUN_ID" .
 export UM03_EVIDENCE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/evidence"
@@ -243,7 +327,7 @@ tag del run actual antes de invocar el runner.
 `platform/runtime/postgres-logging.conf` conserva diagnósticos PostgreSQL con
 SQLSTATE, PID y sesión, y excluye DETAIL, texto SQL y parámetros de errores.
 El encoder JSON sanea las categorías JDBC actual y anterior de Hibernate;
-`UserServiceImpl` conserva evento `dni_conflict`, SQLSTATE y correlación de petición.
+`JpaUserStore` conserva evento `dni_conflict`, SQLSTATE y correlación de petición.
 No cambian UNIQUE, migraciones, aislamiento ni contrato HTTP.
 
 Entorno de prueba aislado (ejecutado en HAR-110; elegir directorio privado nuevo):
@@ -272,6 +356,7 @@ export UM03_EVIDENCE_DIR="$PAPERCLIP_RUN_SCRATCH_DIR/evidence"
 export UM03_BASE_URL=https://localhost:19443
 export UM03_BROWSER_IMAGE="usermanager03-browser:$PAPERCLIP_RUN_ID"
 docker buildx build --builder default --platform linux/arm64 --load \
+  --build-arg "TOOLCHAIN_IMAGE=$UM03_TOOLCHAIN_IMAGE" \
   --build-arg "RUN_ID=$PAPERCLIP_RUN_ID" -f platform/browser/Dockerfile \
   -t "$UM03_BROWSER_IMAGE" .
 mkdir -p "$UM03_EVIDENCE_DIR"

@@ -96,7 +96,7 @@ class HttpContractTest {
     }
     @Test void validRouteIdReachesServiceAsUuidAndMissingRecordRemains404()throws Exception {
         var a=login();UUID id=UUID.fromString("A0B1C2D3-1234-5678-9ABC-DEF012345678");
-        when(service.get(id)).thenThrow(new DomainException(404,"USER_NOT_FOUND","La ficha no existe."));
+        when(service.get(id)).thenThrow(new DomainException("USER_NOT_FOUND","La ficha no existe."));
         mvc.perform(get("/api/users/"+id).session(a.session())).andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"));
         verify(service).get(id);
@@ -117,6 +117,26 @@ class HttpContractTest {
             assertFalse(encoded.contains("synthetic-secret"));
             assertFalse(encoded.contains("00000005M"));
             assertFalse(encoded.contains("synthetic@example.test"));
+        } finally {logger.detachAppender(captured);captured.stop();}
+    }
+
+    @Test void wrappedUnexpectedFailureReturnsGenericProblemAndLogsOneCauseChain()throws Exception {
+        var a=login();UUID id=UUID.fromString("a0b1c2d3-1234-5678-9abc-def012345678");
+        var cause=new IllegalArgumentException("private-body synthetic@example.test");
+        cause.setStackTrace(new StackTraceElement[]{new StackTraceElement(
+            "com.hariklabs.usermanager03.persistence.impl.JpaUserStore","search","JpaUserStore.java",42)});
+        when(service.get(id)).thenThrow(new IllegalStateException("secret-token",cause));
+        var logger=(Logger)org.slf4j.LoggerFactory.getLogger(ExceptionHandler.class);
+        var captured=new ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();captured.start();logger.addAppender(captured);
+        try {
+            mvc.perform(get("/api/users/"+id).session(a.session())).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.detail").value("No se pudo completar la operación."));
+            assertEquals(1,captured.list.size());
+            String encoded=new String(new SafeJsonEncoder().encode(captured.list.getFirst()),StandardCharsets.UTF_8);
+            assertTrue(encoded.contains("JpaUserStore.search:42"));
+            assertTrue(encoded.contains("\"cause_types\""));
+            assertFalse(encoded.contains("private-body"));assertFalse(encoded.contains("synthetic@example.test"));
+            assertFalse(encoded.contains("secret-token"));
         } finally {logger.detachAppender(captured);captured.stop();}
     }
 }

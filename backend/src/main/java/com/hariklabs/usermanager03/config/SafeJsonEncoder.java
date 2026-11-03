@@ -2,6 +2,7 @@ package com.hariklabs.usermanager03.config;
 
 import ch.qos.logback.core.encoder.EncoderBase;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import tools.jackson.databind.json.JsonMapper;
 import java.util.LinkedHashMap;
 import java.nio.charset.StandardCharsets;
@@ -33,18 +34,28 @@ public class SafeJsonEncoder extends EncoderBase<ILoggingEvent> {
         value.putAll(event.getMDCPropertyMap());
         if(event.getKeyValuePairs()!=null)for(var pair:event.getKeyValuePairs()) value.put(pair.key,pair.value);
         if(event.getThrowableProxy()!=null) {
-            value.put("exception_type",event.getThrowableProxy().getClassName());
+            value.put("exception_type",safeType(event.getThrowableProxy().getClassName()));
             List<String> frames=new ArrayList<>();
-            for(var proxy:event.getThrowableProxy().getStackTraceElementProxyArray()) {
-                var frame=proxy.getStackTraceElement();
-                String type=frame.getClassName(),method=frame.getMethodName();
-                if(!type.startsWith("com.hariklabs.usermanager03.") ||
-                    !type.matches("[A-Za-z0-9_.$]+") || !method.matches("[A-Za-z0-9_$<>]+")) continue;
-                frames.add(type+"."+method+":"+frame.getLineNumber());
+            List<String> causes=new ArrayList<>();
+            IThrowableProxy cause=event.getThrowableProxy();
+            for(int depth=0;cause!=null && depth<8;depth++,cause=cause.getCause()) {
+                if(depth>0) causes.add(safeType(cause.getClassName()));
+                for(var proxy:cause.getStackTraceElementProxyArray()) {
+                    var frame=proxy.getStackTraceElement();
+                    String type=frame.getClassName(),method=frame.getMethodName();
+                    if(!type.startsWith("com.hariklabs.usermanager03.") ||
+                        !type.matches("[A-Za-z0-9_.$]+") || !method.matches("[A-Za-z0-9_$<>]+")) continue;
+                    frames.add(depth+":"+type+"."+method+":"+frame.getLineNumber());
+                    if(frames.size()==32) break;
+                }
                 if(frames.size()==32) break;
             }
+            if(!causes.isEmpty()) value.put("cause_types",causes);
             if(!frames.isEmpty()) value.put("stack_trace",frames);
         }
         return (mapper.writeValueAsString(value)+"\n").getBytes(StandardCharsets.UTF_8);
+    }
+    private static String safeType(String type) {
+        return type!=null && type.matches("[A-Za-z0-9_.$]+") ? type : "UnknownException";
     }
 }

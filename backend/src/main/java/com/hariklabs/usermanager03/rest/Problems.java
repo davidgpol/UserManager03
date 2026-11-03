@@ -12,14 +12,14 @@ public class Problems {
     public record Body(String type,String title,int status,String detail,String code,String requestId,List<DomainException.FieldError> errors) {}
     private final JsonMapper json;
     public Problems(JsonMapper json) {this.json=json;}
-    public Body body(HttpServletRequest req,DomainException e) {
+    public Body body(HttpServletRequest req,int status,DomainException e) {
         String requestId=Objects.toString(req.getAttribute("requestId"),UUID.randomUUID().toString());
-        return new Body("/problems/"+e.code().toLowerCase(Locale.ROOT).replace('_','-'),title(e.code()),e.status(),e.getMessage(),e.code(),requestId,
+        return new Body("/problems/"+e.code().toLowerCase(Locale.ROOT).replace('_','-'),title(e.code()),status,e.getMessage(),e.code(),requestId,
             e.errors().stream().sorted(Comparator.comparing(DomainException.FieldError::location).thenComparing(DomainException.FieldError::field).thenComparing(DomainException.FieldError::code)).toList());
     }
     public void write(HttpServletRequest req,HttpServletResponse res,int status,String code,String detail) throws IOException {
         res.setStatus(status);res.setContentType("application/problem+json");res.setHeader("Cache-Control","no-store");
-        json.writeValue(res.getOutputStream(),body(req,new DomainException(status,code,detail)));
+        json.writeValue(res.getOutputStream(),body(req,status,new DomainException(code,detail)));
     }
     private static String title(String code) {
         return switch(code) {

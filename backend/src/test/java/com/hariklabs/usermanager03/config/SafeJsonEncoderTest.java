@@ -43,4 +43,23 @@ class SafeJsonEncoderTest {
         assertFalse(encoded.contains("synthetic@example.test"));
         assertFalse(encoded.contains("PgStatement"));
     }
+
+    @Test void wrappedFailureRetainsOriginFromCauseWithoutSensitiveMessages() {
+        var origin=new IllegalArgumentException("secret-token synthetic@example.test");
+        origin.setStackTrace(new StackTraceElement[]{
+            new StackTraceElement("com.hariklabs.usermanager03.persistence.impl.JpaUserStore","save","JpaUserStore.java",64),
+            new StackTraceElement("org.postgresql.jdbc.PgStatement","execute","PgStatement.java",10)
+        });
+        var wrapper=new IllegalStateException("private-body 00000005M",origin);
+        wrapper.setStackTrace(new StackTraceElement[]{new StackTraceElement("java.lang.Thread","run","Thread.java",1)});
+        var event=new LoggingEvent();event.setLoggerName("com.hariklabs.usermanager03.rest.ExceptionHandler");
+        event.setLevel(Level.ERROR);event.setTimeStamp(0);event.setMessage("Operación fallida");
+        event.setMDCPropertyMap(Map.of("correlation_id","synthetic-correlation"));
+        event.setThrowableProxy(new ThrowableProxy(wrapper));
+        String encoded=new String(new SafeJsonEncoder().encode(event),StandardCharsets.UTF_8);
+        assertTrue(encoded.contains("\"cause_types\":[\"java.lang.IllegalArgumentException\"]"));
+        assertTrue(encoded.contains("1:com.hariklabs.usermanager03.persistence.impl.JpaUserStore.save:64"));
+        for(String secret:new String[]{"secret-token","synthetic@example.test","private-body","00000005M","PgStatement"})
+            assertFalse(encoded.contains(secret));
+    }
 }

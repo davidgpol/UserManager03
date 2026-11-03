@@ -21,8 +21,10 @@ public class ExceptionHandler {
         var headers=new HttpHeaders();headers.setContentType(MediaType.APPLICATION_PROBLEM_JSON);headers.setCacheControl("no-store");
         DomainException failure;
         if(exception instanceof DomainException d) {
-            failure=d;
-            if(d.status()>=500) logFailure(d);
+            if(status(d.code())>=500) {
+                logFailure(d);
+                failure=new DomainException("INTERNAL_ERROR","No se pudo completar la operación.");
+            } else failure=d;
         }
         else if(exception instanceof HttpMessageNotReadableException unreadable) failure=jsonError(unreadable);
         else if(exception instanceof jakarta.validation.ConstraintViolationException validation) {
@@ -35,37 +37,52 @@ public class ExceptionHandler {
                 if(id)code="INVALID_ID";else if(query)code="INVALID_QUERY";
                 errors.add(new DomainException.FieldError(id?"path":query?"query":"body",id||query?parameter:"$","INVALID_FORMAT","Valor no válido."));
             }
-            failure=new DomainException(400,code,"Revise los datos indicados.",errors);
+            failure=new DomainException(code,"Revise los datos indicados.",errors);
         } else if(exception instanceof org.springframework.web.method.annotation.HandlerMethodValidationException validation) {
             var result=validation.getParameterValidationResults().getFirst();
             String parameter=result.getMethodParameter().getParameterName();
             boolean path="id".equals(parameter);
-            failure=new DomainException(400,path?"INVALID_ID":"INVALID_QUERY",path?"Identificador no válido.":"Consulta no válida.",
+            failure=new DomainException(path?"INVALID_ID":"INVALID_QUERY",path?"Identificador no válido.":"Consulta no válida.",
                 List.of(new DomainException.FieldError(path?"path":"query",path?"id":Set.of("page","size","status","q").contains(parameter)?parameter:"$","INVALID_FORMAT","Valor no válido.")));
         } else if(exception instanceof MethodArgumentNotValidException validation) {
             var errors=validation.getBindingResult().getFieldErrors().stream().map(e->new DomainException.FieldError("body",safe(e.getField()),e.getRejectedValue()==null?"REQUIRED":"INVALID_FORMAT","Valor no válido.")).toList();
-            failure=new DomainException(400,"VALIDATION_ERROR","Revise los campos indicados.",errors);
+            failure=new DomainException("VALIDATION_ERROR","Revise los campos indicados.",errors);
         } else if(exception instanceof HttpRequestMethodNotSupportedException method) {
             if(method.getSupportedHttpMethods()!=null) headers.setAllow(method.getSupportedHttpMethods());
-            failure=new DomainException(405,"METHOD_NOT_ALLOWED","Método no permitido.");
-        } else if(exception instanceof HttpMediaTypeNotSupportedException) failure=new DomainException(415,"UNSUPPORTED_MEDIA_TYPE","Tipo de contenido no admitido.");
-        else if(exception instanceof HttpMediaTypeNotAcceptableException) failure=new DomainException(406,"NOT_ACCEPTABLE","La representación solicitada no está disponible.");
+            failure=new DomainException("METHOD_NOT_ALLOWED","Método no permitido.");
+        } else if(exception instanceof HttpMediaTypeNotSupportedException) failure=new DomainException("UNSUPPORTED_MEDIA_TYPE","Tipo de contenido no admitido.");
+        else if(exception instanceof HttpMediaTypeNotAcceptableException) failure=new DomainException("NOT_ACCEPTABLE","La representación solicitada no está disponible.");
         else if(exception instanceof TransientDataAccessException || exception instanceof DataAccessResourceFailureException) {
             logFailure(exception);
-            failure=new DomainException(503,"SERVICE_UNAVAILABLE","Inténtelo más tarde.");
+            failure=new DomainException("SERVICE_UNAVAILABLE","Inténtelo más tarde.");
         }
         else {
             logFailure(exception);
-            failure=new DomainException(500,"INTERNAL_ERROR","No se pudo completar la operación.");
+            failure=new DomainException("INTERNAL_ERROR","No se pudo completar la operación.");
         }
-        if(failure.status()==406) {
+        int status=status(failure.code());
+        if(status==406) {
             String accept=request.getHeader("Accept");
             try {
                 if(accept!=null && MediaType.parseMediaTypes(accept).stream().noneMatch(m->m.getQualityValue()>0&&m.isCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON)))
                     return ResponseEntity.status(406).cacheControl(CacheControl.noStore()).build();
             } catch(InvalidMediaTypeException ignored) {return ResponseEntity.status(406).cacheControl(CacheControl.noStore()).build();}
         }
-        return ResponseEntity.status(failure.status()).headers(headers).body(problems.body(request,failure));
+        return ResponseEntity.status(status).headers(headers).body(problems.body(request,status,failure));
+    }
+    private static int status(String code) {
+        return switch(code) {
+            case "INVALID_ID", "INVALID_QUERY", "VALIDATION_ERROR", "MALFORMED_JSON" -> 400;
+            case "AUTHENTICATION_REQUIRED", "INVALID_CREDENTIALS" -> 401;
+            case "CSRF_INVALID", "ACCESS_DENIED" -> 403;
+            case "USER_NOT_FOUND" -> 404;
+            case "METHOD_NOT_ALLOWED" -> 405;
+            case "NOT_ACCEPTABLE" -> 406;
+            case "DNI_CONFLICT" -> 409;
+            case "UNSUPPORTED_MEDIA_TYPE" -> 415;
+            case "SERVICE_UNAVAILABLE" -> 503;
+            default -> 500;
+        };
     }
     private static void logFailure(Exception exception) {
         // The encoder extracts safe frames from the cause; it never serializes its message.
@@ -84,6 +101,6 @@ public class ExceptionHandler {
                 return DomainException.invalid(field,"INVALID_TYPE");
             }
         }
-        return new DomainException(400,"MALFORMED_JSON","El cuerpo JSON no es válido.");
+        return new DomainException("MALFORMED_JSON","El cuerpo JSON no es válido.");
     }
 }

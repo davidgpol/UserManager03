@@ -13,7 +13,7 @@ import java.util.*;
 public class UserRestMapper {
     public UUID id(String text) {
         if(text==null || !text.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
-            throw new DomainException(400,"INVALID_ID","Identificador no válido.",List.of(new DomainException.FieldError("path","id","INVALID_FORMAT","Use un identificador UUID completo.")));
+            throw new DomainException("INVALID_ID","Identificador no válido.",List.of(new DomainException.FieldError("path","id","INVALID_FORMAT","Use un identificador UUID completo.")));
         return UUID.fromString(text);
     }
     public UserInput input(UserCreateRequest r) {return new UserInput(r.getFirstName(),r.getLastName(),r.getDni(),r.getEmail());}
@@ -42,7 +42,7 @@ public class UserRestMapper {
         return n.intValueExact();
     }
     private static DomainException invalid(String field,String code) {
-        return new DomainException(400,"INVALID_QUERY","Revise los parámetros de búsqueda.",
+        return new DomainException("INVALID_QUERY","Revise los parámetros de búsqueda.",
             List.of(new DomainException.FieldError("query",field,code,"Parámetro no válido.")));
     }
 }

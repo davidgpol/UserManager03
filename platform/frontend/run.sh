@@ -4,7 +4,7 @@ set -euo pipefail
 # Host-side wrapper. It deliberately uses only the approved project image.
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 run_id="${PAPERCLIP_RUN_ID:?PAPERCLIP_RUN_ID is required}"
-image="usermanager03-toolchain:7e663ce2-43fc-488e-a1ee-d1a44950d594"
+image="${UM03_TOOLCHAIN_IMAGE:-usermanager03-toolchain:$run_id}"
 command="${1:-verify}"
 scratch="${PAPERCLIP_RUN_SCRATCH_DIR:?PAPERCLIP_RUN_SCRATCH_DIR is required}/frontend"
 mkdir -p "$scratch"

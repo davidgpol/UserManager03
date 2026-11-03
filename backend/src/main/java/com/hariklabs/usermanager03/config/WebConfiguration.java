@@ -17,7 +17,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                 String accept=req.getHeader("Accept");
                 // Generator lists error media types too; successful representations remain application/json only.
                 if(json&&accept!=null&&MediaType.parseMediaTypes(accept).stream().noneMatch(m->m.getQualityValue()>0&&m.isCompatibleWith(MediaType.APPLICATION_JSON)))
-                    throw new DomainException(406,"NOT_ACCEPTABLE","La representación solicitada no está disponible.");
+                    throw new DomainException("NOT_ACCEPTABLE","La representación solicitada no está disponible.");
                 return true;
             }
         }).addPathPatterns("/api/**");

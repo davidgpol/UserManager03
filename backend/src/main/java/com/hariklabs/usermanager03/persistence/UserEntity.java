@@ -27,5 +27,7 @@ public class UserEntity {
     public UUID getId(){return id;} public String getFirstName(){return firstName;}
     public String getLastName(){return lastName;} public String getDni(){return dni;}
     public String getEmail(){return email;} public boolean isActive(){return active;}
+    public String getFirstNameSearch(){return firstNameSearch;} public String getLastNameSearch(){return lastNameSearch;}
+    public String getEmailSearch(){return emailSearch;}
     public Instant getCreatedAt(){return createdAt;} public Instant getUpdatedAt(){return updatedAt;}
 }

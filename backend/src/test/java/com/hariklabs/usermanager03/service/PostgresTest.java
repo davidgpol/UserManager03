@@ -82,7 +82,7 @@ class PostgresTest {
     @Test void concurrentCanonicalDniHasOneWinnerAndOneConflict()throws Exception {
         var ready=new CountDownLatch(2);var go=new CountDownLatch(1);
         try(var workers=Executors.newVirtualThreadPerTaskExecutor()) {
-            Callable<Integer> create=()-> {ready.countDown();go.await();try{service.create(input(" 00000001r ","Carrera"));return 201;}catch(DomainException e){return e.status();}};
+            Callable<Integer> create=()-> {ready.countDown();go.await();try{service.create(input(" 00000001r ","Carrera"));return 201;}catch(DomainException e){assertEquals("DNI_CONFLICT",e.code());return 409;}};
             var a=workers.submit(create);var b=workers.submit(create);assertTrue(ready.await(5,TimeUnit.SECONDS));go.countDown();
             var results=new ArrayList<>(List.of(a.get(15,TimeUnit.SECONDS),b.get(15,TimeUnit.SECONDS)));Collections.sort(results);assertEquals(List.of(201,409),results);
         }
