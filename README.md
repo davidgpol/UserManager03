@@ -54,9 +54,10 @@ La publicación usó `git push origin main` con el helper HTTPS de la sesión `g
 existente, limitado a ese comando. La recreación usó `platform/runtime/operate.sh
 recreate` tras detener la aplicación y comparar una línea base de datos y archivos
 privados. La copia de entrega `access/operator-password` sigue presente. El script
-versionado `verify-recreation.py` exige su ausencia, por lo que esta ejecución
+versionado `verify-recreation.py` exigía entonces su ausencia, por lo que aquella ejecución
 utilizó una comprobación acotada en scratch que la preservó y verificó sin publicar
-sus bytes. Para recuperar la imagen previa, si la comprobación de salud de la
+sus bytes. La versión actual del script compara la copia si existe y acepta su ausencia.
+Para recuperar la imagen previa, si la comprobación de salud de la
 nueva falla, conservar la copia y volver al tag
 `usermanager03-app:e2723ce5f1b91f5ac88c53082b0cd00a689fb340` mediante
 `UM03_APP_IMAGE` y `bash platform/runtime/operate.sh up`; comprobar después
@@ -251,9 +252,12 @@ REST generado → `rest/mapper/` → `service/api/UserService` →
 `service/impl/UserServiceImpl` (transacciones) → `service/mapper/` →
 `persistence/api/UserStore` → `persistence/impl/JpaUserStore` →
 `persistence/mapper/` → JPA → PostgreSQL.
-`service/model/` contiene entradas, consultas y resultados internos; el mapper
-convierte peticiones, parámetros de consulta y respuestas HTTP sin pasar DTO
-generados ni entidades JPA a través del contrato de servicio.
+`service/api/dto/` contiene entradas, consultas, resultados y violaciones de
+negocio; `persistence/api/dto/` contiene registros y criterios de búsqueda.
+`rest/mapper/` convierte peticiones, parámetros de consulta, respuestas y errores
+HTTP sin pasar DTO generados ni entidades JPA a través del contrato de servicio.
+Los DTO Java generados usan el paquete `rest.generated.api.dto` y el sufijo
+`DTO`; los nombres del contrato y del cliente TypeScript permanecen intactos.
 `backend/pom.xml` mantiene las versiones aprobadas. No editar `backend/target`;
 Maven genera interfaces/DTO desde el contrato publicado. La fuente Unicode fijada
 genera el recurso TSV mediante `platform/backend/generate-unicode.py`.
@@ -445,13 +449,15 @@ el SHA de imagen verificado. `UM03_PRIVATE_DIR=/opt/Dev/Secrets/UserManager03`,
 `UM03_APP_IMAGE=usermanager03-app:<SHA verificado>` y
 `python3 platform/runtime/verify-recreation.py` comprueban propiedad/montajes,
 paran app antes de la línea base y recrean ambos servicios. Comparan fichas completas,
-recuento, volumen y bytes de la credencial solo en memoria; la evidencia expone
+recuento, volumen y bytes de la credencial solo en memoria. La copia privada
+`access/operator-password`, si existe, también se compara byte a byte; si falta
+en ambos momentos, la comprobación es válida. La evidencia expone
 booleanos/recuento, nunca filas, contraseña o hash. Una diferencia exige investigar;
 no restaurar/borrar datos automáticamente. El reinicio invalida sesiones; no cambia
-la cuenta de David ni recrea `access/operator-password`. Ese script exige que la
-copia de entrega esté ausente y no sirve para la rotación actual mientras deba
-conservarse; HAR-163 usó una comprobación acotada en scratch que verificó su
-preservación junto a los demás archivos privados.
+la cuenta de David ni recrea `access/operator-password`. La ejecución histórica
+HAR-163 usó una comprobación acotada en scratch porque la versión anterior del
+script exigía ausencia de la copia; esa evidencia histórica permanece distinta
+de la verificación de la versión actual.
 
 La confirmación autenticada de acceso/Portainer de HAR-107 sigue vigente. El
 2026-11-02, la QA independiente utilizó el acceso privado autorizado únicamente en

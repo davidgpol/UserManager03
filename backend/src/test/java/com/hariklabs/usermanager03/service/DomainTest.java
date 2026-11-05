@@ -1,7 +1,9 @@
 package com.hariklabs.usermanager03.service;
 
 import com.hariklabs.usermanager03.rest.mapper.UserRestMapper;
-import com.hariklabs.usermanager03.service.model.*;
+import com.hariklabs.usermanager03.rest.exception.RestException;
+import com.hariklabs.usermanager03.service.api.exception.DomainException;
+import com.hariklabs.usermanager03.service.api.dto.*;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import tools.jackson.databind.json.JsonMapper;
@@ -37,9 +39,9 @@ class DomainTest {
             var params=new HashMap<String,List<String>>();
             for(String entry:test.get("query").asText().split("&")) {String[] kv=entry.split("=",2);params.computeIfAbsent(kv[0],k->new ArrayList<>()).add(kv[1]);}
             var raw=new HashMap<String,String[]>();params.forEach((k,v)->raw.put(k,v.toArray(String[]::new)));
-            assertEquals("INVALID_QUERY",assertThrows(DomainException.class,()->mapper.query(raw)).code());
+            assertEquals("INVALID_QUERY",assertThrows(RestException.class,()->mapper.query(raw)).code());
         }
-        assertEquals(new UserQuery(0,20,"active",""),mapper.query(Map.of()));
+        assertEquals(new UserQueryDTO(0,20,"active",""),mapper.query(Map.of()));
         assertEquals(1,mapper.query(Map.of("page",new String[]{"000001"})).page());
         assertEquals("nunez",UserValues.nameSearch("Núñez"));
         assertNotEquals(UserValues.emailSearch("josé"),UserValues.emailSearch("jose"));
@@ -49,7 +51,7 @@ class DomainTest {
             var values=new UserValues(factory.getValidator());
             var fixtures=json.readTree(Files.readString(Path.of("../api/fixtures/email.json")));
             for(var test:fixtures.get("cases")) {
-                var input=new UserInput(" Ana ","Prueba"," 00000000t ",test.get("value").asText());
+                var input=new UserInputDTO(" Ana ","Prueba"," 00000000t ",test.get("value").asText());
                 if(test.get("domainAccepts").asBoolean()) {var result=values.validate(input);assertEquals(input.email(),result.email());assertEquals("Ana",result.firstName());assertEquals("00000000T",result.dni());}
                 else assertThrows(DomainException.class,()->values.validate(input));
             }

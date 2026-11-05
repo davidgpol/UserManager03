@@ -3,9 +3,11 @@ package com.hariklabs.usermanager03.rest;
 import com.hariklabs.usermanager03.config.JsonConfiguration;
 import com.hariklabs.usermanager03.config.SafeJsonEncoder;
 import com.hariklabs.usermanager03.rest.mapper.UserRestMapper;
+import com.hariklabs.usermanager03.rest.mapper.ProblemRestMapper;
 import com.hariklabs.usermanager03.security.*;
 import com.hariklabs.usermanager03.service.*;
 import com.hariklabs.usermanager03.service.api.UserService;
+import com.hariklabs.usermanager03.service.api.exception.DomainException;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.*;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -22,13 +24,14 @@ import tools.jackson.databind.json.JsonMapper;
 import java.time.Clock;
 import java.util.*;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest({UsersController.class,AuthController.class})
-@Import({SecurityConfiguration.class,SessionPolicy.class,Problems.class,UserRestMapper.class,JsonConfiguration.class,com.hariklabs.usermanager03.config.WebConfiguration.class})
+@Import({SecurityConfiguration.class,SessionPolicy.class,Problems.class,ProblemRestMapper.class,UserRestMapper.class,JsonConfiguration.class,com.hariklabs.usermanager03.config.WebConfiguration.class})
 class HttpContractTest {
     @MockitoBean UserService service;
     @Autowired MockMvc mvc; @Autowired JsonMapper json;
@@ -118,6 +121,40 @@ class HttpContractTest {
             assertFalse(encoded.contains("00000005M"));
             assertFalse(encoded.contains("synthetic@example.test"));
         } finally {logger.detachAppender(captured);captured.stop();}
+    }
+
+    @Test void connectionFailureAtTransactionStartReturnsGeneric503WithTrace() throws Exception {
+        var access=login();UUID id=UUID.fromString("a0b1c2d3-1234-5678-9abc-def012345678");
+        when(service.get(id)).thenThrow(new org.springframework.transaction.CannotCreateTransactionException(
+            "private connection details",new SQLException("private connection details", "08006")));
+        var logger=(Logger)org.slf4j.LoggerFactory.getLogger(ExceptionHandler.class);
+        var captured=new ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();captured.start();logger.addAppender(captured);
+        try {
+            var response=mvc.perform(get("/api/users/"+id).session(access.session())
+                .header("X-Correlation-ID","synthetic-f1-correlation"))
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(header().string("Cache-Control","no-store"))
+                .andExpect(header().string("X-Correlation-ID","synthetic-f1-correlation"))
+                .andExpect(jsonPath("$.code").value("SERVICE_UNAVAILABLE"))
+                .andExpect(jsonPath("$.detail").value("Inténtelo más tarde."))
+                .andExpect(jsonPath("$.requestId").isString()).andReturn();
+            assertFalse(response.getResponse().getContentAsString().contains("private connection details"));
+            assertEquals(1,captured.list.size());
+            String encoded=new String(new SafeJsonEncoder().encode(captured.list.getFirst()),StandardCharsets.UTF_8);
+            assertTrue(encoded.contains("operation_failed"));
+            assertTrue(encoded.contains("synthetic-f1-correlation"));
+            assertFalse(encoded.contains("private connection details"));
+        } finally {logger.detachAppender(captured);captured.stop();}
+    }
+
+    @Test void nonConnectionTransactionFailureRemainsInternal() throws Exception {
+        var access=login();UUID id=UUID.fromString("a0b1c2d3-1234-5678-9abc-def012345678");
+        when(service.get(id)).thenThrow(new org.springframework.transaction.CannotCreateTransactionException(
+            "private schema details",new SQLException("private schema details", "42P01")));
+        mvc.perform(get("/api/users/"+id).session(access.session()))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
+            .andExpect(jsonPath("$.detail").value("No se pudo completar la operación."));
     }
 
     @Test void wrappedUnexpectedFailureReturnsGenericProblemAndLogsOneCauseChain()throws Exception {

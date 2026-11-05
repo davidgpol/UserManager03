@@ -1,17 +1,17 @@
 package com.hariklabs.usermanager03.persistence.mapper;
 
 import com.hariklabs.usermanager03.persistence.UserEntity;
-import com.hariklabs.usermanager03.persistence.api.StoredUser;
+import com.hariklabs.usermanager03.persistence.api.dto.StoredUserDTO;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserPersistenceMapper {
-    public StoredUser fromEntity(UserEntity entity) {
-        return new StoredUser(entity.getId(), entity.getFirstName(), entity.getLastName(), entity.getDni(), entity.getEmail(),
+    public StoredUserDTO fromEntity(UserEntity entity) {
+        return new StoredUserDTO(entity.getId(), entity.getFirstName(), entity.getLastName(), entity.getDni(), entity.getEmail(),
             entity.getFirstNameSearch(), entity.getLastNameSearch(), entity.getEmailSearch(), entity.isActive(), entity.getCreatedAt(), entity.getUpdatedAt());
     }
 
-    public UserEntity toEntity(StoredUser user) {
+    public UserEntity toEntity(StoredUserDTO user) {
         var entity = new UserEntity(user.id(), user.createdAt());
         entity.edit(user.firstName(), user.lastName(), user.dni(), user.email(), user.firstNameSearch(),
             user.lastNameSearch(), user.emailSearch(), user.updatedAt());

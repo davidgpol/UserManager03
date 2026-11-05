@@ -1,4 +1,4 @@
-package com.hariklabs.usermanager03.persistence.api;
+package com.hariklabs.usermanager03.persistence.api.exception;
 
 public class DuplicateDniException extends RuntimeException {
     public DuplicateDniException() { super("DNI_UNIQUE_CONFLICT"); }

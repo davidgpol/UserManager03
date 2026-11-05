@@ -1,5 +1,6 @@
 package com.hariklabs.usermanager03.service;
 
+import com.hariklabs.usermanager03.service.api.exception.DomainException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;

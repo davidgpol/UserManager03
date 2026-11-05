@@ -36,15 +36,19 @@ Paquete base: `com.hariklabs.usermanager03`.
 | Paquete o carpeta | Responsabilidad |
 |---|---|
 | Paquete base | Arranque de la aplicación Spring Boot. |
-| `rest/` | Controladores HTTP de usuarios y autenticación, navegación hacia la interfaz web y tratamiento de errores HTTP. |
-| `rest/mapper/` | Conversión entre los modelos HTTP y los modelos de `service/model/`. |
+| `rest/` | Controladores HTTP de usuarios y autenticación, navegación hacia la interfaz web y escritura de errores HTTP. |
+| `rest/exception/` | Errores de sintaxis y representación propios de HTTP. |
+| `rest/mapper/` | Conversión entre DTO HTTP y de servicio; construcción de errores HTTP públicos. |
 | `service/` | Validación de dominio, categorías Unicode y errores de negocio. |
 | `service/api/` | Interfaces que definen las operaciones de negocio disponibles para la capa REST. |
+| `service/api/dto/` | DTO de entrada, consulta, resultado y violaciones funcionales del contrato de servicio. |
+| `service/api/exception/` | Errores de dominio del contrato de servicio. |
 | `service/impl/` | Implementaciones de los contratos de servicio, lógica de negocio y límites transaccionales. |
-| `service/model/` | Modelos internos de entrada, consulta y resultado utilizados por los contratos de servicio. |
 | `service/mapper/` | Conversión entre modelos del servicio y modelos del contrato de persistencia. |
 | `persistence/` | Entidades JPA e interfaces de repositorio cuya implementación proporciona Spring Data JPA. |
-| `persistence/api/` | Contrato de acceso a datos, modelos propios de entrada, consulta y resultado, y error de unicidad expuesto al servicio, sin dependencias JPA. |
+| `persistence/api/` | Contrato de acceso a datos sin dependencias JPA. |
+| `persistence/api/dto/` | DTO de almacenamiento y búsqueda del contrato de persistencia. |
+| `persistence/api/exception/` | Error de unicidad expuesto al servicio. |
 | `persistence/impl/` | Implementación JPA del contrato de persistencia, consultas y bloqueos, y traducción de errores específicos de PostgreSQL. |
 | `persistence/mapper/` | Conversión entre modelos del contrato de persistencia y entidades JPA. |
 | `security/` | Configuración de autenticación, protección de peticiones y gestión de los límites de sesión. |
@@ -57,7 +61,7 @@ Raíz: `backend/target/generated-sources/openapi/src/main/java/`.
 | Paquete | Responsabilidad |
 |---|---|
 | `com.hariklabs.usermanager03.rest.generated.api` | Interfaces HTTP generadas desde el contrato OpenAPI. |
-| `com.hariklabs.usermanager03.rest.generated.model` | Modelos de peticiones y respuestas generados desde el contrato OpenAPI. |
+| `com.hariklabs.usermanager03.rest.generated.api.dto` | DTO de peticiones y respuestas generados desde el contrato OpenAPI. |
 
 ### Recursos
 

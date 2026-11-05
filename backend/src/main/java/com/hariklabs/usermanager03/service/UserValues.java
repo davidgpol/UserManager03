@@ -1,6 +1,7 @@
 package com.hariklabs.usermanager03.service;
 
-import com.hariklabs.usermanager03.service.model.UserInput;
+import com.hariklabs.usermanager03.service.api.dto.UserInputDTO;
+import com.hariklabs.usermanager03.service.api.exception.DomainException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.Email;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ public class UserValues {
     private record EmailValue(@Email String value) {}
     private final Validator validator;
     public UserValues(Validator validator) { this.validator=validator; }
-    public UserInput validate(UserInput input) {
+    public UserInputDTO validate(UserInputDTO input) {
         String first=UnicodeCategories.name(input.firstName(),"firstName",100);
         String last=UnicodeCategories.name(input.lastName(),"lastName",150);
         String dni=canonicalDni(input.dni());
@@ -20,7 +21,7 @@ public class UserValues {
         if(input.email()==null) throw DomainException.invalid("email","REQUIRED");
         if(input.email().codePoints().allMatch(UserValues::space)) throw DomainException.invalid("email","BLANK");
         if(!validator.validate(new EmailValue(input.email())).isEmpty()) throw DomainException.invalid("email","INVALID_FORMAT");
-        return new UserInput(first,last,dni,input.email());
+        return new UserInputDTO(first,last,dni,input.email());
     }
     private static boolean space(int cp) { return Character.isWhitespace(cp)||Character.isSpaceChar(cp); }
     public static String trimSpaces(String value) {

@@ -2,7 +2,7 @@
   "generatorName": "spring",
   "library": "spring-boot",
   "apiPackage": "com.hariklabs.usermanager03.rest.generated.api",
-  "modelPackage": "com.hariklabs.usermanager03.rest.generated.model",
+  "modelPackage": "com.hariklabs.usermanager03.rest.generated.api.dto",
   "interfaceOnly": true,
   "skipDefaultInterface": true,
   "useSpringBoot4": true,
@@ -17,5 +17,6 @@
   "useTags": true,
   "hideGenerationTimestamp": true,
   "generateJsonIncludeAnnotations": false,
-  "generateJsonSetterNullsAnnotations": false
+  "generateJsonSetterNullsAnnotations": false,
+  "modelNameSuffix": "DTO"
 }

@@ -2,6 +2,8 @@ package com.hariklabs.usermanager03.persistence.impl;
 
 import com.hariklabs.usermanager03.persistence.*;
 import com.hariklabs.usermanager03.persistence.api.*;
+import com.hariklabs.usermanager03.persistence.api.dto.*;
+import com.hariklabs.usermanager03.persistence.api.exception.DuplicateDniException;
 import com.hariklabs.usermanager03.persistence.mapper.UserPersistenceMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
@@ -24,10 +26,10 @@ public class JpaUserStore implements UserStore {
         this.mapper = mapper;
     }
 
-    public Optional<StoredUser> find(UUID id) { return repository.findById(id).map(mapper::fromEntity); }
-    public Optional<StoredUser> lock(UUID id) { return repository.lockById(id).map(mapper::fromEntity); }
+    public Optional<StoredUserDTO> find(UUID id) { return repository.findById(id).map(mapper::fromEntity); }
+    public Optional<StoredUserDTO> lock(UUID id) { return repository.lockById(id).map(mapper::fromEntity); }
 
-    public StoredUsers search(UserSearch search) {
+    public StoredUsersDTO search(UserSearchDTO search) {
         Specification<UserEntity> spec = (root, query, cb) -> {
             var status = search.status().equals("all") ? cb.conjunction() : cb.equal(root.get("active"), search.status().equals("active"));
             if (search.nameText().isEmpty()) return status;
@@ -38,14 +40,14 @@ public class JpaUserStore implements UserStore {
             return cb.and(status, text);
         };
         var page = repository.findAll(spec, PageRequest.of(search.page(), search.size(), Sort.by("createdAt", "id")));
-        return new StoredUsers(page.getContent().stream().map(mapper::fromEntity).toList(), page.getTotalElements());
+        return new StoredUsersDTO(page.getContent().stream().map(mapper::fromEntity).toList(), page.getTotalElements());
     }
 
     private static String like(String text) {
         return "%" + text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
     }
 
-    public StoredUser save(StoredUser user) {
+    public StoredUserDTO save(StoredUserDTO user) {
         try {
             return mapper.fromEntity(repository.saveAndFlush(mapper.toEntity(user)));
         } catch (DataIntegrityViolationException ex) {
